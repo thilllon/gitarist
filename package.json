@@ -1,0 +1,31 @@
+{
+  "name": "commit",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "repository": "git@github.com:thilllon/commit.git",
+  "author": "thilllon <thilllon970@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsnd ./src/index.ts",
+    "build": "tsc",
+    "start": "node ./dist/index.js",
+    "format": "prettier -w -l \"src/**/*\""
+  },
+  "prettier": {
+    "printWidth": 80,
+    "singleQuote": true
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "fast-glob": "^3.2.12",
+    "fs-extra": "^10.1.0",
+    "octokit": "^2.0.10"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
+    "@types/node": "^18.11.7",
+    "prettier": "^2.7.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.8.4"
+  }
+}

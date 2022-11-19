@@ -1,10 +1,12 @@
 import dotenv from 'dotenv';
-import { closeIssues, createCommits, createIssues } from './git';
+import { Gitt } from './Gitt';
 
 dotenv.config();
 
 const main = async () => {
-  await createCommits({
+  const gitt = new Gitt();
+
+  await gitt.createCommits({
     repo: 'commit',
     owner: 'thilllon',
     branch: 'main',
@@ -13,9 +15,9 @@ const main = async () => {
     numCommits: Math.floor(Math.random() * 3 + 1),
   });
 
-  await createIssues({ repo: 'commit', owner: 'thilllon', numIssues: 2 });
+  await gitt.createIssues({ repo: 'commit', owner: 'thilllon', numIssues: 2 });
 
-  await closeIssues({
+  await gitt.closeIssues({
     repo: 'commit',
     owner: 'thilllon',
     staleTimeInSeconds: 2 * 86400,

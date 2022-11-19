@@ -1,6 +1,4 @@
-# github action cron job
-
-name: Cron
+name: Cron Jobs
 
 on:
   schedule:

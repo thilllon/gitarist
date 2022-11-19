@@ -1,6 +1,7 @@
+import fs from 'fs';
 import { describe, expect, test } from '@jest/globals';
 import dotenv from 'dotenv';
-import { createCommits, sum } from '../src/git';
+import { createFiles, sum } from '../src/git';
 
 beforeAll(async () => {
   dotenv.config({ path: '.env.test' });
@@ -25,9 +26,19 @@ describe('sum module', () => {
   //   );
   // });
   test('create commits', async () => {
-    await createCommits({
-      //
+    await createFiles({
+      numFiles: 10,
+      relPath: '.test',
     });
-    expect();
+
+    expect(() => {
+      const files = fs.readdirSync('.test');
+      console.log(files);
+      return files;
+    }).toBeDefined();
   });
+});
+
+afterAll(async () => {
+  fs.rmdirSync('.test', { recursive: true });
 });

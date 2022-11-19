@@ -9,7 +9,7 @@ const main = async () => {
     owner: 'thilllon',
     branch: 'main',
     numFiles: 2,
-    coursePath: '.commitfiles',
+    relPath: '.commit',
     numCommits: Math.floor(Math.random() * 3 + 1),
   });
 

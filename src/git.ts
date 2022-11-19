@@ -60,8 +60,14 @@ type TreeParam = {
 
 const getFileAsUTF8 = (filePath: string) => readFile(filePath, 'utf8');
 
-const createFiles = (coursePath: string, length: number) => {
-  const targetDir = path.join(process.cwd(), coursePath);
+export const createFiles = ({
+  relPath,
+  numFiles: length,
+}: {
+  relPath: string;
+  numFiles: number;
+}) => {
+  const targetDir = path.join(process.cwd(), relPath);
   fs.mkdirSync(targetDir, { recursive: true });
 
   const files = Array.from({ length })
@@ -81,7 +87,11 @@ const createFiles = (coursePath: string, length: number) => {
   return files;
 };
 
-const removeStaleFiles = (staleTimeInSeconds: number) => {
+export const removeStaleFiles = ({
+  staleTimeInSeconds,
+}: {
+  staleTimeInSeconds: number;
+}) => {
   glob.sync(['*'], { onlyDirectories: true }).forEach((dir) => {
     if (new Date(dir) < new Date(Date.now() - staleTimeInSeconds * 1000)) {
       fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10 });
@@ -95,7 +105,7 @@ export const createCommits = async ({
   owner,
   branch,
   numFiles = 10,
-  coursePath = '.tmp',
+  relPath = '.commit',
   staleTimeInSeconds = 86400 * 3,
   numCommits = 1,
 }: {
@@ -103,7 +113,7 @@ export const createCommits = async ({
   owner: string;
   branch: string;
   numFiles?: number;
-  coursePath?: string;
+  relPath?: string;
   staleTimeInSeconds?: number;
   numCommits?: number;
 }) => {
@@ -112,8 +122,8 @@ export const createCommits = async ({
       const now = Date.now().toString();
       const iso = new Date().toISOString();
 
-      createFiles(coursePath, numFiles);
-      removeStaleFiles(staleTimeInSeconds);
+      createFiles({ relPath, numFiles });
+      removeStaleFiles({ staleTimeInSeconds });
 
       // gets commit's AND its tree's SHA
       const ref = `heads/${branch}`;
@@ -130,7 +140,7 @@ export const createCommits = async ({
       });
 
       const treeSha = lastCommit.tree.sha;
-      const filesPaths = glob.sync([coursePath + '/*']);
+      const filesPaths = glob.sync([relPath + '/*']);
       const filesBlobs = await Promise.all(
         filesPaths.map(async (filePath) => {
           const content = await getFileAsUTF8(filePath);
@@ -145,7 +155,7 @@ export const createCommits = async ({
         })
       );
       const pathsForBlobs = filesPaths.map((fullPath) =>
-        path.relative(coursePath, fullPath)
+        path.relative(relPath, fullPath)
       );
 
       const tree: TreeParam[] = filesBlobs.map(({ sha }, index) => ({
@@ -179,7 +189,7 @@ export const createCommits = async ({
     } catch (err) {
       console.error(err);
     } finally {
-      const targetDir = path.join(process.cwd(), coursePath);
+      const targetDir = path.join(process.cwd(), relPath);
       fs.rmSync(targetDir, { recursive: true, force: true, maxRetries: 10 });
     }
   }

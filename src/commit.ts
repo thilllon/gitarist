@@ -44,7 +44,7 @@ const removeStaleFiles = (staleTimeInSeconds: number) => {
   });
 };
 
-export const gitCommit = async ({
+export const createCommits = async ({
   repo,
   owner,
   branch,

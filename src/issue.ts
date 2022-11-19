@@ -5,7 +5,7 @@ dotenv.config();
 
 const tokenName = 'GIT_GITHUB_REPO_PUSH_TOKEN';
 
-export const createIssue = async ({
+export const createIssues = async ({
   repo,
   owner,
   numIssues = 1,

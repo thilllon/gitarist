@@ -1,10 +1,8 @@
 // https://dev.to/lucis/how-to-push-files-programatically-to-a-repository-using-octokit-with-typescript-1nj0
 
 import dotenv from 'dotenv';
-import { gitCommit as createCommits } from './commit';
-import { closeIssues, createIssue as createIssues } from './issue';
-
-dotenv.config();
+import { createCommits } from './commit';
+import { closeIssues, createIssues } from './issue';
 
 const main = async () => {
   await createCommits({

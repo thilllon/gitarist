@@ -5,43 +5,57 @@ dotenv.config();
 
 const tokenName = 'GIT_GITHUB_REPO_PUSH_TOKEN';
 
-export const createIssue = async (repo: string, owner: string) => {
-  try {
-    const iso = new Date().toISOString();
-    const content = (iso + '\n').repeat(2);
-    const auth = process.env[tokenName];
-    if (!auth) {
-      throw new Error('environment variable is not defined: ' + tokenName);
+export const createIssue = async ({
+  repo,
+  owner,
+  numIssues = 1,
+}: {
+  repo: string;
+  owner: string;
+  numIssues?: number;
+}) => {
+  for (const _ of Array(numIssues).keys()) {
+    try {
+      const iso = new Date().toISOString();
+      const content = (iso + '\n').repeat(2);
+      const auth = process.env[tokenName];
+      if (!auth) {
+        throw new Error('environment variable is not defined: ' + tokenName);
+      }
+      const octokit = new Octokit({ auth });
+      const created = await octokit.rest.issues.create({
+        owner,
+        repo,
+        title: iso,
+        body: content,
+        assignees: [owner],
+      });
+
+      const issueNumber = created.data.number;
+
+      const comment = await octokit.rest.issues.createComment({
+        owner,
+        repo,
+        body: content,
+        issue_number: issueNumber,
+      });
+    } catch (err) {
+      console.error(err);
     }
-    const octokit = new Octokit({ auth });
-    const created = await octokit.rest.issues.create({
-      owner,
-      repo,
-      title: iso,
-      body: content,
-      assignees: [owner],
-    });
-
-    const issueNumber = created.data.number;
-
-    const comment = await octokit.rest.issues.createComment({
-      owner,
-      repo,
-      body: content,
-      issue_number: issueNumber,
-    });
-  } catch (err) {
-    console.error(err);
   }
 };
 
 // TODO: https://github.com/octokit/octokit.js/discussions/2343
 
-export const closeIssues = async (
-  repo: string,
-  owner: string,
-  staleTimeInSeconds = 3 * 86400
-) => {
+export const closeIssues = async ({
+  repo,
+  owner,
+  staleTimeInSeconds = 3 * 86400,
+}: {
+  repo: string;
+  owner: string;
+  staleTimeInSeconds?: number;
+}) => {
   try {
     const auth = process.env[tokenName];
     if (!auth) {

@@ -1,28 +1,8 @@
-import * as dotenv from 'dotenv';
-import * as fs from 'fs';
+import glob from 'fast-glob';
+import fs from 'fs';
+import { readFile } from 'fs-extra';
 import { Octokit } from 'octokit';
-import * as path from 'path';
-
-dotenv.config();
-
-type Workflow = {
-  id: number;
-  node_id: string;
-  name: string;
-  path: string;
-  state:
-    | 'active'
-    | 'deleted'
-    | 'disabled_fork'
-    | 'disabled_inactivity'
-    | 'disabled_manually';
-  created_at: string;
-  updated_at: string;
-  url: string;
-  html_url: string;
-  badge_url: string;
-  deleted_at?: string | undefined;
-};
+import path from 'path';
 
 // click here to create a new token
 // #1. repo token
@@ -45,11 +25,266 @@ if (!process.env.GITHUB_REPO_TOKEN) {
   throw new Error();
 }
 
+const tokenName = 'GIT_GITHUB_REPO_PUSH_TOKEN';
 const perPage = 100;
+// const auth = process.env[tokenName];
+// if (!auth) {
+//   throw new Error('environment variable is not defined: ' + tokenName);
+// }
+const auth = process.env[tokenName];
 
-const auth = process.env.GITHUB_REPO_TOKEN;
+if (!auth) {
+  throw new Error('environment variable is not defined: ' + tokenName);
+}
 
 const octokit = new Octokit({ auth });
+
+// https://dev.to/lucis/how-to-push-files-programatically-to-a-repository-using-octokit-with-typescript-1nj0
+
+// https://docs.githu b.com/en/rest/git/commits#create-a-commit
+// https://octokit.github.io/rest.js/v19/#git-create-tree
+
+type TreeParam = {
+  path: string;
+  /**
+   * 100644 for file (blob)
+   * 100755 for executable (blob)
+   * 040000 for subdirectory (tree)
+   * 160000 for submodule (commit)
+   * 120000 for a blob
+   */
+  mode: '100644' | '100755' | '040000' | '160000' | '120000';
+  type: 'blob' | 'tree' | 'commit';
+  sha: string;
+};
+
+const getFileAsUTF8 = (filePath: string) => readFile(filePath, 'utf8');
+
+const createFiles = (coursePath: string, length: number) => {
+  const targetDir = path.join(process.cwd(), coursePath);
+  fs.mkdirSync(targetDir, { recursive: true });
+
+  const files = Array.from({ length })
+    .map(() => {
+      try {
+        const now = Date.now().toString();
+        const content = (now + '\n').repeat(100);
+        const filePath = path.join(targetDir, now);
+        fs.writeFileSync(filePath, content, 'utf8');
+        return filePath;
+      } catch (err) {
+        console.log(err);
+      }
+    })
+    .filter((file): file is string => !!file);
+
+  return files;
+};
+
+const removeStaleFiles = (staleTimeInSeconds: number) => {
+  glob.sync(['*'], { onlyDirectories: true }).forEach((dir) => {
+    if (new Date(dir) < new Date(Date.now() - staleTimeInSeconds * 1000)) {
+      fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10 });
+    }
+  });
+};
+
+// https://dev.to/lucis/how-to-push-files-programatically-to-a-repository-using-octokit-with-typescript-1nj0
+export const createCommits = async ({
+  repo,
+  owner,
+  branch,
+  numFiles = 10,
+  coursePath = '.tmp',
+  staleTimeInSeconds = 86400 * 3,
+  numCommits = 1,
+}: {
+  repo: string;
+  owner: string;
+  branch: string;
+  numFiles?: number;
+  coursePath?: string;
+  staleTimeInSeconds?: number;
+  numCommits?: number;
+}) => {
+  for (const _ of Array(numCommits).keys()) {
+    try {
+      const now = Date.now().toString();
+      const iso = new Date().toISOString();
+
+      createFiles(coursePath, numFiles);
+      removeStaleFiles(staleTimeInSeconds);
+
+      // gets commit's AND its tree's SHA
+      const ref = `heads/${branch}`;
+      const { data: refData } = await octokit.rest.git.getRef({
+        owner,
+        repo,
+        ref,
+      });
+      const commitSha = refData.object.sha;
+      const { data: lastCommit } = await octokit.rest.git.getCommit({
+        owner,
+        repo,
+        commit_sha: commitSha,
+      });
+
+      const treeSha = lastCommit.tree.sha;
+      const filesPaths = glob.sync([coursePath + '/*']);
+      const filesBlobs = await Promise.all(
+        filesPaths.map(async (filePath) => {
+          const content = await getFileAsUTF8(filePath);
+          const encoding = 'utf-8';
+          const blobData = await octokit.rest.git.createBlob({
+            owner,
+            repo,
+            content,
+            encoding,
+          });
+          return blobData.data;
+        })
+      );
+      const pathsForBlobs = filesPaths.map((fullPath) =>
+        path.relative(coursePath, fullPath)
+      );
+
+      const tree: TreeParam[] = filesBlobs.map(({ sha }, index) => ({
+        path: now + '/' + pathsForBlobs[index],
+        mode: '100644',
+        type: 'blob',
+        sha,
+      }));
+      const { data: newTree } = await octokit.rest.git.createTree({
+        owner,
+        repo,
+        tree,
+        base_tree: treeSha,
+      });
+
+      const { data: newCommit } = await octokit.rest.git.createCommit({
+        owner,
+        repo,
+        message: iso,
+        tree: newTree.sha,
+        parents: [refData.object.sha],
+      });
+
+      // THE MOST IMPORTANT PART(git push)
+      await octokit.rest.git.updateRef({
+        owner,
+        repo,
+        ref,
+        sha: newCommit.sha,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      const targetDir = path.join(process.cwd(), coursePath);
+      fs.rmSync(targetDir, { recursive: true, force: true, maxRetries: 10 });
+    }
+  }
+};
+
+export const sum = (a: number, b: number): number => a + b;
+
+export const createIssues = async ({
+  repo,
+  owner,
+  numIssues = 1,
+}: {
+  repo: string;
+  owner: string;
+  numIssues?: number;
+}) => {
+  for (const _ of Array(numIssues).keys()) {
+    try {
+      const iso = new Date().toISOString();
+      const content = (iso + '\n').repeat(2);
+      const created = await octokit.rest.issues.create({
+        owner,
+        repo,
+        title: iso,
+        body: content,
+        assignees: [owner],
+      });
+
+      const issueNumber = created.data.number;
+
+      const comment = await octokit.rest.issues.createComment({
+        owner,
+        repo,
+        body: content,
+        issue_number: issueNumber,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+};
+
+// TODO: https://github.com/octokit/octokit.js/discussions/2343
+export const closeIssues = async ({
+  repo,
+  owner,
+  staleTimeInSeconds = 3 * 86400,
+}: {
+  repo: string;
+  owner: string;
+  staleTimeInSeconds?: number;
+}) => {
+  try {
+    const issues = await octokit.rest.issues.list({
+      per_page: perPage,
+      state: 'open',
+    });
+    const filtered = issues.data.filter(
+      (elem) => elem.repository?.name === repo
+    );
+
+    await Promise.all(
+      filtered.map(async (issue) => {
+        try {
+          if (
+            issue.created_at &&
+            new Date(issue.created_at) <
+              new Date(Date.now() - staleTimeInSeconds * 1000)
+          ) {
+            await octokit.rest.issues.update({
+              owner,
+              repo,
+              issue_number: issue.number,
+              state: 'closed',
+              state_reason: 'completed',
+            });
+          }
+        } catch (err) {
+          console.log(issue.number);
+        }
+      })
+    );
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+type Workflow = {
+  id: number;
+  node_id: string;
+  name: string;
+  path: string;
+  state:
+    | 'active'
+    | 'deleted'
+    | 'disabled_fork'
+    | 'disabled_inactivity'
+    | 'disabled_manually';
+  created_at: string;
+  updated_at: string;
+  url: string;
+  html_url: string;
+  badge_url: string;
+  deleted_at?: string | undefined;
+};
 
 export const listRepositories = async ({
   owner,
@@ -269,6 +504,7 @@ export const deleteRepoWorkflowLogs = async (owner: string, repo: string) => {
           console.error(err.message);
         }
       }
+
       // for await (const runId of runIds) {
       //   console.log(`[${repo}] ${runId}`);
       //   await Promise.all([

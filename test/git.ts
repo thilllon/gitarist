@@ -1,8 +1,9 @@
 import { describe, expect, test } from '@jest/globals';
-import { sum } from '../src/commit';
+import dotenv from 'dotenv';
+import { createCommits, sum } from '../src/git';
 
 beforeAll(async () => {
-  //
+  dotenv.config({ path: '.env.test' });
 });
 
 afterAll(async () => {
@@ -23,4 +24,10 @@ describe('sum module', () => {
   //     })
   //   );
   // });
+  test('create commits', async () => {
+    await createCommits({
+      //
+    });
+    expect();
+  });
 });

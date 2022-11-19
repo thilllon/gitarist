@@ -370,6 +370,10 @@ export class Gitt {
     );
   };
 
+  /**
+   * 낭비되고 있는 github action을 감지한다.
+   * @param
+   */
   findWastedActions = async ({ owner }: { owner: string }) => {
     const res = await this.octokit.rest.repos.listForAuthenticatedUser({
       username: owner,
@@ -449,11 +453,12 @@ export class Gitt {
     wfIds = [...new Set(wfIds)];
 
     console.log('workflow Ids', wfIds);
-    const totalPages = 20;
+
+    const maxTotalPages = 20;
 
     for (const wfId of wfIds) {
       const workflow = wfs.find((elem) => elem.id === wfId);
-      for await (const page of Array(totalPages).keys()) {
+      for await (const page of Array(maxTotalPages).keys()) {
         const runResponse =
           await this.octokit.rest.actions.listWorkflowRunsForRepo({
             owner,

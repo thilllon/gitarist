@@ -9,6 +9,8 @@ import path from 'path';
 
 dotenv.config();
 
+const tokenName = 'GIT_GITHUB_REPO_PUSH_TOKEN';
+
 type GitCreateTreeParamsTree = any; // TODO: fix this type
 
 const getFileAsUTF8 = (filePath: string) => readFile(filePath, 'utf8');
@@ -54,9 +56,9 @@ export const gitCommit = async (
     const now = Date.now().toString();
     const iso = new Date().toISOString();
 
-    const auth = process.env.GIT_GITHUB_REPO_PUSH_TOKEN;
+    const auth = process.env[tokenName];
     if (!auth) {
-      throw new Error('GIT_GITHUB_REPO_PUSH_TOKEN is not defined');
+      throw new Error('environment variable is not defined: ' + tokenName);
     }
     const octokit = new Octokit({ auth });
 

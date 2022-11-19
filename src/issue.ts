@@ -4,6 +4,7 @@ import { Octokit } from 'octokit';
 dotenv.config();
 
 const tokenName = 'GIT_GITHUB_REPO_PUSH_TOKEN';
+
 export const createIssue = async (repo: string, owner: string) => {
   try {
     const iso = new Date().toISOString();

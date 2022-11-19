@@ -5,7 +5,7 @@ import * as path from 'path';
 
 dotenv.config();
 
-type WorkflowType = {
+type Workflow = {
   id: number;
   node_id: string;
   name: string;
@@ -163,7 +163,7 @@ export const findWastedActions = async ({ owner }: { owner: string }) => {
 
 export const deleteRepoWorkflowLogs = async (owner: string, repo: string) => {
   let wfIds: number[] = [];
-  const wfs: WorkflowType[] = [];
+  const wfs: Workflow[] = [];
   for await (const page of Array(200).keys()) {
     const wfResponse = await octokit.rest.actions.listRepoWorkflows({
       owner,
@@ -305,4 +305,3 @@ export const deleteRepoWorkflowLogs = async (owner: string, repo: string) => {
     }
   }
 };
-// const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

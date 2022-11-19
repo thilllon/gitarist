@@ -11,7 +11,20 @@ dotenv.config();
 
 const tokenName = 'GIT_GITHUB_REPO_PUSH_TOKEN';
 
-type GitCreateTreeParamsTree = any; // TODO: fix this type
+// TODO: fix this type
+// https://docs.github.com/en/rest/git/commits#create-a-commit
+// https://octokit.github.io/rest.js/v19/#git-create-tree
+// 100644 for file (blob)
+// 100755 for executable (blob)
+// 040000 for subdirectory (tree)
+// 160000 for submodule (commit)
+// 120000 for a blob
+type TreeParam = {
+  path: string;
+  mode: '100644' | '100755' | '040000' | '160000' | '120000';
+  type: 'blob' | 'tree' | 'commit';
+  sha: string;
+};
 
 const getFileAsUTF8 = (filePath: string) => readFile(filePath, 'utf8');
 
@@ -108,14 +121,12 @@ export const createCommits = async ({
         path.relative(coursePath, fullPath)
       );
 
-      const tree: GitCreateTreeParamsTree[] = filesBlobs.map(
-        ({ sha }, index) => ({
-          path: now + '/' + pathsForBlobs[index],
-          mode: `100644`,
-          type: `blob`,
-          sha,
-        })
-      );
+      const tree: TreeParam[] = filesBlobs.map(({ sha }, index) => ({
+        path: now + '/' + pathsForBlobs[index],
+        mode: `100644`,
+        type: `blob`,
+        sha,
+      }));
       const { data: newTree } = await octokit.rest.git.createTree({
         owner,
         repo,
@@ -146,3 +157,5 @@ export const createCommits = async ({
     }
   }
 };
+
+export const sum = (a: number, b: number): number => a + b;

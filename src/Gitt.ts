@@ -22,15 +22,19 @@ dotenv.config();
 
 /**
  * click here to create a new token
+ *
  * #1. repo token
  * https://github.com/settings/tokens/new?description=github_token_repo&scopes=repo,read:packages,read:org,delete_repo
+ *
  * #2. workflow token(workflow control must include permission to repo)
  * https://github.com/settings/tokens/new?description=github_token_workflow&scopes=repo,workflow
  * token options
+ *
  * https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
- * links above are classic tokens. new token method (fine grained) is newly released.
- * (currently beta version)
+ *
+ * links above are classic tokens. new token method (fine grained) is newly released. (currently beta version)
  * https://github.com/settings/personal-access-tokens/new
+ *
  * Octokit documents
  * https://octokit.github.io/rest.js/v19
  */

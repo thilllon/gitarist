@@ -87,3 +87,8 @@ export type DeleteRepoWorkflowLogsOptions = {
   owner: string;
   staleTimeInSeconds: number;
 };
+
+export type CreatePullRequestOptions = {
+  owner: string;
+  repo: string;
+};

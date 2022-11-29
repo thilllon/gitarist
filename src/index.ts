@@ -35,6 +35,11 @@ const main = async () => {
     owner: 'thilllon',
     staleTimeInSeconds: 2 * 86400,
   });
+
+  await gitt.createPullRequest({
+    owner: 'thilllon',
+    repo: 'gitt',
+  });
 };
 
 main();

@@ -20,7 +20,8 @@
     "dotenv": "^16.0.3",
     "fast-glob": "^3.2.12",
     "fs-extra": "^10.1.0",
-    "octokit": "^2.0.10"
+    "octokit": "^2.0.10",
+    "octokit-plugin-create-pull-request": "^4.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.3.1",

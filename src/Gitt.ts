@@ -9,6 +9,7 @@ import {
   CreateCommitsOptions,
   CreateFilesOptions,
   CreateIssuesOptions,
+  CreatePullRequestOptions,
   DeleteReposOptions,
   DeleteRepoWorkflowLogsOptions,
   FindWastedActionsOptions,
@@ -17,6 +18,7 @@ import {
   TreeParam,
   Workflow,
 } from './Gitt.interface';
+import { createPullRequest } from 'octokit-plugin-create-pull-request';
 
 dotenv.config();
 
@@ -39,7 +41,7 @@ dotenv.config();
  * https://octokit.github.io/rest.js/v19
  */
 export class Gitt {
-  private readonly octokit: Octokit;
+  private readonly octokit;
   private readonly perPage = 100;
 
   constructor() {
@@ -49,7 +51,8 @@ export class Gitt {
       throw new Error('environment variable is not defined: ' + tokenName);
     }
 
-    this.octokit = new Octokit({ auth });
+    const _Octokit = Octokit.plugin(createPullRequest);
+    this.octokit = new _Octokit({ auth });
   }
 
   sum(a: number, b: number) {
@@ -102,8 +105,8 @@ export class Gitt {
    * @param param0
    */
   async createCommits({
-    repo,
     owner,
+    repo,
     branch,
     numFiles = 10,
     relPath = '.commit',
@@ -188,7 +191,7 @@ export class Gitt {
     }
   }
 
-  async createIssues({ repo, owner, numIssues = 1 }: CreateIssuesOptions) {
+  async createIssues({ owner, repo, numIssues = 1 }: CreateIssuesOptions) {
     for (const _ of Array(numIssues).keys()) {
       try {
         const iso = new Date().toISOString();
@@ -223,7 +226,7 @@ export class Gitt {
    * @param owner string
    * @param staleTimeInSeconds number
    */
-  async closeIssues({ repo, owner, staleTimeInSeconds }: CloseIssuesOptions) {
+  async closeIssues({ owner, repo, staleTimeInSeconds }: CloseIssuesOptions) {
     // FIXME: rxjs 로 변경
 
     try {
@@ -373,8 +376,8 @@ export class Gitt {
   }
 
   async deleteRepoWorkflowLogs({
-    repo,
     owner,
+    repo,
     staleTimeInSeconds,
   }: DeleteRepoWorkflowLogsOptions) {
     let wfIds: number[] = [];
@@ -514,5 +517,58 @@ export class Gitt {
         }
       }
     }
+  }
+
+  // https://www.npmjs.com/package/octokit-plugin-create-pull-request
+  async createPullRequest({ owner, repo }: CreatePullRequestOptions) {
+    const now = Date.now().toString();
+
+    this.octokit
+      .createPullRequest({
+        owner,
+        repo,
+        title: now,
+        body: now,
+        head: 'feat/' + now,
+        update: false,
+        forceFork: false,
+        changes: [
+          {
+            /* optional: if `files` is not passed, an empty commit is created instead */
+            files: {
+              ['pr/' + now]: now,
+              // 'path/to/file2.png': {
+              //   content: '_base64_encoded_content_',
+              //   encoding: 'base64',
+              // },
+              // // deletes file if it exists,
+              // 'path/to/file3.txt': null,
+              // // updates file based on current content
+              // 'path/to/file4.txt': ({ exists, encoding, content }: anyTemp) => {
+              //   // do not create the file if it does not exist
+              //   if (!exists) {
+              //     return null;
+              //   }
+              //   return Buffer.from(content, encoding)
+              //     .toString('utf-8')
+              //     .toUpperCase();
+              // },
+              // 'path/to/file5.sh': {
+              //   content: 'echo Hello World',
+              //   encoding: 'utf-8',
+              //   // one of the modes supported by the git tree object
+              //   // https://developer.github.com/v3/git/trees/#tree-object
+              //   mode: '100755',
+              // },
+            },
+            commit: 'pr',
+          },
+        ],
+      })
+      .then((pr) => {
+        if (pr) {
+          console.log(pr.data.number);
+        }
+      });
   }
 }

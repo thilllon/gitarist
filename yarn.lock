@@ -2341,6 +2341,13 @@ npm-run-path@^4.0.1:
   dependencies:
     path-key "^3.0.0"
 
+octokit-plugin-create-pull-request@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/octokit-plugin-create-pull-request/-/octokit-plugin-create-pull-request-4.0.0.tgz#1ea0c093882cc4944cd1f72eb4d018b32cc1e97c"
+  integrity sha512-ieo9CHoz4Q4W0Wu7bVTeQUBamH8HwZR+SrARY13cB99/kTCj8rP5SGHpw9cxEvCoZs0LGdoYemiQk+sgPDeU3g==
+  dependencies:
+    "@octokit/types" "^8.0.0"
+
 octokit@^2.0.10:
   version "2.0.10"
   resolved "https://registry.yarnpkg.com/octokit/-/octokit-2.0.10.tgz#e3b991b34fba733ced82b4ddb2444aeeb7da0d2a"

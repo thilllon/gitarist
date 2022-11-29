@@ -115,7 +115,10 @@ export class Gitt {
     staleTimeInSeconds: number;
   }) => {
     glob.sync(['*'], { onlyDirectories: true }).forEach((dir) => {
-      if (new Date(dir) < new Date(Date.now() - staleTimeInSeconds * 1000)) {
+      if (
+        new Date(parseInt(dir)) <
+        new Date(Date.now() - staleTimeInSeconds * 1000)
+      ) {
         fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10 });
       }
     });
@@ -261,7 +264,9 @@ export class Gitt {
    * close issues
    * Deleting issues are not supported currently
    * https://github.com/octokit/octokit.js/discussions/2343
-   * @param
+   * @param repo string
+   * @param owner string
+   * @param staleTimeInSeconds number
    */
   closeIssues = async ({
     repo,
@@ -272,14 +277,20 @@ export class Gitt {
     owner: string;
     staleTimeInSeconds?: number;
   }) => {
+    // FIXME: rxjs 로 변경
+
     try {
       const issues = await this.octokit.rest.issues.list({
+        owned: true,
         per_page: this.perPage,
         state: 'open',
+        filter: 'created',
       });
+
       const filtered = issues.data.filter(
-        (elem) => elem.repository?.name === repo
+        ({ repository }) => repository?.name === repo
       );
+      console.log(filtered);
 
       await Promise.all(
         filtered.map(async (issue) => {
@@ -297,13 +308,13 @@ export class Gitt {
                 state_reason: 'completed',
               });
             }
-          } catch (err) {
-            console.log(issue.number);
+          } catch (err: any) {
+            console.log(issue.number, err.message);
           }
         })
       );
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error(err.message);
     }
   };
 

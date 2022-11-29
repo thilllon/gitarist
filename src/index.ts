@@ -7,8 +7,8 @@ const main = async () => {
   const gitt = new Gitt();
 
   await gitt.createCommits({
-    repo: 'gitt',
     owner: 'thilllon',
+    repo: 'gitt',
     branch: 'main',
     numFiles: 2,
     dirName: '__commit',
@@ -19,20 +19,20 @@ const main = async () => {
   });
 
   await gitt.createIssues({
-    repo: 'gitt',
     owner: 'thilllon',
+    repo: 'gitt',
     numIssues: 2,
   });
 
   await gitt.closeIssues({
-    repo: 'gitt',
     owner: 'thilllon',
+    repo: 'gitt',
     staleTimeInSeconds: 2 * 86400,
   });
 
   await gitt.deleteRepoWorkflowLogs({
-    repo: 'gitt',
     owner: 'thilllon',
+    repo: 'gitt',
     staleTimeInSeconds: 2 * 86400,
   });
 

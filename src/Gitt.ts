@@ -4,46 +4,21 @@ import fs from 'fs';
 import { readFile } from 'fs-extra';
 import { Octokit } from 'octokit';
 import path from 'path';
+import {
+  CloseIssuesOptions,
+  CreateCommitsOptions,
+  CreateFilesOptions,
+  CreateIssuesOptions,
+  DeleteReposOptions,
+  DeleteRepoWorkflowLogsOptions,
+  FindWastedActionsOptions,
+  ListRepositoriesOptions,
+  RemoveStaleFilesOptions,
+  TreeParam,
+  Workflow,
+} from './Gitt.interface';
 
 dotenv.config();
-
-type Workflow = {
-  id: number;
-  node_id: string;
-  name: string;
-  path: string;
-  state:
-    | 'active'
-    | 'deleted'
-    | 'disabled_fork'
-    | 'disabled_inactivity'
-    | 'disabled_manually';
-  created_at: string;
-  updated_at: string;
-  url: string;
-  html_url: string;
-  badge_url: string;
-  deleted_at?: string | undefined;
-};
-
-/**
- * Parameters for create a commit
- * @reference https://docs.github.com/en/rest/git/commits#create-a-commit
- * @reference https://octokit.github.io/rest.js/v19/#git-create-tree
- */
-type TreeParam = {
-  path: string;
-  /**
-   * 100644 for file (blob)
-   * 100755 for executable (blob)
-   * 040000 for subdirectory (tree)
-   * 160000 for submodule (commit)
-   * 120000 for a blob
-   */
-  mode: '100644' | '100755' | '040000' | '160000' | '120000';
-  type: 'blob' | 'tree' | 'commit';
-  sha: string;
-};
 
 /**
  * click here to create a new token
@@ -73,13 +48,11 @@ export class Gitt {
     this.octokit = new Octokit({ auth });
   }
 
-  createFiles({
-    relPath,
-    numFiles: length,
-  }: {
-    relPath: string;
-    numFiles: number;
-  }) {
+  sum(a: number, b: number) {
+    return a + b;
+  }
+
+  createFiles({ relPath, numFiles: length }: CreateFilesOptions) {
     const targetDir = path.join(process.cwd(), relPath);
     fs.mkdirSync(targetDir, { recursive: true });
 
@@ -109,11 +82,7 @@ export class Gitt {
    * 파일의 실제 생성시간을 확인하는 것이 아니라 폴더이름을 바탕으로 삭제한다.
    * @param staleTimeInSeconds 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지
    */
-  removeStaleFiles = ({
-    staleTimeInSeconds,
-  }: {
-    staleTimeInSeconds: number;
-  }) => {
+  removeStaleFiles({ staleTimeInSeconds }: RemoveStaleFilesOptions) {
     glob.sync(['*'], { onlyDirectories: true }).forEach((dir) => {
       if (
         new Date(parseInt(dir)) <
@@ -122,36 +91,28 @@ export class Gitt {
         fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10 });
       }
     });
-  };
+  }
 
   /**
    * https://dev.to/lucis/how-to-push-files-programatically-to-a-repository-using-octokit-with-typescript-1nj0
    * @param param0
    */
-  createCommits = async ({
+  async createCommits({
     repo,
     owner,
     branch,
     numFiles = 10,
     relPath = '.commit',
-    staleTimeInSeconds = 86400 * 3,
     numCommits = 1,
-  }: {
-    repo: string;
-    owner: string;
-    branch: string;
-    numFiles?: number;
-    relPath?: string;
-    staleTimeInSeconds?: number;
-    numCommits?: number;
-  }) => {
+    removeOptions,
+  }: CreateCommitsOptions) {
     for (const _ of Array(numCommits).keys()) {
       try {
         const now = Date.now().toString();
         const iso = new Date().toISOString();
 
         this.createFiles({ relPath, numFiles });
-        this.removeStaleFiles({ staleTimeInSeconds });
+        this.removeStaleFiles(removeOptions);
 
         // gets commit's AND its tree's SHA
         const ref = `heads/${branch}`;
@@ -221,19 +182,9 @@ export class Gitt {
         fs.rmSync(targetDir, { recursive: true, force: true, maxRetries: 10 });
       }
     }
-  };
+  }
 
-  sum = (a: number, b: number): number => a + b;
-
-  createIssues = async ({
-    repo,
-    owner,
-    numIssues = 1,
-  }: {
-    repo: string;
-    owner: string;
-    numIssues?: number;
-  }) => {
+  async createIssues({ repo, owner, numIssues = 1 }: CreateIssuesOptions) {
     for (const _ of Array(numIssues).keys()) {
       try {
         const iso = new Date().toISOString();
@@ -258,7 +209,7 @@ export class Gitt {
         console.error(err);
       }
     }
-  };
+  }
 
   /**
    * close issues
@@ -268,15 +219,7 @@ export class Gitt {
    * @param owner string
    * @param staleTimeInSeconds number
    */
-  closeIssues = async ({
-    repo,
-    owner,
-    staleTimeInSeconds = 3 * 86400,
-  }: {
-    repo: string;
-    owner: string;
-    staleTimeInSeconds?: number;
-  }) => {
+  async closeIssues({ repo, owner, staleTimeInSeconds }: CloseIssuesOptions) {
     // FIXME: rxjs 로 변경
 
     try {
@@ -316,15 +259,12 @@ export class Gitt {
     } catch (err: any) {
       console.error(err.message);
     }
-  };
+  }
 
-  listRepositories = async ({
+  async listRepositories({
     owner,
     jsonFile = 'repos.json',
-  }: {
-    owner: string;
-    jsonFile: string;
-  }) => {
+  }: ListRepositoriesOptions) {
     const total: string[] = [];
     let iter = 0;
 
@@ -350,15 +290,9 @@ export class Gitt {
       JSON.stringify(total),
       'utf8'
     );
-  };
+  }
 
-  deleteRepos = async ({
-    owner,
-    jsonFile = 'repos.json',
-  }: {
-    owner: string;
-    jsonFile: string;
-  }) => {
+  async deleteRepos({ owner, jsonFile = 'repos.json' }: DeleteReposOptions) {
     const repos: string[] = JSON.parse(
       fs.readFileSync(path.join(process.cwd(), jsonFile), 'utf8')
     );
@@ -374,18 +308,19 @@ export class Gitt {
         console.log(`error deleting ${repo}`);
       }
     }
+
     fs.writeFileSync(
       path.join(process.cwd(), 'deleted.json'),
       JSON.stringify(deleted),
       'utf8'
     );
-  };
+  }
 
   /**
    * 낭비되고 있는 github action을 감지한다.
    * @param
    */
-  findWastedActions = async ({ owner }: { owner: string }) => {
+  async findWastedActions({ owner }: FindWastedActionsOptions) {
     const res = await this.octokit.rest.repos.listForAuthenticatedUser({
       username: owner,
       per_page: this.perPage,
@@ -431,9 +366,13 @@ export class Gitt {
         }
       }
     }
-  };
+  }
 
-  deleteRepoWorkflowLogs = async (owner: string, repo: string) => {
+  async deleteRepoWorkflowLogs({
+    repo,
+    owner,
+    staleTimeInSeconds,
+  }: DeleteRepoWorkflowLogsOptions) {
     let wfIds: number[] = [];
     const wfs: Workflow[] = [];
     for await (const page of Array(200).keys()) {
@@ -483,7 +422,20 @@ export class Gitt {
 
         const filtered = runResponse.data.workflow_runs.filter((elem) => {
           // TODO: filtering logic
-          // 'completed', // "completed" | "action_required" | "cancelled" | "failure" | "neutral" | "skipped" | "stale" | "success" | "timed_out" | "in_progress" | "queued" | "requested" | "waiting"
+          // "completed"
+          // "action_required"
+          // "cancelled"
+          // "failure"
+          // "neutral"
+          // "skipped"
+          // "stale"
+          // "success"
+          // "timed_out"
+          // "in_progress"
+          // "queued"
+          // "requested"
+          // "waiting"
+
           if (
             elem.status === 'skipped' ||
             elem.status === 'cancelled' ||
@@ -495,8 +447,9 @@ export class Gitt {
             (elem.status === 'completed' && elem.conclusion === 'cancelled') ||
             (elem.status === 'completed' &&
               new Date(elem.created_at) <
-                new Date(Date.now() - 21 * 86400 * 1000)) ||
-            new Date(elem.created_at) < new Date(Date.now() - 30 * 86400 * 1000)
+                new Date(Date.now() - staleTimeInSeconds * 1000)) ||
+            new Date(elem.created_at) <
+              new Date(Date.now() - staleTimeInSeconds * 1000)
           ) {
             return true;
           }
@@ -504,6 +457,8 @@ export class Gitt {
         });
 
         const runIds = filtered.map(({ id }) => id);
+
+        // TODO: rxjs
         // get 5 items from array and call request simultaneously using rxjs
         // and wait for all to finish
         // and retry failed ones
@@ -580,5 +535,5 @@ export class Gitt {
         }
       }
     }
-  };
+  }
 }

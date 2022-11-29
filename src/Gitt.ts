@@ -59,8 +59,8 @@ export class Gitt {
     return a + b;
   }
 
-  createFiles({ relPath, numFiles: length }: CreateFilesOptions) {
-    const targetDir = path.join(process.cwd(), relPath);
+  createFiles({ dirName, numFiles: length }: CreateFilesOptions) {
+    const targetDir = path.join(process.cwd(), dirName);
     fs.mkdirSync(targetDir, { recursive: true });
 
     const files = Array.from({ length })
@@ -109,7 +109,7 @@ export class Gitt {
     repo,
     branch,
     numFiles = 10,
-    relPath = '.commit',
+    dirName,
     numCommits = 1,
     removeOptions,
   }: CreateCommitsOptions) {
@@ -118,7 +118,7 @@ export class Gitt {
         const now = Date.now().toString();
         const iso = new Date().toISOString();
 
-        this.createFiles({ relPath, numFiles });
+        this.createFiles({ dirName, numFiles });
         this.removeStaleFiles(removeOptions);
 
         // gets commit's AND its tree's SHA
@@ -136,7 +136,7 @@ export class Gitt {
         });
 
         const treeSha = lastCommit.tree.sha;
-        const filesPaths = glob.sync([relPath + '/*']);
+        const filesPaths = glob.sync([dirName + '/*']);
         const filesBlobs = await Promise.all(
           filesPaths.map(async (filePath) => {
             const content = await this.getFileAsUTF8(filePath);
@@ -151,7 +151,7 @@ export class Gitt {
           })
         );
         const pathsForBlobs = filesPaths.map((fullPath) =>
-          path.relative(relPath, fullPath)
+          path.relative(dirName, fullPath)
         );
 
         const tree: TreeParam[] = filesBlobs.map(({ sha }, index) => ({
@@ -185,7 +185,7 @@ export class Gitt {
       } catch (err) {
         console.error(err);
       } finally {
-        const targetDir = path.join(process.cwd(), relPath);
+        const targetDir = path.join(process.cwd(), dirName);
         fs.rmSync(targetDir, { recursive: true, force: true, maxRetries: 10 });
       }
     }
@@ -520,7 +520,11 @@ export class Gitt {
   }
 
   // https://www.npmjs.com/package/octokit-plugin-create-pull-request
-  async createPullRequest({ owner, repo }: CreatePullRequestOptions) {
+  async createPullRequest({
+    owner,
+    repo,
+    dirName: dir,
+  }: CreatePullRequestOptions) {
     const now = Date.now().toString();
 
     this.octokit
@@ -536,7 +540,7 @@ export class Gitt {
           {
             /* optional: if `files` is not passed, an empty commit is created instead */
             files: {
-              ['pr/' + now]: now,
+              [dir + '/' + now]: now,
               // 'path/to/file2.png': {
               //   content: '_base64_encoded_content_',
               //   encoding: 'base64',

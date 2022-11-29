@@ -46,13 +46,13 @@ export type CreateCommitsOptions = {
   owner: string;
   branch: string;
   numFiles?: number;
-  relPath?: string;
+  dirName: string;
   numCommits?: number;
   removeOptions: RemoveStaleFilesOptions;
 };
 
 export type CreateFilesOptions = {
-  relPath: string;
+  dirName: string;
   numFiles: number;
 };
 
@@ -91,4 +91,5 @@ export type DeleteRepoWorkflowLogsOptions = {
 export type CreatePullRequestOptions = {
   owner: string;
   repo: string;
+  dirName: string;
 };

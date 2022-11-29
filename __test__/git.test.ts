@@ -37,7 +37,7 @@ describe('sum module', () => {
     const dirName = '.test';
     await gitt.createFiles({
       numFiles: 10,
-      relPath: dirName,
+      dirName,
     });
 
     expect(() => {

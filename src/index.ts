@@ -11,7 +11,7 @@ const main = async () => {
     owner: 'thilllon',
     branch: 'main',
     numFiles: 2,
-    relPath: '.gitt',
+    dirName: '__commit',
     numCommits: Math.floor(Math.random() * 3 + 1),
     removeOptions: {
       staleTimeInSeconds: 2 * 86400,
@@ -39,6 +39,7 @@ const main = async () => {
   await gitt.createPullRequest({
     owner: 'thilllon',
     repo: 'gitt',
+    dirName: '__pullrequest',
   });
 };
 

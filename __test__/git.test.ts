@@ -33,7 +33,7 @@ describe('sum module', () => {
   //   );
   // });
 
-  test('create commits', async () => {
+  test('create files', async () => {
     await gitt.createFiles({
       numFiles: 10,
       relPath: '.test',

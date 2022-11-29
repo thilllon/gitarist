@@ -9,7 +9,13 @@ beforeAll(async () => {
   gitt = new Gitt();
   dotenv.config({ path: '.env.test' });
 
-  console.log(process.env.GIT_GITHUB_REPO_PUSH_TOKEN);
+  const auth = process.env.GIT_GITHUB_REPO_PUSH_TOKEN;
+
+  console.log(auth);
+
+  if (!auth) {
+    throw new Error('No auth token found');
+  }
 });
 
 describe('sum module', () => {
@@ -26,6 +32,7 @@ describe('sum module', () => {
   //     })
   //   );
   // });
+
   test('create commits', async () => {
     await gitt.createFiles({
       numFiles: 10,

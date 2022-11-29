@@ -27,13 +27,13 @@ const main = async () => {
   await gitt.closeIssues({
     repo: 'gitt',
     owner: 'thilllon',
-    staleTimeInSeconds: 86400,
+    staleTimeInSeconds: 2 * 86400,
   });
 
   await gitt.deleteRepoWorkflowLogs({
     repo: 'gitt',
     owner: 'thilllon',
-    staleTimeInSeconds: 3 * 86400,
+    staleTimeInSeconds: 2 * 86400,
   });
 };
 

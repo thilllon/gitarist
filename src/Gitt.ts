@@ -478,57 +478,32 @@ export class Gitt {
         for await (const runId of runIds) {
           console.log(`[${repo}] ${runId}`);
           try {
-            const deleted =
+            const deletedRunLogs =
               await this.octokit.rest.actions.deleteWorkflowRunLogs({
                 owner,
                 repo,
                 run_id: runId,
               });
-            console.log(`[${repo}] ${workflow?.name} / ${wfId} / ${runId}`);
+            console.log(
+              `[Run Log Deleted][${repo}] ${workflow?.name} / ${wfId} / ${runId}`
+            );
           } catch (err: any) {
             console.error(err.message);
           }
           try {
-            const deleted = await this.octokit.rest.actions.deleteWorkflowRun({
-              owner,
-              repo,
-              run_id: runId,
-            });
-            console.log(`[${repo}] ${workflow?.name} / ${wfId} / ${runId}`);
+            const deletedRun =
+              await this.octokit.rest.actions.deleteWorkflowRun({
+                owner,
+                repo,
+                run_id: runId,
+              });
+            console.log(
+              `[Run Deleted][${repo}] ${workflow?.name} / ${wfId} / ${runId}`
+            );
           } catch (err: any) {
             console.error(err.message);
           }
         }
-
-        // for await (const runId of runIds) {
-        //   console.log(`[${repo}] ${runId}`);
-        //   await Promise.all([
-        //     async () => {
-        //       try {
-        //         const deleted = await this.octokit.rest.actions.deleteWorkflowRunLogs({
-        //           owner,
-        //           repo,
-        //           run_id: runId,
-        //         });
-        //         console.log(`[${repo}] ${workflow?.name} / ${wfId} / ${runId}`);
-        //       } catch (err: any) {
-        //         console.error(err.message);
-        //       }
-        //     },
-        //     async () => {
-        //       try {
-        //         const deleted = await this.octokit.rest.actions.deleteWorkflowRun({
-        //           owner,
-        //           repo,
-        //           run_id: runId,
-        //         });
-        //         console.log(`[${repo}] ${workflow?.name} / ${wfId} / ${runId}`);
-        //       } catch (err: any) {
-        //         console.error(err.message);
-        //       }
-        //     },
-        //   ]);
-        // }
 
         if (runResponse.data.total_count === 0) {
           break;

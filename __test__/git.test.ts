@@ -34,16 +34,17 @@ describe('sum module', () => {
   // });
 
   test('create files', async () => {
+    const dirName = '.test';
     await gitt.createFiles({
       numFiles: 10,
-      relPath: '.test',
+      relPath: dirName,
     });
 
     expect(() => {
-      const files = fs.readdirSync('.test');
+      const files = fs.readdirSync(dirName);
       console.log(files);
       return files;
     }).toBeDefined();
-    fs.rmdirSync('.test', { recursive: true });
+    fs.rmdirSync(dirName, { recursive: true });
   });
 });

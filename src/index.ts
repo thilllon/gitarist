@@ -27,7 +27,7 @@ const main = async () => {
   await gitt.closeIssues({
     owner: 'thilllon',
     repo: 'gitt',
-    staleTimeInSeconds: 2 * 86400,
+    staleTimeInSeconds: 0,
   });
 
   await gitt.deleteRepoWorkflowLogs({

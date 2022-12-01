@@ -526,6 +526,7 @@ export class Gitt {
     dirName: dir,
   }: CreatePullRequestOptions) {
     const now = Date.now().toString();
+    const iso = new Date().toISOString();
 
     this.octokit
       .createPullRequest({
@@ -565,7 +566,7 @@ export class Gitt {
               //   mode: '100755',
               // },
             },
-            commit: 'pr',
+            commit: iso + ' pr',
           },
         ],
       })

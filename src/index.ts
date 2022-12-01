@@ -14,7 +14,7 @@ const main = async () => {
     dirName: '__commit',
     numCommits: Math.floor(Math.random() * 3 + 1),
     removeOptions: {
-      staleTimeInSeconds: 2 * 86400,
+      staleTimeInSeconds: 86400,
     },
   });
 
@@ -33,7 +33,7 @@ const main = async () => {
   await gitt.deleteRepoWorkflowLogs({
     owner: 'thilllon',
     repo: 'gitt',
-    staleTimeInSeconds: 2 * 86400,
+    staleTimeInSeconds: 86400,
   });
 
   await gitt.createPullRequest({

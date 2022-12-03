@@ -20,15 +20,6 @@ import {
   Workflow,
 } from './Gitt.interface';
 
-declare namespace NodeJS {
-  interface ProcessEnv {
-    NODE_ENV: 'development' | 'production';
-    GITT_TOKEN: string;
-    GITT_OWNER: string;
-    GITT_REPO: string;
-  }
-}
-
 /**
  * click here to create a new token
  *

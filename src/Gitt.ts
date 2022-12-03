@@ -1,8 +1,8 @@
-import dotenv from 'dotenv';
 import glob from 'fast-glob';
 import fs from 'fs';
 import { readFile } from 'fs-extra';
 import { Octokit } from 'octokit';
+import { createPullRequest } from 'octokit-plugin-create-pull-request';
 import path from 'path';
 import {
   CloseIssuesOptions,
@@ -18,9 +18,6 @@ import {
   TreeParam,
   Workflow,
 } from './Gitt.interface';
-import { createPullRequest } from 'octokit-plugin-create-pull-request';
-
-dotenv.config();
 
 /**
  * click here to create a new token
@@ -101,7 +98,7 @@ export class Gitt {
   }: RemoveStaleFilesOptions) {
     searchingPaths = searchingPaths ?? ['*'];
     glob.sync(searchingPaths, { onlyDirectories: true }).forEach((dir) => {
-      console.log(dir);
+      // console.log(dir);
 
       if (
         new Date(parseInt(dir)) <
@@ -194,8 +191,8 @@ export class Gitt {
           ref,
           sha: newCommit.sha,
         });
-      } catch (err) {
-        console.error(err);
+      } catch (err: any) {
+        console.error(err.message);
       } finally {
         const targetDir = path.join(process.cwd(), dirName);
         fs.rmSync(targetDir, { recursive: true, force: true, maxRetries: 10 });
@@ -224,8 +221,8 @@ export class Gitt {
           body: content,
           issue_number: issueNumber,
         });
-      } catch (err) {
-        console.error(err);
+      } catch (err: any) {
+        console.error(err.message);
       }
     }
   }
@@ -252,7 +249,8 @@ export class Gitt {
       const filtered = issues.data.filter(
         ({ repository }) => repository?.name === repo
       );
-      console.log(filtered);
+
+      // console.log(filtered);
 
       await Promise.all(
         filtered.map(async (issue) => {

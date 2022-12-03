@@ -3,11 +3,12 @@ import { Gitt } from './Gitt';
 
 dotenv.config();
 
-const owner = process.env.GITT_OWNER;
-const repo = process.env.GITT_REPO;
+const token = process.env.GITT_TOKEN;
+const owner = process.env.GITT_OWNER ?? 'thilllon';
+const repo = process.env.GITT_REPO ?? 'gitt';
 
 const main = async () => {
-  const gitt = new Gitt();
+  const gitt = new Gitt({ token });
 
   await gitt.createCommits({
     owner,
@@ -17,33 +18,33 @@ const main = async () => {
     dirName: '__commit',
     numCommits: Math.floor(Math.random() * 3 + 1),
     removeOptions: {
-      staleTimeInSeconds: 0,
+      staleTimeInSeconds: 86400,
     },
   });
 
-  // await gitt.createIssues({
-  //   owner,
-  //   repo,
-  //   numIssues: 2,
-  // });
+  await gitt.createIssues({
+    owner,
+    repo,
+    numIssues: 2,
+  });
 
-  // await gitt.closeIssues({
-  //   owner,
-  //   repo,
-  //   staleTimeInSeconds: 0,
-  // });
+  await gitt.closeIssues({
+    owner,
+    repo,
+    staleTimeInSeconds: 0,
+  });
 
-  // await gitt.deleteRepoWorkflowLogs({
-  //   owner,
-  //   repo,
-  //   staleTimeInSeconds: 86400,
-  // });
+  await gitt.deleteRepoWorkflowLogs({
+    owner,
+    repo,
+    staleTimeInSeconds: 3600,
+  });
 
-  // await gitt.createPullRequest({
-  //   owner,
-  //   repo,
-  //   dirName: '__pullrequest',
-  // });
+  await gitt.createPullRequest({
+    owner,
+    repo,
+    dirName: '__pullrequest',
+  });
 };
 
 main();

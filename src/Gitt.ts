@@ -59,19 +59,33 @@ export class Gitt {
     return a + b;
   }
 
-  createFiles({ dirName, numFiles: length }: CreateFilesOptions) {
+  createFiles({ dirName, numFiles }: CreateFilesOptions) {
     const targetDir = path.join(process.cwd(), dirName);
 
     if (!fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true });
     }
 
-    const files = Array.from({ length })
+    console.log(targetDir);
+    console.log(targetDir);
+    console.log(targetDir);
+    console.log(targetDir);
+    console.log(targetDir);
+    console.log(targetDir);
+
+    const files = Array.from({ length: numFiles })
       .map(() => {
         try {
           const now = Date.now().toString();
           const content = (now + '\n').repeat(100);
           const filePath = path.join(targetDir, now);
+          console.log(filePath);
+          console.log(filePath);
+          console.log(filePath);
+          console.log(filePath);
+          console.log(filePath);
+          console.log(filePath);
+          console.log(filePath);
           fs.writeFileSync(filePath, content, 'utf8');
           return filePath;
         } catch (err) {
@@ -96,15 +110,22 @@ export class Gitt {
     staleTimeInSeconds,
     searchingPaths,
   }: RemoveStaleFilesOptions) {
-    searchingPaths = searchingPaths ?? ['*'];
-    glob.sync(searchingPaths, { onlyDirectories: true }).forEach((dir) => {
-      // console.log(dir);
+    console.log('[remove stale files]');
+
+    searchingPaths = searchingPaths ?? ['__commit'];
+
+    glob.sync(searchingPaths, { onlyDirectories: false }).forEach((name) => {
+      if (isNaN(parseInt(name))) {
+        return;
+      }
+
+      console.log(name);
 
       if (
-        new Date(parseInt(dir)) <
+        new Date(parseInt(name)) <
         new Date(Date.now() - staleTimeInSeconds * 1000)
       ) {
-        fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10 });
+        fs.rmSync(name, { recursive: true, force: true, maxRetries: 10 });
       }
     });
   }
@@ -195,7 +216,7 @@ export class Gitt {
         console.error(err.message);
       } finally {
         const targetDir = path.join(process.cwd(), dirName);
-        fs.rmSync(targetDir, { recursive: true, force: true, maxRetries: 10 });
+        // fs.rmSync(targetDir, { recursive: true, force: true, maxRetries: 10 });
       }
     }
   }

@@ -22,29 +22,29 @@ const main = async () => {
     },
   });
 
-  await gitt.createIssues({
-    owner,
-    repo,
-    numIssues: 2,
-  });
+  // await gitt.createIssues({
+  //   owner,
+  //   repo,
+  //   numIssues: 2,
+  // });
 
-  await gitt.closeIssues({
-    owner,
-    repo,
-    staleTimeInSeconds: 0,
-  });
+  // await gitt.closeIssues({
+  //   owner,
+  //   repo,
+  //   staleTimeInSeconds: 0,
+  // });
 
-  await gitt.deleteRepoWorkflowLogs({
-    owner,
-    repo,
-    staleTimeInSeconds: 3600,
-  });
+  // await gitt.deleteRepoWorkflowLogs({
+  //   owner,
+  //   repo,
+  //   staleTimeInSeconds: 3600,
+  // });
 
-  await gitt.createPullRequest({
-    owner,
-    repo,
-    dirName: '__pullrequest',
-  });
+  // await gitt.createPullRequest({
+  //   owner,
+  //   repo,
+  //   dirName: '__pullrequest',
+  // });
 };
 
 main();

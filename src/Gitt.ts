@@ -61,7 +61,10 @@ export class Gitt {
 
   createFiles({ dirName, numFiles: length }: CreateFilesOptions) {
     const targetDir = path.join(process.cwd(), dirName);
-    fs.mkdirSync(targetDir, { recursive: true });
+
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
 
     const files = Array.from({ length })
       .map(() => {
@@ -89,8 +92,11 @@ export class Gitt {
    * 파일의 실제 생성시간을 확인하는 것이 아니라 폴더이름을 바탕으로 삭제한다.
    * @param staleTimeInSeconds 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지
    */
-  removeStaleFiles({ staleTimeInSeconds }: RemoveStaleFilesOptions) {
-    glob.sync(['*'], { onlyDirectories: true }).forEach((dir) => {
+  removeStaleFiles({ staleTimeInSeconds, paths }: RemoveStaleFilesOptions) {
+    paths = paths ?? ['*'];
+    glob.sync(paths, { onlyDirectories: true }).forEach((dir) => {
+      console.log(dir);
+
       if (
         new Date(parseInt(dir)) <
         new Date(Date.now() - staleTimeInSeconds * 1000)

@@ -44,11 +44,14 @@ export class Gitt {
   private readonly octokit;
   private readonly perPage = 100;
 
-  constructor() {
-    const tokenName = 'GIT_GITHUB_REPO_PUSH_TOKEN';
-    const auth = process.env[tokenName];
+  constructor({ token }: { token?: string } = {}) {
+    let auth = token;
     if (!auth) {
-      throw new Error('environment variable is not defined: ' + tokenName);
+      const TOKEN_NAME = 'GITT_TOKEN';
+      auth = process.env[TOKEN_NAME];
+      if (!auth) {
+        throw new Error('environment variable is not defined: ' + TOKEN_NAME);
+      }
     }
 
     const _Octokit = Octokit.plugin(createPullRequest);
@@ -92,9 +95,12 @@ export class Gitt {
    * 파일의 실제 생성시간을 확인하는 것이 아니라 폴더이름을 바탕으로 삭제한다.
    * @param staleTimeInSeconds 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지
    */
-  removeStaleFiles({ staleTimeInSeconds, paths }: RemoveStaleFilesOptions) {
-    paths = paths ?? ['*'];
-    glob.sync(paths, { onlyDirectories: true }).forEach((dir) => {
+  removeStaleFiles({
+    staleTimeInSeconds,
+    searchingPaths,
+  }: RemoveStaleFilesOptions) {
+    searchingPaths = searchingPaths ?? ['*'];
+    glob.sync(searchingPaths, { onlyDirectories: true }).forEach((dir) => {
       console.log(dir);
 
       if (
@@ -293,6 +299,7 @@ export class Gitt {
       console.log('status', status);
       const repos = data.map((repo) => repo.name);
       total.push(...repos);
+
       if (repos.length === 0) {
         break;
       }

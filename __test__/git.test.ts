@@ -9,7 +9,7 @@ beforeAll(async () => {
   gitt = new Gitt();
   dotenv.config({ path: '.env.test' });
 
-  const auth = process.env.GIT_GITHUB_REPO_PUSH_TOKEN;
+  const auth = process.env.GITT_TOKEN;
 
   console.log(auth);
 

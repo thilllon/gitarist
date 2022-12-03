@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  GIT_GITHUB_REPO_PUSH_TOKEN: ${{ secrets.GIT_GITHUB_REPO_PUSH_TOKEN }}
+  GITT_TOKEN: ${{ secrets.GITT_TOKEN }}
 
 jobs:
   start:

@@ -153,16 +153,17 @@ export class Gitt {
 
         // gets commit's AND its tree's SHA
         const ref = `heads/${branch}`;
+        
         const { data: refData } = await this.octokit.rest.git.getRef({
           owner,
           repo,
           ref,
         });
-        const commitSha = refData.object.sha;
+
         const { data: lastCommit } = await this.octokit.rest.git.getCommit({
           owner,
           repo,
-          commit_sha: commitSha,
+          commit_sha: refData.object.sha,
         });
 
         const treeSha = lastCommit.tree.sha;
@@ -190,6 +191,7 @@ export class Gitt {
           type: 'blob',
           sha,
         }));
+
         const { data: newTree } = await this.octokit.rest.git.createTree({
           owner,
           repo,

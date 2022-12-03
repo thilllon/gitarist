@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import glob from 'fast-glob';
 import fs from 'fs';
 import { readFile } from 'fs-extra';
@@ -18,6 +19,15 @@ import {
   TreeParam,
   Workflow,
 } from './Gitt.interface';
+
+declare namespace NodeJS {
+  interface ProcessEnv {
+    NODE_ENV: 'development' | 'production';
+    GITT_TOKEN: string;
+    GITT_OWNER: string;
+    GITT_REPO: string;
+  }
+}
 
 /**
  * click here to create a new token
@@ -40,6 +50,8 @@ import {
 export class Gitt {
   private readonly octokit;
   private readonly perPage = 100;
+  private readonly _owner?: string;
+  private readonly _repo?: string;
 
   constructor({ token }: { token?: string } = {}) {
     let auth = token;
@@ -53,6 +65,17 @@ export class Gitt {
 
     const _Octokit = Octokit.plugin(createPullRequest);
     this.octokit = new _Octokit({ auth });
+
+    this._owner = process.env.GITT_OWNER;
+    this._repo = process.env.GITT_REPO;
+  }
+
+  get owner() {
+    return this._owner;
+  }
+
+  get repo() {
+    return this._repo;
   }
 
   sum(a: number, b: number) {
@@ -67,11 +90,6 @@ export class Gitt {
     }
 
     console.log(targetDir);
-    console.log(targetDir);
-    console.log(targetDir);
-    console.log(targetDir);
-    console.log(targetDir);
-    console.log(targetDir);
 
     const files = Array.from({ length: numFiles })
       .map(() => {
@@ -79,13 +97,9 @@ export class Gitt {
           const now = Date.now().toString();
           const content = (now + '\n').repeat(100);
           const filePath = path.join(targetDir, now);
+
           console.log(filePath);
-          console.log(filePath);
-          console.log(filePath);
-          console.log(filePath);
-          console.log(filePath);
-          console.log(filePath);
-          console.log(filePath);
+
           fs.writeFileSync(filePath, content, 'utf8');
           return filePath;
         } catch (err) {
@@ -153,7 +167,7 @@ export class Gitt {
 
         // gets commit's AND its tree's SHA
         const ref = `heads/${branch}`;
-        
+
         const { data: refData } = await this.octokit.rest.git.getRef({
           owner,
           repo,
@@ -390,6 +404,10 @@ export class Gitt {
           )) {
             const wfs = wfResponse.data;
             for (const wf of wfs) {
+              // Github workflow ID can be found in url.
+              // e.g., https://github.com/<owner>/<repo>/actions/workflows/firebase-hosting-merge.yml
+              // => "firebase-hosting-merge.yml" is workflow id'
+
               const usages = await this.octokit.rest.actions.getWorkflowUsage({
                 owner,
                 repo,
@@ -409,6 +427,7 @@ export class Gitt {
     }
   }
 
+  // https://github.com/<owner>/<repo>/actions/runs/<run_id>
   async deleteRepoWorkflowLogs({
     owner,
     repo,
@@ -609,5 +628,73 @@ export class Gitt {
           console.log(pr.data.number);
         }
       });
+  }
+
+  async removeIssueCommentsByBot({
+    owner,
+    repo,
+  }: {
+    owner: string;
+    repo: string;
+  }) {
+    const arr = [...Array(9999).keys()];
+
+    for await (const page of arr) {
+      const commentsResponse =
+        await this.octokit.rest.issues.listCommentsForRepo({
+          owner,
+          repo,
+          per_page: this.perPage,
+          page,
+        });
+      const comments = commentsResponse.data;
+      if (comments.length === 0) {
+        break;
+      }
+
+      for (const comm of comments) {
+        const isBot = comm.user?.login?.includes('[bot]');
+
+        if (isBot) {
+          try {
+            await this.octokit.rest.issues.deleteComment({
+              owner,
+              repo,
+              comment_id: comm.id,
+            });
+            console.log('deleted:', comm.id);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+
+        // const { title, number: issue_number } = issue;
+        // let newTitle = '';
+        // let labels: string[] = [];
+        // if (/^<client>/gi.test(title)) {
+        //   newTitle = title.replace(/^<client>/gi, '').trim();
+        //   labels = ['client'];
+        // } else if (/^<server>/gi.test(title)) {
+        //   newTitle = title.replace(/^<server>/gi, '').trim();
+        //   labels = ['server'];
+        // } else if (/^<infra>/gi.test(title)) {
+        //   newTitle = title.replace(/^<infra>/gi, '').trim();
+        //   labels = ['infra'];
+        // } else {
+        //   continue;
+        // }
+        // try {
+        //   const updateResponse = await this.octokitService.rest.issues.update({ owner, repo, issue_number, title: newTitle });
+        //   const addLabelResponse = await this.octokitService.rest.issues.addLabels({ owner, repo, issue_number, labels });
+        //   console.log('issue:', issue_number, '/', updateResponse.status, addLabelResponse.status);
+        // } catch (err) {
+        //   console.error(err);
+        // }
+      }
+    }
+  }
+
+  async saveRepoList() {
+    //
   }
 }

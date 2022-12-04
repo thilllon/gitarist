@@ -46,6 +46,7 @@ export class Gitt {
 
   constructor({ token }: { token?: string } = {}) {
     let auth = token;
+
     if (!auth) {
       const TOKEN_NAME = 'GITT_TOKEN';
       auth = process.env[TOKEN_NAME];

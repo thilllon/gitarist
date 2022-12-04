@@ -6,6 +6,10 @@ Github green grass("planting grass") means nothing
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.
 - Run cron job using Github Action
 
+## Issues
+
+- [ ] 커밋 생성시 `__commits` 폴더에 저장되고 있지 않은 현상
+
 ## How to use
 
 - Rename `.env.example` to `.env` and fill the environment values by following instructions

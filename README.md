@@ -1,6 +1,6 @@
 # Gitt
 
-Github green grass("planting grass") means nothing
+To proved that Github green grass("planting grass") means nothing
 
 - Multiple useful Github utilities based on Octokit
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.

@@ -681,7 +681,155 @@ export class Gitt {
     }
   }
 
-  async saveRepoList() {
-    //
+  /**
+   *
+   * get all issues and change title and add labels
+   * @param repo
+   * @param org
+   * @param owner
+   */
+  async changeIssueTitleAndAddLabels({
+    owner,
+    repo,
+    options = {},
+  }: {
+    owner: string;
+    repo: string;
+    options?: {
+      changeTitle?: boolean;
+    };
+  }) {
+    const titleToLabel = {
+      '<client>': ['client'],
+      '<server>': ['server'],
+      '<infra>': ['infra'],
+    };
+
+    const arr = [...Array(1000000).keys()];
+
+    for await (const page of arr) {
+      const res = await this.octokit.rest.issues.listForRepo({
+        owner,
+        repo,
+        per_page: this.perPage,
+        page,
+      });
+
+      const issues = res.data;
+
+      console.log(`# issues(page ${page}) ${issues.length}`);
+
+      if (issues.length === 0) {
+        break;
+      }
+
+      for (const issue of issues) {
+        const labels: string[] = Object.entries(titleToLabel).flatMap(
+          ([title, label]) =>
+            issue.title.toLowerCase().includes(title) ? label : []
+        );
+
+        const newTitle = options.changeTitle
+          ? issue.title.trim()
+          : issue.title.replace(/<client>|<server>|<infra>/gi, '').trim();
+
+        try {
+          if (newTitle !== issue.title && options.changeTitle) {
+            const updateResponse = await this.octokit.rest.issues.update({
+              owner,
+              repo,
+              issue_number: issue.number,
+              title: newTitle,
+            });
+          }
+          const addLabelResponse = await this.octokit.rest.issues.addLabels({
+            owner,
+            repo,
+            issue_number: issue.number,
+            labels,
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
+  }
+
+  /**
+   * list repos
+   * @param auth
+   * @param owner
+   * @param jsonFile
+   * @returns
+   */
+  async listRepos(auth: string, owner: string) {
+    const jsonFile = 'repos.json';
+
+    const repoNames: string[] = [];
+    let iter = 0;
+
+    //   while (true) {
+    //     console.log('fetching repos...');
+
+    //     const octokit = this.getOctokit(auth);
+    //     const { data, status } =
+    //       await octokit.rest.repos.listForAuthenticatedUser({
+    //         username: owner,
+    //         per_page: this.perPage,
+    //         page: iter++,
+    //         type: 'all',
+    //       });
+    //     console.log('status', status);
+    //     const repos = data.map((repo) => repo.name);
+    //     repoNames.push(...repos);
+    //     if (repos.length === 0) {
+    //       break;
+    //     }
+    //   }
+
+    //   fs.writeFileSync(
+    //     path.join(process.cwd(), jsonFile),
+    //     JSON.stringify(repoNames),
+    //     'utf8'
+    //   );
+
+    //   return repoNames;
+  }
+
+  /**
+   * delete repos
+   * @param runs
+   * @param owner
+   */
+  async deleteRepoFromJson(
+    auth: string,
+    owner: string,
+    repos?: string[],
+    jsonFile = 'repos.json'
+  ) {
+    repos ??= JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), jsonFile), 'utf8')
+    );
+
+    if (!repos) {
+      return;
+    }
+
+    const deleted = [];
+
+    for (const repo of repos) {
+      try {
+        const res = await octokit.rest.repos.delete({ owner, repo });
+        console.log(`deleted ${repo}`);
+        deleted.push(repo);
+      } catch (error) {
+        console.log(`error deleting ${repo}`);
+      }
+    }
+    fs.writeFileSync(
+      path.join(process.cwd(), 'deleted.json'),
+      JSON.stringify(deleted),
+      'utf8'
+    );
   }
 }

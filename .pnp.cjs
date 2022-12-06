@@ -29,6 +29,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["@jest/globals", "npm:29.3.1"],\
+            ["@octokit/core", "npm:4.1.0"],\
+            ["@octokit/request-error", "npm:3.0.2"],\
+            ["@octokit/webhooks", "npm:10.3.1"],\
             ["@types/fs-extra", "npm:9.0.13"],\
             ["@types/jest", "npm:29.2.4"],\
             ["@types/node", "npm:18.11.11"],\
@@ -3132,6 +3135,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["commit", "workspace:."],\
             ["@jest/globals", "npm:29.3.1"],\
+            ["@octokit/core", "npm:4.1.0"],\
+            ["@octokit/request-error", "npm:3.0.2"],\
+            ["@octokit/webhooks", "npm:10.3.1"],\
             ["@types/fs-extra", "npm:9.0.13"],\
             ["@types/jest", "npm:29.2.4"],\
             ["@types/node", "npm:18.11.11"],\

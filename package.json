@@ -17,6 +17,9 @@
     "singleQuote": true
   },
   "dependencies": {
+    "@octokit/core": "^4.1.0",
+    "@octokit/request-error": "^3.0.2",
+    "@octokit/webhooks": "^10.3.1",
     "dotenv": "^16.0.3",
     "fast-glob": "^3.2.12",
     "fs-extra": "^11.1.0",

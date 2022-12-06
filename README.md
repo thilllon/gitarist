@@ -2,13 +2,13 @@
 
 To proved that Github green grass("planting grass") means nothing
 
-- Multiple useful Github utilities based on Octokit
+- Multiple useful Github utilities based on `Octokit`
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.
-- Run cron job using Github Action
+- Run cron job using `Github Action`
 
 ## Issues
 
-- [ ] 커밋 생성시 `__commits` 폴더에 저장되고 있지 않은 현상
+- [ ] commit dummy file are not stored in the `__commits` directory
 
 ## How to use
 

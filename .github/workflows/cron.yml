@@ -3,7 +3,7 @@ name: Cron Jobs
 on:
   schedule:
     # cron for every day 8hours except sunday
-    - cron: '0 */12 * * 1-6'
+    - cron: '0 */4 * * 1-6'
   workflow_dispatch:
 
 env:

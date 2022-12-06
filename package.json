@@ -5,6 +5,7 @@
   "repository": "git@github.com:thilllon/commit.git",
   "author": "thilllon <thilllon970@gmail.com>",
   "license": "MIT",
+  "packageManager": "yarn@3.3.0",
   "scripts": {
     "dev": "tsnd ./src/index.ts",
     "build": "tsc",

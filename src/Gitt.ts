@@ -186,12 +186,12 @@ export class Gitt {
           })
         );
 
-        const pathsForBlobs = filesPaths.map((fullPath) =>
-          path.relative(dirName, fullPath)
+        const pathsForBlobs = filesPaths.map(
+          (fullPath) => '__commit/' + path.basename(fullPath)
         );
 
         const tree: TreeParam[] = filesBlobs.map(({ sha }, index) => ({
-          path: '__commit/' + pathsForBlobs[index],
+          path: pathsForBlobs[index],
           mode: '100644',
           type: 'blob',
           sha,

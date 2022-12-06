@@ -819,7 +819,7 @@ export class Gitt {
 
     for (const repo of repos) {
       try {
-        const res = await octokit.rest.repos.delete({ owner, repo });
+        const res = await this.octokit.rest.repos.delete({ owner, repo });
         console.log(`deleted ${repo}`);
         deleted.push(repo);
       } catch (error) {

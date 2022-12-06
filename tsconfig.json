@@ -6,7 +6,8 @@
     "lib": ["ESNext", "DOM"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true
+    "strict": true,
+    "removeComments": true
   },
   "include": ["src"],
   "exclude": ["dist"]

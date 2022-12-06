@@ -75,7 +75,7 @@ export class Gitt {
     return a + b;
   }
 
-  createTmpFiles({ numFiles }: CreateFilesOptions) {
+  createCommitFiles({ numFiles }: CreateFilesOptions) {
     console.log('[create files]');
 
     const targetDir = path.join(process.cwd(), '__tmp');
@@ -88,7 +88,8 @@ export class Gitt {
       .map(() => {
         try {
           const now = Date.now().toString();
-          const content = (now + '\n').repeat(100);
+          const iso = new Date().toISOString();
+          const content = (iso + '\n').repeat(10);
           const filePath = path.join(targetDir, now);
 
           console.log(filePath);
@@ -153,7 +154,7 @@ export class Gitt {
       try {
         const iso = new Date().toISOString();
 
-        this.createTmpFiles({ numFiles });
+        this.createCommitFiles({ numFiles });
         this.removeStaleFiles(removeOptions);
 
         // gets commit's AND its tree's SHA

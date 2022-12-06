@@ -1,54 +1,63 @@
-# Gitt
+# Gitarist
 
 To proved that Github green grass("planting grass") means nothing
+
+[![npm version](https://badge.fury.io/js/gitt-cli.svg)](https://badge.fury.io/js/gitt-cli)
 
 - Multiple useful Github utilities based on `Octokit`
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.
 - Run cron job using `Github Action`
 
-## Issues
-
-- [ ] commit dummy file are not stored in the `__commits` directory
-
 ## How to use
 
-- Rename `.env.example` to `.env` and fill the environment values by following instructions
+1. create a secret
+   https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo
+
+2. set the secret to the target repository
+
+Go to setting page and set secret as "GITARIST_TOKEN", https://github.com/{OWNER}/{REPO}/settings/secrets/actions
+Make sure that you are the owner of the target repository.
+
+3. initialize gitarist
 
 ```sh
+npx gitarist init # to create github action workflow file
+```
+
+## How to contribute this project
+
+Rename `.env.example` to `.env` and fill the environment values by following instructions.
+
+```sh
+# install dependencies
+pnpm
+
 # development
-yarn dev
+pnpm dev
 
 # production
-yarn build
-yarn start
+pnpm build
+pnpm start
 ```
 
 ## How to make a clean git history
 
 ```sh
 # interactive rebase and squash all except root commit
+# or, git rebase -i HEAD~11
 git rebase -i --root
-# git rebase -i HEAD~11
 
-# force push
-git push origin -f main
+git push origin --force main
 ```
 
-## setup Yarn berry
+## clean PR history
 
 ```sh
-# "packageManager": "yarn@3.3.0",
+git config pull.rebase true
 
-# https://velog.io/@creco/next.js-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0
-rm -rf node_modules .npmrc .yarnrc
-rm -rf .pnp.cjs .pnp.loader.mjs .yarnrc.yml .yarn
-rm -rf yarn.lock
-touch yarn.lock
-yarn set version stable
-echo 'nodeLinker: "pnp"' >> .yarnrc.yml
-yarn install
-yarn plugin import typescript
-yarn add --dev typescript
-yarn add @yarnpkg/sdks -D
-yarn dlx @yarnpkg/sdks vscode
+git pull --prune
+
+git branch -r | grep --only "commit\/167.*" | xargs git push origin --delete
+
+git pull --prune
 ```

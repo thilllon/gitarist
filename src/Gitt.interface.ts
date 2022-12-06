@@ -64,7 +64,7 @@ export type CreateIssuesOptions = {
 export type CloseIssuesOptions = {
   repo: string;
   owner: string;
-  staleTimeInSeconds: number;
+  staleTimeMs: number;
 };
 
 export type ListRepositoriesOptions = {
@@ -84,13 +84,12 @@ export type FindWastedActionsOptions = {
 export type DeleteRepoWorkflowLogsOptions = {
   repo: string;
   owner: string;
-  staleTimeInSeconds: number;
+  staleTimeMs: number;
 };
 
 export type CreatePullRequestOptions = {
   owner: string;
   repo: string;
-  dirName: string;
 };
 
 // --------------------------------

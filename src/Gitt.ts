@@ -112,7 +112,7 @@ export class Gitt {
   /**
    * 현재 프로젝트에서 일정 기간이 지난 파일을 삭제하는 함수
    * 파일의 실제 생성시간을 확인하는 것이 아니라 폴더이름을 바탕으로 삭제한다.
-   * @param staleTimeInSeconds 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지
+   * @param staleTimeMs 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지
    */
   removeStaleFiles({ staleTimeMs, searchingPaths }: RemoveStaleFilesOptions) {
     console.log('[remove stale files]');
@@ -262,9 +262,9 @@ export class Gitt {
    * https://github.com/octokit/octokit.js/discussions/2343
    * @param repo string
    * @param owner string
-   * @param staleTimeInSeconds number
+   * @param staleTimeMs number
    */
-  async closeIssues({ owner, repo, staleTimeInSeconds }: CloseIssuesOptions) {
+  async closeIssues({ owner, repo, staleTimeMs }: CloseIssuesOptions) {
     // FIXME: rxjs 로 변경
 
     try {
@@ -286,8 +286,7 @@ export class Gitt {
           try {
             if (
               issue.created_at &&
-              new Date(issue.created_at) <
-                new Date(Date.now() - staleTimeInSeconds * 1000)
+              new Date(issue.created_at) < new Date(Date.now() - staleTimeMs)
             ) {
               await this.octokit.rest.issues.update({
                 owner,
@@ -423,7 +422,7 @@ export class Gitt {
   async deleteRepoWorkflowLogs({
     owner,
     repo,
-    staleTimeInSeconds,
+    staleTimeMs,
   }: DeleteRepoWorkflowLogsOptions) {
     let wfIds: number[] = [];
     const wfs: Workflow[] = [];
@@ -498,10 +497,8 @@ export class Gitt {
             (elem.status === 'completed' && elem.conclusion === 'skipped') ||
             (elem.status === 'completed' && elem.conclusion === 'cancelled') ||
             (elem.status === 'completed' &&
-              new Date(elem.created_at) <
-                new Date(Date.now() - staleTimeInSeconds * 1000)) ||
-            new Date(elem.created_at) <
-              new Date(Date.now() - staleTimeInSeconds * 1000)
+              new Date(elem.created_at) < new Date(Date.now() - staleTimeMs)) ||
+            new Date(elem.created_at) < new Date(Date.now() - staleTimeMs)
           ) {
             return true;
           }
@@ -565,11 +562,9 @@ export class Gitt {
   }
 
   // https://www.npmjs.com/package/octokit-plugin-create-pull-request
-  async createPullRequest({
-    owner,
-    repo,
-    dirName: dir,
-  }: CreatePullRequestOptions) {
+  async createPullRequest({ owner, repo }: CreatePullRequestOptions) {
+    const dir = '__pullrequest';
+
     const now = Date.now().toString();
     const iso = new Date().toISOString();
 
@@ -611,7 +606,7 @@ export class Gitt {
               //   mode: '100755',
               // },
             },
-            commit: iso + ' pr',
+            commit: 'PR ' + iso,
           },
         ],
       })

@@ -43,6 +43,7 @@ export class Gitt {
   private readonly perPage = 100;
   private readonly _owner?: string;
   private readonly _repo?: string;
+  private readonly maxRetries = 10;
 
   constructor({ token }: { token?: string } = {}) {
     let auth = token;
@@ -74,14 +75,14 @@ export class Gitt {
     return a + b;
   }
 
-  createFiles({ dirName, numFiles }: CreateFilesOptions) {
-    const targetDir = path.join(process.cwd(), dirName);
+  createTmpFiles({ numFiles }: CreateFilesOptions) {
+    console.log('[create files]');
+
+    const targetDir = path.join(process.cwd(), '__tmp');
 
     if (!fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true });
     }
-
-    console.log(targetDir);
 
     const files = Array.from({ length: numFiles })
       .map(() => {
@@ -112,26 +113,24 @@ export class Gitt {
    * 파일의 실제 생성시간을 확인하는 것이 아니라 폴더이름을 바탕으로 삭제한다.
    * @param staleTimeInSeconds 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지
    */
-  removeStaleFiles({
-    staleTimeInSeconds,
-    searchingPaths,
-  }: RemoveStaleFilesOptions) {
+  removeStaleFiles({ staleTimeMs, searchingPaths }: RemoveStaleFilesOptions) {
     console.log('[remove stale files]');
 
-    searchingPaths = searchingPaths ?? ['__commit'];
+    searchingPaths ??= ['./__commit/**'];
 
-    glob.sync(searchingPaths, { onlyDirectories: false }).forEach((name) => {
-      if (isNaN(parseInt(name))) {
+    glob.sync(searchingPaths, { onlyFiles: true }).forEach((filePath) => {
+      console.log(filePath);
+      const fileName = path.basename(filePath);
+      if (isNaN(parseInt(fileName))) {
         return;
       }
 
-      console.log(name);
-
-      if (
-        new Date(parseInt(name)) <
-        new Date(Date.now() - staleTimeInSeconds * 1000)
-      ) {
-        fs.rmSync(name, { recursive: true, force: true, maxRetries: 10 });
+      if (new Date(parseInt(fileName)) < new Date(Date.now() - staleTimeMs)) {
+        fs.rmSync(filePath, {
+          recursive: true,
+          force: true,
+          maxRetries: this.maxRetries,
+        });
       }
     });
   }
@@ -145,21 +144,21 @@ export class Gitt {
     repo,
     branch,
     numFiles = 10,
-    dirName,
     numCommits = 1,
     removeOptions,
   }: CreateCommitsOptions) {
+    const dirName = '__commit';
+
     for (const _ of Array(numCommits).keys()) {
       try {
         const now = Date.now().toString();
         const iso = new Date().toISOString();
 
-        this.createFiles({ dirName, numFiles });
+        this.createTmpFiles({ numFiles });
         this.removeStaleFiles(removeOptions);
 
         // gets commit's AND its tree's SHA
         const ref = `heads/${branch}`;
-
         const { data: refData } = await this.octokit.rest.git.getRef({
           owner,
           repo,
@@ -223,8 +222,8 @@ export class Gitt {
       } catch (err: any) {
         console.error(err.message);
       } finally {
-        const targetDir = path.join(process.cwd(), dirName);
-        // fs.rmSync(targetDir, { recursive: true, force: true, maxRetries: 10 });
+        const tmpDir = path.join(process.cwd(), '__tmp');
+        fs.rmSync(tmpDir, { recursive: true, force: true, maxRetries: 10 });
       }
     }
   }

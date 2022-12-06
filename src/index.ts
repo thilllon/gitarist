@@ -14,37 +14,38 @@ const main = async () => {
     owner,
     repo,
     branch: 'main',
-    numFiles: 2,
-    dirName: '__commit',
-    numCommits: Math.floor(Math.random() * 3 + 1),
+    numFiles: 10,
+    // numCommits: Math.floor(Math.random() * 3 + 1),
+    numCommits: 1,
     removeOptions: {
-      staleTimeInSeconds: 86400,
+      // staleTimeMs: 86400 * 1000,
+      staleTimeMs: 1 * 1000,
     },
   });
 
-  await gitt.createIssues({
-    owner,
-    repo,
-    numIssues: 2,
-  });
+  // await gitt.createIssues({
+  //   owner,
+  //   repo,
+  //   numIssues: 2,
+  // });
 
-  await gitt.closeIssues({
-    owner,
-    repo,
-    staleTimeInSeconds: 0,
-  });
+  // await gitt.closeIssues({
+  //   owner,
+  //   repo,
+  //   staleTimeInSeconds: 0,
+  // });
 
-  await gitt.deleteRepoWorkflowLogs({
-    owner,
-    repo,
-    staleTimeInSeconds: 3600,
-  });
+  // await gitt.deleteRepoWorkflowLogs({
+  //   owner,
+  //   repo,
+  //   staleTimeInSeconds: 3600,
+  // });
 
-  await gitt.createPullRequest({
-    owner,
-    repo,
-    dirName: '__pullrequest',
-  });
+  // await gitt.createPullRequest({
+  //   owner,
+  //   repo,
+  //   dirName: '__pullrequest',
+  // });
 };
 
 main();

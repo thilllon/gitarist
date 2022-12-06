@@ -3,5 +3,6 @@ dist
 .env*
 !.env.example
 
-__pullrequest
-__commit
+**/__pullrequest
+**/__commit
+**/__tmp

@@ -38,7 +38,7 @@ export type TreeParam = {
 };
 
 export type RemoveStaleFilesOptions = {
-  staleTimeInSeconds: number;
+  staleTimeMs: number;
   searchingPaths?: string[];
 };
 
@@ -47,13 +47,11 @@ export type CreateCommitsOptions = {
   owner: string;
   branch: string;
   numFiles?: number;
-  dirName: string;
   numCommits?: number;
   removeOptions: RemoveStaleFilesOptions;
 };
 
 export type CreateFilesOptions = {
-  dirName: string;
   numFiles: number;
 };
 

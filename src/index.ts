@@ -14,7 +14,7 @@ const main = async () => {
     owner,
     repo,
     branch: 'main',
-    numFiles: 10,
+    numFiles: 2,
     // numCommits: Math.floor(Math.random() * 3 + 1),
     numCommits: 1,
     removeOptions: {

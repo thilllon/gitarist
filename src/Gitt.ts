@@ -151,7 +151,6 @@ export class Gitt {
 
     for (const _ of Array(numCommits).keys()) {
       try {
-        const now = Date.now().toString();
         const iso = new Date().toISOString();
 
         this.createTmpFiles({ numFiles });
@@ -172,7 +171,7 @@ export class Gitt {
         });
 
         const treeSha = lastCommit.tree.sha;
-        const filesPaths = glob.sync([dirName + '/*']);
+        const filesPaths = glob.sync(['__tmp/*']);
         const filesBlobs = await Promise.all(
           filesPaths.map(async (filePath) => {
             const content = await this.getFileAsUTF8(filePath);
@@ -186,12 +185,13 @@ export class Gitt {
             return blobData.data;
           })
         );
+
         const pathsForBlobs = filesPaths.map((fullPath) =>
           path.relative(dirName, fullPath)
         );
 
         const tree: TreeParam[] = filesBlobs.map(({ sha }, index) => ({
-          path: now + '/' + pathsForBlobs[index],
+          path: '__commit/' + pathsForBlobs[index],
           mode: '100644',
           type: 'blob',
           sha,

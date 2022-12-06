@@ -120,13 +120,15 @@ export class Gitt {
     searchingPaths ??= ['./__commit/**'];
 
     glob.sync(searchingPaths, { onlyFiles: true }).forEach((filePath) => {
-      console.log(filePath);
+      // console.log(filePath);
       const fileName = path.basename(filePath);
       if (isNaN(parseInt(fileName))) {
         return;
       }
 
       if (new Date(parseInt(fileName)) < new Date(Date.now() - staleTimeMs)) {
+        console.log(filePath);
+
         fs.rmSync(filePath, {
           recursive: true,
           force: true,
@@ -148,8 +150,6 @@ export class Gitt {
     numCommits = 1,
     removeOptions,
   }: CreateCommitsOptions) {
-    const dirName = '__commit';
-
     for (const _ of Array(numCommits).keys()) {
       try {
         const iso = new Date().toISOString();

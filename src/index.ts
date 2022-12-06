@@ -15,11 +15,9 @@ const main = async () => {
     repo,
     branch: 'main',
     numFiles: 2,
-    // numCommits: Math.floor(Math.random() * 3 + 1),
-    numCommits: 1,
+    numCommits: Math.floor(Math.random() * 3 + 1),
     removeOptions: {
-      // staleTimeMs: 86400 * 1000,
-      staleTimeMs: 1 * 1000,
+      staleTimeMs: 86400 * 1000,
     },
   });
 

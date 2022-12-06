@@ -49,5 +49,6 @@ echo 'nodeLinker: "pnp"' >> .yarnrc.yml
 yarn install
 yarn plugin import typescript
 yarn add --dev typescript
+yarn add @yarnpkg/sdks -D
 yarn dlx @yarnpkg/sdks vscode
 ```

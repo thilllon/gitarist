@@ -5,6 +5,7 @@
   "repository": "git@github.com:thilllon/gitt.git",
   "author": "thilllon <thilllon970@gmail.com>",
   "license": "MIT",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],

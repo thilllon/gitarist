@@ -16,6 +16,7 @@
     "start": "node ./dist/index.js",
     "format": "prettier -w -l \"src/**/*\"",
     "release": "release-it",
+    "lint": "eslint --fix .",
     "test": "jest"
   },
   "prettier": {

@@ -5,8 +5,8 @@ module.exports = {
   root: true,
   rules: {
     'no-constant-condition': 'off',
-    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-unused-vars': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
   },
-  ignorePatterns: ['.eslintrc*'],
+  ignorePatterns: ['.eslintrc*', 'jest.config.js', 'dist'],
 };

@@ -766,7 +766,7 @@ export class Gitt {
     const jsonFile = 'repos.json';
 
     const repoNames: string[] = [];
-    let iter = 0;
+    const iter = 0;
 
     //   while (true) {
     //     console.log('fetching repos...');

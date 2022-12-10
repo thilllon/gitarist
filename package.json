@@ -1,6 +1,6 @@
 {
   "name": "gitt-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./dist/index.js",
   "repository": "git@github.com:thilllon/gitt.git",
   "author": "thilllon <thilllon970@gmail.com>",

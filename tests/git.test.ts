@@ -6,16 +6,14 @@ import { Gitt } from '../src/Gitt';
 let gitt: Gitt;
 
 beforeAll(async () => {
-  gitt = new Gitt();
   dotenv.config({ path: '.env.test' });
-
   const auth = process.env.GITT_TOKEN;
-
   console.log(auth);
-
   if (!auth) {
     throw new Error('No auth token found');
   }
+
+  gitt = new Gitt();
 });
 
 describe('sum module', () => {
@@ -34,10 +32,10 @@ describe('sum module', () => {
   // });
 
   test('create files', async () => {
-    const dirName = '.test';
-    await gitt.createFiles({
+    const dirName = '__tmp';
+    await gitt.createCommitFiles({
       numFiles: 10,
-      dirName,
+      // dirName,
     });
 
     expect(() => {

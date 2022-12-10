@@ -49,10 +49,9 @@ export class Gitt {
     let auth = token;
 
     if (!auth) {
-      const TOKEN_NAME = 'GITT_TOKEN';
-      auth = process.env[TOKEN_NAME];
+      auth = process.env.GITT_TOKEN;
       if (!auth) {
-        throw new Error('environment variable is not defined: ' + TOKEN_NAME);
+        throw new Error('environment variable is not defined: "GITT_TOKEN"');
       }
     }
 

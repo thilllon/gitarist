@@ -46,18 +46,21 @@ export class Gitt {
   private readonly maxRetries = 10;
 
   constructor({ token }: { token?: string } = {}) {
-    let auth = token;
-
-    if (!auth) {
-      auth = process.env.GITT_TOKEN;
-      if (!auth) {
+    if (!token) {
+      token = process.env.GITT_TOKEN;
+      if (!token) {
         throw new Error('environment variable is not defined: "GITT_TOKEN"');
       }
     }
 
-    const _Octokit = Octokit.plugin(createPullRequest);
-    this.octokit = new _Octokit({ auth });
+    if (!process.env.GITT_OWNER) {
+      throw new Error('environment variable is not defined: "GITT_OWNER"');
+    } else if (!process.env.GITT_REPO) {
+      throw new Error('environment variable is not defined: "GITT_REPO"');
+    }
 
+    const _Octokit = Octokit.plugin(createPullRequest);
+    this.octokit = new _Octokit({ auth: token });
     this._owner = process.env.GITT_OWNER;
     this._repo = process.env.GITT_REPO;
   }

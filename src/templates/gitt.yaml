@@ -1,0 +1,41 @@
+name: Gitt Cron Jobs
+
+on:
+  schedule:
+    # cron for every day 8hours except sunday
+    - cron: '0 */4 * * 1-6'
+  workflow_dispatch:
+
+env:
+  GITT_TOKEN: ${{ secrets.GITT_TOKEN }}
+
+jobs:
+  start:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        # run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+        run: echo "::set-output name=STORE_PATH::$(pnpm store path)"
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - run: pnpm install
+      - run: pnpm build
+      - run: pnpm start

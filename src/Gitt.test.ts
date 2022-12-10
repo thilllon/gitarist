@@ -1,7 +1,7 @@
 import { describe, expect, test } from '@jest/globals';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import { Gitt } from '../src/Gitt';
+import { Gitt } from './Gitt';
 
 let gitt: Gitt;
 

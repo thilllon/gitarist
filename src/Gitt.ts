@@ -24,7 +24,7 @@ import {
  * click here to create a new token
  *
  * #1. repo token
- * https://github.com/settings/tokens/new?description=github_token_repo&scopes=repo,read:packages,read:org,delete_repo
+ * https://github.com/settings/tokens/new?description=GITT_TOKEN&scopes=repo,read:packages,read:org,delete_repo
  *
  * #2. workflow token(workflow control must include permission to repo)
  * https://github.com/settings/tokens/new?description=github_token_workflow&scopes=repo,workflow
@@ -831,4 +831,46 @@ export class Gitt {
       'utf8'
     );
   }
+
+  // /**
+  //  * get stale, error, failed workflow runs. (older than `exceptRecent` runs)
+  //  * @example getStaleWorkflowRuns(runList, 10) means getting from recent 11st to last
+  //  * @param runs
+  //  * @param exceptRecent
+  //  * @returns
+  //  */
+  // async getStaleWorkflowRuns(
+  //   runs: Run[],
+  //   {
+  //     exceptRecent,
+  //     ignoreBranches,
+  //   }: { exceptRecent: number; ignoreBranches: string[] }
+  // ) {
+  //   type WorkflowId = number;
+
+  //   // TODO: 동작중인 workflow 제외하기
+  //   runs = runs.filter((run) => {
+  //     const flag =
+  //       run.conclusion !== 'success' ||
+  //       !ignoreBranches.includes(run.head_branch);
+  //     return flag;
+  //   });
+
+  //   const runObj: Record<WorkflowId, Run[]> = runs.reduce((obj, elem) => {
+  //     const wfs = obj[elem.workflow_id] || [];
+  //     obj[elem.workflow_id] = [...wfs, elem];
+  //     return obj;
+  //   }, {} as { [key: WorkflowId]: Run[] });
+
+  //   const targetRunList = Object.entries(runObj)
+  //     .map(([_, workflowRunList]) => {
+  //       // descending order by created_at
+  //       const sorted = workflowRunList.sort((a, b) =>
+  //         a.created_at < b.created_at ? 1 : -1
+  //       );
+  //       return sorted.slice(exceptRecent, sorted.length);
+  //     })
+  //     .flat();
+  //   return targetRunList;
+  // }
 }

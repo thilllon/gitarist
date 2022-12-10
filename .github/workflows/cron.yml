@@ -1,4 +1,4 @@
-name: Cron Jobs
+name: Gitt Cron Jobs
 
 on:
   schedule:

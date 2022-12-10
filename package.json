@@ -5,7 +5,7 @@
   "repository": "git@github.com:thilllon/commit.git",
   "author": "thilllon <thilllon970@gmail.com>",
   "license": "MIT",
-  "bin": "./dist/cli.js", 
+  "bin": "./dist/cli.js",
   "scripts": {
     "dev": "tsnd ./src/index.ts",
     "build": "tsc",
@@ -13,7 +13,7 @@
     "start": "node ./dist/index.js",
     "format": "prettier -w -l \"src/**/*\"",
     "test": "jest"
-  },  
+  },
   "prettier": {
     "printWidth": 80,
     "singleQuote": true
@@ -26,7 +26,8 @@
     "fast-glob": "^3.2.12",
     "fs-extra": "^11.1.0",
     "octokit": "^2.0.10",
-    "octokit-plugin-create-pull-request": "^4.0.0"
+    "octokit-plugin-create-pull-request": "^4.0.0",
+    "release-it": "^15.5.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.3.1",

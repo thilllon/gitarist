@@ -170,6 +170,7 @@ export type Repository__ = {
 // TODO: @octokit/type 값으로 변경하기
 export type PullRequest__ = any;
 
+// TODO: @octokit/type 값으로 변경하기
 export type Run__ = {
   id: number;
   name: string;
@@ -218,6 +219,7 @@ export type Run__ = {
   head_repository: Repository__;
 };
 
+// TODO: @octokit/type 값으로 변경하기
 export type Conclusion__ =
   | 'action_required'
   | 'cancelled'

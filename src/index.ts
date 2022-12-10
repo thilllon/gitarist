@@ -1,5 +1,5 @@
 import { Gitt } from './Gitt';
-import { runGitt } from './main';
+import { runGitt } from './runner';
 
 runGitt();
 

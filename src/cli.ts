@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import figlet from 'figlet';
 import { mkdir, readFileSync, writeFileSync } from 'fs-extra';
 import path from 'path';
+import { runGitt } from './main';
 
 figlet.textSync('Gitt');
 
@@ -44,6 +45,13 @@ program
       encoding: 'utf8',
       flag: 'w+',
     });
+  });
+
+program
+  .command('commit')
+  .description('commit')
+  .action(() => {
+    runGitt();
   });
 
 program.parse();

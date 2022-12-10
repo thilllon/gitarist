@@ -10,6 +10,7 @@
     "dist"
   ],
   "bin": {
+    "gitt-cli": "./dist/cli.js",
     "gitt": "./dist/cli.js"
   },
   "scripts": {

@@ -9,6 +9,20 @@ const repo = process.env.GITT_REPO ?? 'gitt';
 
 const main = async () => {
   const gitt = new Gitt({ token });
+console.log('#####')
+console.log('#####')
+console.log('#####')
+console.log('#####')
+console.log('#####')
+console.log('#####')
+console.log('#####')
+return; 
+
+
+
+
+
+
 
   await gitt.createCommits({
     owner,

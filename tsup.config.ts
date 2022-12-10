@@ -7,7 +7,6 @@ export default defineConfig({
   dts: true,
   treeshake: true,
   minify: true,
-  shims: true,
   format: ['esm', 'cjs'],
   tsconfig: 'tsconfig.json',
 });

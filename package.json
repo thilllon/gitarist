@@ -1,6 +1,6 @@
 {
   "name": "gitarist",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "main": "./dist/index.js",
   "repository": "git@github.com:thilllon/gitarist.git",
   "author": "thilllon <thilllon970@gmail.com>",

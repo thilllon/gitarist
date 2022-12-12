@@ -2,7 +2,7 @@
 
 To proved that Github green grass("planting grass") means nothing
 
-[![npm version](https://badge.fury.io/js/gitt-cli.svg)](https://badge.fury.io/js/gitt-cli)
+[![npm version](https://badge.fury.io/js/gitarist.svg)](https://badge.fury.io/js/gitarist)
 
 - Multiple useful Github utilities based on `Octokit`
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.

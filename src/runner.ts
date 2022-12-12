@@ -12,10 +12,8 @@ export const runner = async () => {
     owner,
     repo,
     branch: 'main',
-    // numFiles: 1,
-    // numCommits: 1,
-    numFiles: { min: 3, max: 3 },
-    numCommits: { min: 3, max: 3 },
+    numFiles: { min: 1, max: 10 },
+    numCommits: { min: 1, max: 1 },
     removeOptions: {
       staleTimeMs: 86400 * 1000,
     },

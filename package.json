@@ -14,8 +14,7 @@
   "types": "./dist/index.d.ts",
   "packageManager": "pnpm@7.18.1",
   "files": [
-    "dist",
-    "templates"
+    "dist"
   ],
   "bin": {
     "gitarist": "./dist/cli.js"

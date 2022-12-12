@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: npx gitarist@latest run --token \${{ secrets.GITARIST_TOKEN }} --owner $GITHUB_REPOSITORY_OWNER --repo \${{ github.event.repository.name }}
+      - run: npx gitarist run --token \${{ secrets.GITARIST_TOKEN }} --owner $GITHUB_REPOSITORY_OWNER --repo \${{ github.event.repository.name }}
 `;
 
 export const envTemplate = `

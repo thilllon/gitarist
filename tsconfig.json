@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "removeComments": true
+    "removeComments": false
   },
   "include": ["src"],
   "exclude": ["dist"]

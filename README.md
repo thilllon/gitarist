@@ -67,4 +67,4 @@ git config pull.rebase true && git pull --prune && git branch -r | grep --only "
 - [ ] how to make user configurable `runner.ts`
 - [ ] branch is not configurable now, but should be configurable. currently `main` by default
 - [ ] `npx gitarist init` does not work and throws error that can't find directory `./.github/workflows/gitarist.yml`
-- [ ] connect github action with NPM to publish whenever `git push` occurs
+- [ ] connect github action with NPM to publish whenever `git push` occurs to specific branch, such as `release` branch

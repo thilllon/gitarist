@@ -59,3 +59,12 @@ git push origin --force main
 ```sh
 git config pull.rebase true && git pull --prune && git branch -r | grep --only "commit\/167.*" | xargs git push origin --delete && git pull --prune
 ```
+
+## Roadmap
+
+- [ ] husky, lintstaged, commitizen, commitlint
+- [ ] fix the malfunction of `rename stale file`. idea: tree update after set 'sha' as null..
+- [ ] how to make user configurable `runner.ts`
+- [ ] branch is not configurable now, but should be configurable. currently `main` by default
+- [ ] `npx gitarist init` does not work and throws error that can't find directory `./.github/workflows/gitarist.yml`
+- [ ] connect github action with NPM to publish whenever `git push` occurs

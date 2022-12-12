@@ -25,7 +25,7 @@ To proved that Github green grass("planting grass") means nothing
 3. initialize Gitarist and check `./.github/workflows/gitarist.yml`
 
    ```sh
-   npx gitarist init
+   npx gitarist@latest init
    ```
 
 ## How to contribute this project

@@ -2,8 +2,9 @@
 
 import { Command } from 'commander';
 import figlet from 'figlet';
-import { mkdir, readFileSync, writeFileSync } from 'fs-extra';
+import { mkdir, writeFileSync } from 'fs-extra';
 import path from 'path';
+import { actionTemplate, envTemplate } from './gitarist.template';
 import { runner } from './runner';
 
 figlet.textSync('Gitarist');
@@ -22,22 +23,14 @@ program
     const workflowDir = path.join(process.cwd(), '.github', 'workflows');
     mkdir(workflowDir, { recursive: true });
 
-    const actionTemplate = readFileSync(
-      path.join(process.cwd(), 'templates', 'gitarist.yml'),
-      { encoding: 'utf8' }
-    );
     writeFileSync(path.join(workflowDir, 'gitarist.yml'), actionTemplate, {
       encoding: 'utf8',
       flag: 'w+',
     });
 
-    const envTemplate = readFileSync(
-      path.join(__dirname, '.env.example'),
-      'utf8'
-    );
-    writeFileSync(path.join(workflowDir, '.env.example'), envTemplate, {
+    writeFileSync(path.join(workflowDir, '.env'), envTemplate, {
       encoding: 'utf8',
-      flag: 'w+',
+      flag: 'a+',
     });
   });
 

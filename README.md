@@ -2,7 +2,7 @@
 
 To proved that Github green grass("planting grass") means nothing
 
-[![npm version](https://badge.fury.io/js/gitt-cli.svg)](https://badge.fury.io/js/gitt-cli)
+[![npm version](https://badge.fury.io/js/gitarist.svg)](https://badge.fury.io/js/gitarist)
 
 - Multiple useful Github utilities based on `Octokit`
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.
@@ -11,8 +11,9 @@ To proved that Github green grass("planting grass") means nothing
 ## How to use
 
 1. create a secret
+   Permission to `repo` must be inluded to control workflow
 
-   https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo
+   https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow
 
 2. set the secret to the target repository
 

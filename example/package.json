@@ -6,9 +6,10 @@
   "scripts": {
     "clean": "rm -rf ./node_modules .github .gitarist .env && pnpm install",
     "dev:init": "pnpm clean && gitarist init",
-    "dev": "gitarist run"
+    "dev": "dotenv .env && gitarist run --token $GITARIST_TOKEN --owner $GITARIST_OWNER --repo $GITARIST_REPO"
   },
   "dependencies": {
+    "dotenv-cli": "^6.0.0",
     "gitarist": "link:../."
   }
 }

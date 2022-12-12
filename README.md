@@ -8,8 +8,6 @@ To proved that Github green grass("planting grass") means nothing
 
 ## Issues
 
-- [ ] commit dummy file are not stored in the `__commits` directory
-
 ## How to use
 
 - Rename `.env.example` to `.env` and fill the environment values by following instructions

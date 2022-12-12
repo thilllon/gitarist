@@ -42,14 +42,14 @@ export type RemoveStaleFilesOptions = {
   searchingPaths?: string[];
 };
 
-export type TRange = { min: number; max: number };
+export type NumberOrRange = number | { min: number; max: number };
 
 export type CreateCommitsOptions = {
   repo: string;
   owner: string;
   branch: string;
-  numFiles?: number | TRange;
-  numCommits?: number | TRange;
+  numFiles?: NumberOrRange;
+  numCommits?: NumberOrRange;
   removeOptions: RemoveStaleFilesOptions;
 };
 

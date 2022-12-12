@@ -18,7 +18,7 @@ import {
   ListRepositoriesOptions,
   RemoveStaleFilesOptions,
   Run__,
-  TRange,
+  NumberOrRange,
   TreeParam,
   Workflow,
 } from './Gitarist.interface';
@@ -121,8 +121,8 @@ export class Gitarist {
    */
   removeStaleFiles({ staleTimeMs, searchingPaths }: RemoveStaleFilesOptions) {
     console.log('[remove stale files]');
-
-    searchingPaths ??= ['./__commit/**'];
+    const dstFolder = '__commit';
+    searchingPaths ??= [`./.gitarist/${dstFolder}/**`];
 
     glob.sync(searchingPaths, { onlyFiles: true }).forEach((filePath) => {
       // console.log(filePath);
@@ -155,14 +155,12 @@ export class Gitarist {
     numCommits = 1,
     removeOptions,
   }: CreateCommitsOptions) {
-    const dstDir = '__commit';
+    const dstFolder = '__commit';
     const tmpFolder = '__tmp';
 
     if (typeof numCommits !== 'number') {
       numCommits = Math.floor(
-        Math.random() *
-          ((numCommits as TRange).max - (numCommits as TRange).min) +
-          numCommits.min
+        Math.random() * (numCommits.max - numCommits.min) + numCommits.min
       );
     }
 
@@ -172,9 +170,7 @@ export class Gitarist {
       try {
         if (typeof numFiles !== 'number') {
           numFiles = Math.floor(
-            Math.random() *
-              ((numFiles as TRange).max - (numFiles as TRange).min) +
-              numFiles.min
+            Math.random() * (numFiles.max - numFiles.min) + numFiles.min
           );
         }
 
@@ -215,7 +211,7 @@ export class Gitarist {
         await this.octokit.rest.git.deleteRef;
 
         const pathsForBlobs = filesPaths.map(
-          (fullPath) => `.gitarist/${dstDir}/` + path.basename(fullPath)
+          (fullPath) => `.gitarist/${dstFolder}/` + path.basename(fullPath)
         );
 
         const tree: TreeParam[] = filesBlobs.map(({ sha }, index) => ({

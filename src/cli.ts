@@ -28,7 +28,6 @@ program
       encoding: 'utf8',
       flag: 'w+',
     });
-    console.log('########');
 
     writeFileSync(path.join(process.cwd(), '.env'), envTemplate, {
       encoding: 'utf8',

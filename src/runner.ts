@@ -1,16 +1,16 @@
 import dotenv from 'dotenv';
-import { Gitt } from './Gitt';
+import { Gitarist } from './Gitarist';
 
 dotenv.config();
 
-const token = process.env.GITT_TOKEN;
-const owner = process.env.GITT_OWNER ?? 'thilllon';
-const repo = process.env.GITT_REPO ?? 'gitt';
+export const runner = async () => {
+  const token = process.env.GITARIST_TOKEN;
+  const owner = process.env.GITARIST_OWNER;
+  const repo = process.env.GITARIST_REPO;
 
-export const runGitt = async () => {
-  const gitt = new Gitt({ token });
+  const gitarist = new Gitarist({ token });
 
-  await gitt.createCommits({
+  await gitarist.createCommits({
     owner,
     repo,
     branch: 'main',
@@ -21,25 +21,25 @@ export const runGitt = async () => {
     },
   });
 
-  await gitt.createIssues({
+  await gitarist.createIssues({
     owner,
     repo,
     numIssues: 3,
   });
 
-  await gitt.closeIssues({
+  await gitarist.closeIssues({
     owner,
     repo,
     staleTimeMs: 0,
   });
 
-  await gitt.deleteRepoWorkflowLogs({
+  await gitarist.deleteRepoWorkflowLogs({
     owner,
     repo,
     staleTimeMs: 86400 * 1000,
   });
 
-  await gitt.createPullRequest({
+  await gitarist.createPullRequest({
     owner,
     repo,
   });

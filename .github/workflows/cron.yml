@@ -1,4 +1,4 @@
-name: Gitt Cron Jobs
+name: Cron Jobs
 
 on:
   schedule:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  GITT_TOKEN: ${{ secrets.GITT_TOKEN }}
+  GITARIST_TOKEN: ${{ secrets.GITARIST_TOKEN }}
 
 jobs:
   start:

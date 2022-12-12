@@ -1,24 +1,24 @@
 import { describe, expect, test } from '@jest/globals';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import { Gitt } from './Gitt';
+import { Gitarist } from './Gitarist';
 
-let gitt: Gitt;
+let gitarist: Gitarist;
 
 beforeAll(async () => {
   dotenv.config({ path: '.env.test' });
-  const auth = process.env.GITT_TOKEN;
+  const auth = process.env.GITARIST_TOKEN;
   console.log(auth);
   if (!auth) {
     throw new Error('No auth token found');
   }
 
-  gitt = new Gitt();
+  gitarist = new Gitarist();
 });
 
 describe('sum module', () => {
   test('adds 1 + 2 to equal 3', () => {
-    expect(gitt.sum(1, 2)).toBe(3);
+    expect(gitarist.sum(1, 2)).toBe(3);
   });
 
   // test('create commits', async () => {
@@ -33,7 +33,7 @@ describe('sum module', () => {
 
   test('create files', async () => {
     const dirName = '__tmp';
-    await gitt.createCommitFiles({
+    await gitarist.createCommitFiles({
       numFiles: 10,
       // dirName,
     });

@@ -19,13 +19,13 @@ import {
   Run__,
   TreeParam,
   Workflow,
-} from './Gitt.interface';
+} from './Gitarist.interface';
 
 /**
  * click here to create a new token
  *
  * #1. repo token
- * https://github.com/settings/tokens/new?description=GITT_TOKEN&scopes=repo,read:packages,read:org,delete_repo
+ * https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo
  *
  * #2. workflow token(workflow control must include permission to repo)
  * https://github.com/settings/tokens/new?description=github_token_workflow&scopes=repo,workflow
@@ -39,7 +39,7 @@ import {
  * Octokit documents
  * https://octokit.github.io/rest.js/v19
  */
-export class Gitt {
+export class Gitarist {
   private readonly octokit;
   private readonly perPage = 100;
   private readonly _owner?: string;
@@ -48,22 +48,24 @@ export class Gitt {
 
   constructor({ token }: { token?: string } = {}) {
     if (!token) {
-      token = process.env.GITT_TOKEN;
+      token = process.env.GITARIST_TOKEN;
       if (!token) {
-        throw new Error('environment variable is not defined: "GITT_TOKEN"');
+        throw new Error(
+          'environment variable is not defined: "GITARIST_TOKEN"'
+        );
       }
     }
 
-    if (!process.env.GITT_OWNER) {
-      throw new Error('environment variable is not defined: "GITT_OWNER"');
-    } else if (!process.env.GITT_REPO) {
-      throw new Error('environment variable is not defined: "GITT_REPO"');
+    if (!process.env.GITARIST_OWNER) {
+      throw new Error('environment variable is not defined: "GITARIST_OWNER"');
+    } else if (!process.env.GITARIST_REPO) {
+      throw new Error('environment variable is not defined: "GITARIST_REPO"');
     }
 
     const _Octokit = Octokit.plugin(createPullRequest);
     this.octokit = new _Octokit({ auth: token });
-    this._owner = process.env.GITT_OWNER;
-    this._repo = process.env.GITT_REPO;
+    this._owner = process.env.GITARIST_OWNER;
+    this._repo = process.env.GITARIST_REPO;
   }
 
   get owner() {

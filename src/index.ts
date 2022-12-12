@@ -1,6 +1,6 @@
-import { Gitt } from './Gitt';
-import { runGitt } from './runner';
+import { Gitarist } from './Gitarist';
+import { runner } from './runner';
 
-runGitt();
+runner();
 
-export { Gitt, runGitt };
+export { Gitarist, runner };

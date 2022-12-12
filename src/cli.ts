@@ -4,19 +4,19 @@ import { Command } from 'commander';
 import figlet from 'figlet';
 import { mkdir, readFileSync, writeFileSync } from 'fs-extra';
 import path from 'path';
-import { runGitt } from './runner';
+import { runner } from './runner';
 
-figlet.textSync('Gitt');
+figlet.textSync('Gitarist');
 
 const actionTemplate = readFileSync(
-  path.join(process.cwd(), 'src', 'templates', 'gitt.yml'),
+  path.join(process.cwd(), 'src', 'templates', 'gitarist.yml'),
   { encoding: 'utf8' }
 );
 
 const program = new Command();
 
 program
-  .name('gitt')
+  .name('gitarist')
   .description('CLI to some JavaScript string utilities')
   .version('0.8.0');
 
@@ -32,7 +32,7 @@ program
 
     const dir = path.join(process.cwd(), '.github', 'workflows');
     mkdir(dir, { recursive: true });
-    writeFileSync(path.join(dir, 'gitt.yml'), actionTemplate, {
+    writeFileSync(path.join(dir, 'gitarist.yml'), actionTemplate, {
       encoding: 'utf8',
       flag: 'w+',
     });
@@ -51,7 +51,7 @@ program
   .command('commit')
   .description('commit')
   .action(() => {
-    runGitt();
+    runner();
   });
 
 program.parse();

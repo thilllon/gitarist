@@ -38,6 +38,9 @@ jobs:
       - run: pnpm install
       - run: pnpm build
       - run: pnpm start
+
+      # // --------------------------------
+      # // --------------------------------
 # jobs:
 #   start:
 #     runs-on: ubuntu-latest

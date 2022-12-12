@@ -1,0 +1,13 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "gitarist commit"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "gitarist": "link:../."
+  }
+}

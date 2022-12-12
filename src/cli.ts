@@ -8,11 +8,6 @@ import { runner } from './runner';
 
 figlet.textSync('Gitarist');
 
-const actionTemplate = readFileSync(
-  path.join(process.cwd(), 'src', 'templates', 'gitarist.yml'),
-  { encoding: 'utf8' }
-);
-
 const program = new Command();
 
 program
@@ -32,6 +27,10 @@ program
 
     const dir = path.join(process.cwd(), '.github', 'workflows');
     mkdir(dir, { recursive: true });
+    const actionTemplate = readFileSync(
+      path.join(process.cwd(), 'src', 'templates', 'gitarist.yml'),
+      { encoding: 'utf8' }
+    );
     writeFileSync(path.join(dir, 'gitarist.yml'), actionTemplate, {
       encoding: 'utf8',
       flag: 'w+',
@@ -50,7 +49,17 @@ program
 program
   .command('commit')
   .description('commit')
-  .action(() => {
+  .option('-t,--token <string>', 'github token')
+  .option('-o,--owner <string>', 'github owner')
+  .option('-r,--repo <string>', 'github repo')
+  .action((options) => {
+    process.env.GITARIST_TOKEN = options.token;
+    process.env.GITARIST_OWNER = options.owner;
+    process.env.GITARIST_REPO = options.repo;
+    // console.log(options);
+    // console.log(process.env.GITARIST_TOKEN);
+    // console.log(process.env.GITARIST_OWNER);
+    // console.log(process.env.GITARIST_REPO);
     runner();
   });
 

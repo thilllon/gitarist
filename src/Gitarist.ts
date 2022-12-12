@@ -62,10 +62,14 @@ export class Gitarist {
       throw new Error('environment variable is not defined: "GITARIST_REPO"');
     }
 
-    const _Octokit = Octokit.plugin(createPullRequest);
-    this.octokit = new _Octokit({ auth: token });
     this._owner = process.env.GITARIST_OWNER;
     this._repo = process.env.GITARIST_REPO;
+    const _Octokit = Octokit.plugin(createPullRequest);
+    try {
+      this.octokit = new _Octokit({ auth: token });
+    } catch (err) {
+      throw new Error('@#$@#$@#$@#$@#$@#$');
+    }
   }
 
   get owner() {

@@ -57,7 +57,11 @@ git push origin --force main
 ## clean PR history
 
 ```sh
-git config pull.rebase true && git pull --prune && git branch -r | grep --only "commit\/167.*" | xargs git push origin --delete && git pull --prune
+git config pull.rebase true && git pull --prune && git branch -r | grep --only "commit\/167.*" | xargs git push --delete origin && git pull --prune
+
+
+# git push --delete origin SOME_TAG_NAME
+# git tag --delete SOME_TAG_NAME
 ```
 
 ## Roadmap

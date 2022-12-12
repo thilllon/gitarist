@@ -23,13 +23,14 @@ program
   .action(() => {
     const workflowDir = path.join(process.cwd(), '.github', 'workflows');
     mkdir(workflowDir, { recursive: true });
-
+    console.log('###');
     writeFileSync(path.join(workflowDir, 'gitarist.yml'), actionTemplate, {
       encoding: 'utf8',
       flag: 'w+',
     });
+    console.log('########');
 
-    writeFileSync(path.join(workflowDir, '.env'), envTemplate, {
+    writeFileSync(path.join(process.cwd(), '.env'), envTemplate, {
       encoding: 'utf8',
       flag: 'a+',
     });

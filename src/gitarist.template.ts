@@ -1,5 +1,4 @@
-export const actionTemplate = `
-name: Gitarist
+export const actionTemplate = `name: Gitarist
 
 on:
   workflow_dispatch:
@@ -17,10 +16,7 @@ jobs:
 `;
 
 export const envTemplate = `
-
-# https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo
 GITARIST_TOKEN=""
 GITARIST_OWNER=""
 GITARIST_REPO=""
-
 `;

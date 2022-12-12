@@ -11,18 +11,22 @@ To proved that Github green grass("planting grass") means nothing
 ## How to use
 
 1. create a secret
+
    https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo
 
 2. set the secret to the target repository
 
-Go to setting page and set secret as "GITARIST_TOKEN", https://github.com/{OWNER}/{REPO}/settings/secrets/actions
-Make sure that you are the owner of the target repository.
+   Go to setting page and set secret as `GITARIST_TOKEN`
 
-3. initialize gitarist
+   https://github.com/{OWNER}/{REPO}/settings/secrets/actions
 
-```sh
-npx gitarist init # to create github action workflow file
-```
+   Make sure that you are the owner of the target repository.
+
+3. initialize Gitarist and check `./.github/workflows/gitarist.yml`
+
+   ```sh
+   npx gitarist@latest init
+   ```
 
 ## How to contribute this project
 

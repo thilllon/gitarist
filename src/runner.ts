@@ -14,33 +14,33 @@ export const runner = async () => {
     branch: 'main',
     // numFiles: 1,
     // numCommits: 1,
-    numFiles: { min: 1, max: 3 },
-    numCommits: { min: 1, max: 3 },
+    numFiles: { min: 3, max: 3 },
+    numCommits: { min: 3, max: 3 },
     removeOptions: {
       staleTimeMs: 86400 * 1000,
     },
   });
 
-  // await gitarist.createIssues({
-  //   owner,
-  //   repo,
-  //   numIssues: 3,
-  // });
+  await gitarist.createIssues({
+    owner,
+    repo,
+    numIssues: 3,
+  });
 
-  // await gitarist.closeIssues({
-  //   owner,
-  //   repo,
-  //   staleTimeMs: 0,
-  // });
+  await gitarist.closeIssues({
+    owner,
+    repo,
+    staleTimeMs: 0,
+  });
 
-  // await gitarist.deleteRepoWorkflowLogs({
-  //   owner,
-  //   repo,
-  //   staleTimeMs: 86400 * 1000,
-  // });
+  await gitarist.deleteRepoWorkflowLogs({
+    owner,
+    repo,
+    staleTimeMs: 86400 * 1000,
+  });
 
-  // await gitarist.createPullRequest({
-  //   owner,
-  //   repo,
-  // });
+  await gitarist.createPullRequest({
+    owner,
+    repo,
+  });
 };

@@ -1,4 +1,4 @@
-# Gitt
+# Gitarist
 
 To proved that Github green grass("planting grass") means nothing
 
@@ -34,9 +34,6 @@ git rebase -i --root
 git push origin -f main
 ```
 
-
-
-
 ## setup Yarn berry
 
 ```sh
@@ -55,3 +52,5 @@ yarn add --dev typescript
 yarn add @yarnpkg/sdks -D
 yarn dlx @yarnpkg/sdks vscode
 ```
+
+¡

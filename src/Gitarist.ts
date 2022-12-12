@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import glob from 'fast-glob';
-import fs from 'fs';
-import { readFile } from 'fs-extra';
+import fs, { existsSync, mkdirSync, readFileSync } from 'fs';
 import { Octokit } from 'octokit';
 import { createPullRequest } from 'octokit-plugin-create-pull-request';
 import path from 'path';
@@ -70,8 +69,8 @@ export class Gitarist {
     const tmpFolder = '__tmp';
     const tmpDir = path.join(process.cwd(), '.gitarist', tmpFolder);
 
-    if (!fs.existsSync(tmpDir)) {
-      fs.mkdirSync(tmpDir, { recursive: true });
+    if (!existsSync(tmpDir)) {
+      mkdirSync(tmpDir, { recursive: true });
     }
 
     const files = Array.from({ length: numFiles })
@@ -95,7 +94,7 @@ export class Gitarist {
   }
 
   async getFileAsUTF8(filePath: string) {
-    return readFile(filePath, 'utf8');
+    return readFileSync(filePath, 'utf8');
   }
 
   /**

@@ -2,7 +2,7 @@
 
 import { Command } from 'commander';
 import figlet from 'figlet';
-import { mkdir, writeFileSync } from 'fs-extra';
+import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import packageJson from '../package.json';
 import { actionTemplate, envTemplate } from './gitarist.template';
@@ -22,8 +22,8 @@ program
   .description('initialize')
   .action(() => {
     const workflowDir = path.join(process.cwd(), '.github', 'workflows');
-    mkdir(workflowDir, { recursive: true });
-    console.log('###');
+    mkdirSync(workflowDir, { recursive: true });
+
     writeFileSync(path.join(workflowDir, 'gitarist.yml'), actionTemplate, {
       encoding: 'utf8',
       flag: 'w+',

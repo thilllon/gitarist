@@ -4,6 +4,7 @@ import fs from 'fs';
 import { readFile } from 'fs-extra';
 import { Octokit } from 'octokit';
 import { createPullRequest } from 'octokit-plugin-create-pull-request';
+import { tmpdir } from 'os';
 import path from 'path';
 import {
   CloseIssuesOptions,
@@ -17,8 +18,8 @@ import {
   ListRepositoriesOptions,
   RemoveStaleFilesOptions,
   Run__,
-  TreeParam,
   TRange,
+  TreeParam,
   Workflow,
 } from './Gitarist.interface';
 
@@ -83,11 +84,11 @@ export class Gitarist {
 
   createCommitFiles({ numFiles }: CreateFilesOptions) {
     console.log('[create files]');
+    const tmpFolder = '__tmp';
+    const tmpDir = path.join(process.cwd(), '.gitarist', tmpFolder);
 
-    const targetDir = path.join(process.cwd(), '__tmp');
-
-    if (!fs.existsSync(targetDir)) {
-      fs.mkdirSync(targetDir, { recursive: true });
+    if (!fs.existsSync(tmpDir)) {
+      fs.mkdirSync(tmpDir, { recursive: true });
     }
 
     const files = Array.from({ length: numFiles })
@@ -96,9 +97,7 @@ export class Gitarist {
           const now = Date.now().toString();
           const iso = new Date().toISOString();
           const content = (iso + '\n').repeat(10);
-          const filePath = path.join(targetDir, now);
-
-          console.log(filePath);
+          const filePath = path.join(tmpDir, now);
 
           fs.writeFileSync(filePath, content, 'utf8');
           return filePath;
@@ -156,6 +155,9 @@ export class Gitarist {
     numCommits = 1,
     removeOptions,
   }: CreateCommitsOptions) {
+    const dstDir = '__commit';
+    const tmpFolder = '__tmp';
+
     if (typeof numCommits !== 'number') {
       numCommits = Math.floor(
         Math.random() *
@@ -177,6 +179,7 @@ export class Gitarist {
         }
 
         this.createCommitFiles({ numFiles });
+        // FIXME: remove stale files. 삭제만 하면안되고 commit에 포함시켜야함. https://stackoverflow.com/questions/72847260/deleting-folder-from-github-using-octokit-rest
         // this.removeStaleFiles(removeOptions);
 
         // gets commit's AND its tree's SHA
@@ -194,7 +197,7 @@ export class Gitarist {
         });
 
         const treeSha = lastCommit.tree.sha;
-        const filesPaths = glob.sync(['__tmp/*']);
+        const filesPaths = glob.sync([`.gitarist/${tmpFolder}/*`]);
         const filesBlobs = await Promise.all(
           filesPaths.map(async (filePath) => {
             const content = await this.getFileAsUTF8(filePath);
@@ -209,8 +212,10 @@ export class Gitarist {
           })
         );
 
+        await this.octokit.rest.git.deleteRef;
+
         const pathsForBlobs = filesPaths.map(
-          (fullPath) => '__commit/' + path.basename(fullPath)
+          (fullPath) => `.gitarist/${dstDir}/` + path.basename(fullPath)
         );
 
         const tree: TreeParam[] = filesBlobs.map(({ sha }, index) => ({
@@ -245,8 +250,8 @@ export class Gitarist {
       } catch (err: any) {
         console.error(err.message);
       } finally {
-        // const tmpDir = path.join(process.cwd(), '__tmp');
-        // fs.rmSync(tmpDir, { recursive: true, force: true, maxRetries: 10 });
+        const dir = path.join(process.cwd(), '.gitarist', tmpFolder);
+        fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10 });
       }
     }
   }

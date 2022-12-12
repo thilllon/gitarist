@@ -1,6 +1,7 @@
 import { describe, expect, test } from '@jest/globals';
 import dotenv from 'dotenv';
 import fs from 'fs';
+import path from 'path';
 import { Gitarist } from './Gitarist';
 
 let gitarist: Gitarist;
@@ -32,17 +33,16 @@ describe('sum module', () => {
   // });
 
   test('create files', async () => {
-    const dirName = '__tmp';
-    await gitarist.createCommitFiles({
-      numFiles: 10,
-      // dirName,
-    });
+    const tmpFolder = '__tmp';
+    const tmpDir = path.join(process.cwd(), '.gitarist', tmpFolder);
+    await gitarist.createCommitFiles({ numFiles: 10 });
 
     expect(() => {
-      const files = fs.readdirSync(dirName);
+      const files = fs.readdirSync(tmpDir);
       console.log(files);
       return files;
     }).toBeDefined();
-    fs.rmdirSync(dirName, { recursive: true });
+
+    fs.rmdirSync(tmpDir, { recursive: true });
   });
 });

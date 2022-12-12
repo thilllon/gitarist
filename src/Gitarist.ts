@@ -18,6 +18,7 @@ import {
   RemoveStaleFilesOptions,
   Run__,
   TreeParam,
+  TRange,
   Workflow,
 } from './Gitarist.interface';
 
@@ -65,11 +66,7 @@ export class Gitarist {
     this._owner = process.env.GITARIST_OWNER;
     this._repo = process.env.GITARIST_REPO;
     const _Octokit = Octokit.plugin(createPullRequest);
-    try {
-      this.octokit = new _Octokit({ auth: token });
-    } catch (err) {
-      throw new Error('@#$@#$@#$@#$@#$@#$');
-    }
+    this.octokit = new _Octokit({ auth: token });
   }
 
   get owner() {
@@ -159,12 +156,28 @@ export class Gitarist {
     numCommits = 1,
     removeOptions,
   }: CreateCommitsOptions) {
+    if (typeof numCommits !== 'number') {
+      numCommits = Math.floor(
+        Math.random() *
+          ((numCommits as TRange).max - (numCommits as TRange).min) +
+          numCommits.min
+      );
+    }
+
     for (const _ of Array(numCommits).keys()) {
+      const iso = new Date().toISOString();
+
       try {
-        const iso = new Date().toISOString();
+        if (typeof numFiles !== 'number') {
+          numFiles = Math.floor(
+            Math.random() *
+              ((numFiles as TRange).max - (numFiles as TRange).min) +
+              numFiles.min
+          );
+        }
 
         this.createCommitFiles({ numFiles });
-        this.removeStaleFiles(removeOptions);
+        // this.removeStaleFiles(removeOptions);
 
         // gets commit's AND its tree's SHA
         const ref = `heads/${branch}`;
@@ -232,8 +245,8 @@ export class Gitarist {
       } catch (err: any) {
         console.error(err.message);
       } finally {
-        const tmpDir = path.join(process.cwd(), '__tmp');
-        fs.rmSync(tmpDir, { recursive: true, force: true, maxRetries: 10 });
+        // const tmpDir = path.join(process.cwd(), '__tmp');
+        // fs.rmSync(tmpDir, { recursive: true, force: true, maxRetries: 10 });
       }
     }
   }

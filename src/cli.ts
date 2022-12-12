@@ -4,17 +4,18 @@ import { Command } from 'commander';
 import figlet from 'figlet';
 import { mkdir, writeFileSync } from 'fs-extra';
 import path from 'path';
+import packageJson from '../package.json';
 import { actionTemplate, envTemplate } from './gitarist.template';
 import { runner } from './runner';
 
-figlet.textSync('Gitarist');
+console.log(figlet.textSync(packageJson.name, { font: 'Slant' }));
 
 const program = new Command();
 
 program
-  .name('gitarist')
-  .description('CLI to some JavaScript string utilities')
-  .version('0.8.0');
+  .name(packageJson.name)
+  .description(packageJson.description)
+  .version(packageJson.version);
 
 program
   .command('init')

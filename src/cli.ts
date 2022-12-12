@@ -7,7 +7,7 @@ import path from 'path';
 import { actionTemplate, envTemplate } from './gitarist.template';
 import { runner } from './runner';
 
-figlet.textSync('Gitarist');
+console.log(figlet.textSync('Gitarist', { horizontalLayout: 'full' }));
 
 const program = new Command();
 

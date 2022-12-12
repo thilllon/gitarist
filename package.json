@@ -18,7 +18,7 @@
     "build:tsup": "tsup",
     "start": "node ./dist/index.js",
     "format": "prettier -w -l \"src/**/*\"",
-    "prerelease": "pnpm format && pnpm lint && pnpm test && pnpm build",
+    "_prerelease": "pnpm format && pnpm lint && pnpm test && pnpm build",
     "release": "release-it",
     "lint": "eslint --fix .",
     "test": "jest"

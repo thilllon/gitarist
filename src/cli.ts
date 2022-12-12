@@ -19,7 +19,7 @@ program
 
 program
   .command('init')
-  .description('setup a cron job')
+  .description('initialize')
   .action(() => {
     const workflowDir = path.join(process.cwd(), '.github', 'workflows');
     mkdir(workflowDir, { recursive: true });

@@ -587,7 +587,7 @@ export class Gitarist {
       repo,
       title: now,
       body: now,
-      head: 'feat/' + now,
+      head: 'commit/' + now,
       update: false,
       forceFork: false,
       changes: [

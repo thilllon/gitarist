@@ -47,8 +47,8 @@ program
   });
 
 program
-  .command('commit')
-  .description('commit')
+  .command('run')
+  .description('run gitarist suite')
   .option('-t,--token <string>', 'github token')
   .option('-o,--owner <string>', 'github owner')
   .option('-r,--repo <string>', 'github repo')

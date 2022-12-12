@@ -7,6 +7,15 @@ export const runner = async () => {
   const owner = process.env.GITARIST_OWNER as string;
   const repo = process.env.GITARIST_REPO as string;
 
+  console.log(token, owner, repo);
+  console.log('####');
+  console.log('####');
+  console.log('####');
+  console.log('####');
+  if (!token || !owner || !repo) {
+    throw new Error('Missing required environment variables');
+  }
+
   const gitarist = new Gitarist({ token });
   await gitarist.createCommits({
     owner,

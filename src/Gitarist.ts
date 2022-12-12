@@ -586,58 +586,57 @@ export class Gitarist {
 
   // https://www.npmjs.com/package/octokit-plugin-create-pull-request
   async createPullRequest({ owner, repo }: CreatePullRequestOptions) {
-    const dir = '__pullrequest';
+    const dstFolder = '__pullrequest';
 
     const now = Date.now().toString();
     const iso = new Date().toISOString();
 
-    this.octokit
-      .createPullRequest({
-        owner,
-        repo,
-        title: now,
-        body: now,
-        head: 'feat/' + now,
-        update: false,
-        forceFork: false,
-        changes: [
-          {
-            /* optional: if `files` is not passed, an empty commit is created instead */
-            files: {
-              [dir + '/' + now]: now,
-              // 'path/to/file2.png': {
-              //   content: '_base64_encoded_content_',
-              //   encoding: 'base64',
-              // },
-              // // deletes file if it exists,
-              // 'path/to/file3.txt': null,
-              // // updates file based on current content
-              // 'path/to/file4.txt': ({ exists, encoding, content }: anyTemp) => {
-              //   // do not create the file if it does not exist
-              //   if (!exists) {
-              //     return null;
-              //   }
-              //   return Buffer.from(content, encoding)
-              //     .toString('utf-8')
-              //     .toUpperCase();
-              // },
-              // 'path/to/file5.sh': {
-              //   content: 'echo Hello World',
-              //   encoding: 'utf-8',
-              //   // one of the modes supported by the git tree object
-              //   // https://developer.github.com/v3/git/trees/#tree-object
-              //   mode: '100755',
-              // },
-            },
-            commit: 'PR ' + iso,
+    const pullRequest = await this.octokit.createPullRequest({
+      owner,
+      repo,
+      title: now,
+      body: now,
+      head: 'feat/' + now,
+      update: false,
+      forceFork: false,
+      changes: [
+        {
+          commit: 'PR ' + iso,
+          /* optional: if `files` is not passed, an empty commit is created instead */
+          files: {
+            [`.gitarist/${dstFolder}/${now}`]: now,
+
+            // 'path/to/file2.png': {
+            //   content: '_base64_encoded_content_',
+            //   encoding: 'base64',
+            // },
+            // // deletes file if it exists,
+            // 'path/to/file3.txt': null,
+            // // updates file based on current content
+            // 'path/to/file4.txt': ({ exists, encoding, content }: anyTemp) => {
+            //   // do not create the file if it does not exist
+            //   if (!exists) {
+            //     return null;
+            //   }
+            //   return Buffer.from(content, encoding)
+            //     .toString('utf-8')
+            //     .toUpperCase();
+            // },
+            // 'path/to/file5.sh': {
+            //   content: 'echo Hello World',
+            //   encoding: 'utf-8',
+            //   // one of the modes supported by the git tree object
+            //   // https://developer.github.com/v3/git/trees/#tree-object
+            //   mode: '100755',
+            // },
           },
-        ],
-      })
-      .then((pr) => {
-        if (pr) {
-          console.log(pr.data.number);
-        }
-      });
+        },
+      ],
+    });
+
+    if (pullRequest) {
+      console.log(pullRequest.data.number);
+    }
   }
 
   async removeIssueCommentsByBot({

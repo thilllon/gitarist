@@ -40,6 +40,10 @@ export type TreeParam = {
 export type RemoveStaleFilesOptions = {
   staleTimeMs: number;
   searchingPaths?: string[];
+  /**
+   * subpath under the ".gitarist" directory. e.g., "__pullrequest"
+   */
+  subpath?: string;
 };
 
 export type NumberOrRange = number | { min: number; max: number };
@@ -50,6 +54,10 @@ export type CreateCommitsOptions = {
   branch: string;
   numFiles?: NumberOrRange;
   numCommits?: NumberOrRange;
+  /**
+   * subpath under the ".gitarist" directory. e.g., "__pullrequest"
+   */
+  subpath?: string;
   removeOptions: RemoveStaleFilesOptions;
 };
 
@@ -92,6 +100,19 @@ export type DeleteRepoWorkflowLogsOptions = {
 export type CreatePullRequestOptions = {
   owner: string;
   repo: string;
+  /**
+   * PR branch name
+   * prior to the "prefixHead" option
+   */
+  head?: string;
+  /**
+   * prefix for the head branch. ignored if "head" option is provided
+   */
+  headPrefix?: string;
+  /**
+   * subpath under the ".gitarist" directory. e.g., "__pullrequest"
+   */
+  subpath?: string;
 };
 
 // --------------------------------

@@ -4,7 +4,6 @@ import fs from 'fs';
 import { readFile } from 'fs-extra';
 import { Octokit } from 'octokit';
 import { createPullRequest } from 'octokit-plugin-create-pull-request';
-import { tmpdir } from 'os';
 import path from 'path';
 import {
   CloseIssuesOptions,
@@ -18,35 +17,18 @@ import {
   ListRepositoriesOptions,
   RemoveStaleFilesOptions,
   Run__,
-  NumberOrRange,
   TreeParam,
   Workflow,
 } from './Gitarist.interface';
 
-/**
- * click here to create a new token
- *
- * #1. repo token
- * https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo
- *
- * #2. workflow token(workflow control must include permission to repo)
- * https://github.com/settings/tokens/new?description=github_token_workflow&scopes=repo,workflow
- * token options
- *
- * https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
- *
- * links above are classic tokens. new token method (fine grained) is newly released. (currently beta version)
- * https://github.com/settings/personal-access-tokens/new
- *
- * Octokit documents
- * https://octokit.github.io/rest.js/v19
- */
+// https://octokit.github.io/rest.js/v19
+// https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
+
 export class Gitarist {
   private readonly octokit;
-  private readonly perPage = 100;
   private readonly _owner?: string;
   private readonly _repo?: string;
-  private readonly maxRetries = 10;
+  private readonly perPage = 100;
 
   constructor({ token }: { token?: string } = {}) {
     if (!token) {
@@ -66,6 +48,7 @@ export class Gitarist {
 
     this._owner = process.env.GITARIST_OWNER;
     this._repo = process.env.GITARIST_REPO;
+
     const _Octokit = Octokit.plugin(createPullRequest);
     this.octokit = new _Octokit({ auth: token });
   }
@@ -120,10 +103,13 @@ export class Gitarist {
    * 파일의 실제 생성시간을 확인하는 것이 아니라 폴더이름을 바탕으로 삭제한다.
    * @param staleTimeMs 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지
    */
-  removeStaleFiles({ staleTimeMs, searchingPaths }: RemoveStaleFilesOptions) {
+  removeStaleFiles({
+    staleTimeMs,
+    searchingPaths,
+    subpath = '__commit',
+  }: RemoveStaleFilesOptions) {
     console.group('[remove stale files]');
-    const dstFolder = '__commit';
-    searchingPaths ??= [`./.gitarist/${dstFolder}/**`];
+    searchingPaths ??= [`./.gitarist/${subpath}/**`];
 
     glob.sync(searchingPaths, { onlyFiles: true }).forEach((filePath) => {
       const fileName = path.basename(filePath);
@@ -134,11 +120,7 @@ export class Gitarist {
       if (new Date(parseInt(fileName)) < new Date(Date.now() - staleTimeMs)) {
         console.debug(filePath);
 
-        fs.rmSync(filePath, {
-          recursive: true,
-          force: true,
-          maxRetries: this.maxRetries,
-        });
+        fs.rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
       }
     });
 
@@ -155,9 +137,9 @@ export class Gitarist {
     branch,
     numFiles = 10,
     numCommits = 1,
+    subpath = '__commit',
     removeOptions,
   }: CreateCommitsOptions) {
-    const dstFolder = '__commit';
     const tmpFolder = '__tmp';
 
     if (typeof numCommits !== 'number') {
@@ -211,7 +193,7 @@ export class Gitarist {
         );
 
         const pathsForBlobs = filesPaths.map(
-          (fullPath) => `.gitarist/${dstFolder}/` + path.basename(fullPath)
+          (fullPath) => `.gitarist/${subpath}/` + path.basename(fullPath)
         );
 
         const tree: TreeParam[] = filesBlobs.map(({ sha }, index) => ({
@@ -446,15 +428,14 @@ export class Gitarist {
     staleTimeMs,
   }: DeleteRepoWorkflowLogsOptions) {
     console.group('[deleteRepoWorkflowLogs]');
-    const wfIdSet = new Set<number>();
-    const largeEnough = 200;
+    const bigEnough = 200;
     const maxTotalPages = 20;
 
     let wfIds: number[] = [];
     const wfs: Workflow[] = [];
 
-    // TODO: rxjs로 바꾸기
-    for await (const page of Array(largeEnough).keys()) {
+    // TODO: rxjs
+    for await (const page of Array(bigEnough).keys()) {
       const wfResponse = await this.octokit.rest.actions.listRepoWorkflows({
         owner,
         repo,
@@ -575,9 +556,14 @@ export class Gitarist {
   }
 
   // https://www.npmjs.com/package/octokit-plugin-create-pull-request
-  async createPullRequest({ owner, repo }: CreatePullRequestOptions) {
-    console.group('[createPullRequest]');
-    const dstFolder = '__pullrequest';
+  async createPullRequest({
+    owner,
+    repo,
+    head,
+    headPrefix = 'request',
+    subpath = '__pullrequest',
+  }: CreatePullRequestOptions) {
+    console.group('[create pull request]');
 
     const now = Date.now().toString();
     const iso = new Date().toISOString();
@@ -587,15 +573,15 @@ export class Gitarist {
       repo,
       title: now,
       body: now,
-      head: 'commit/' + now,
-      update: false,
+      head: head ?? headPrefix + '/' + now,
+      update: true,
       forceFork: false,
       changes: [
         {
-          commit: 'PR ' + iso,
+          commit: '[PR]' + iso,
           /* optional: if `files` is not passed, an empty commit is created instead */
           files: {
-            [`.gitarist/${dstFolder}/${now}`]: now,
+            [`.gitarist/${subpath}/${now}`]: now,
 
             // 'path/to/file2.png': {
             //   content: '_base64_encoded_content_',
@@ -632,15 +618,16 @@ export class Gitarist {
     console.groupEnd();
   }
 
-  async removeIssueCommentsByBot({
+  async removeCommentsOnIssueByBot({
     owner,
     repo,
   }: {
     owner: string;
     repo: string;
   }) {
-    const largeEnough = 9999;
-    const arr = [...Array(largeEnough).keys()];
+    // TODO: rxjs
+    const bigEnough = 9999;
+    const arr = [...Array(bigEnough).keys()];
 
     for await (const page of arr) {
       const commentsResponse =
@@ -715,7 +702,7 @@ export class Gitarist {
       changeTitle?: boolean;
     };
   }) {
-    const largeEnough = 9999;
+    const bigEnough = 9999;
 
     const titleToLabel = {
       '<client>': ['client'],
@@ -723,7 +710,7 @@ export class Gitarist {
       '<infra>': ['infra'],
     };
 
-    const arr = [...Array(largeEnough).keys()];
+    const arr = [...Array(bigEnough).keys()];
 
     for await (const page of arr) {
       const res = await this.octokit.rest.issues.listForRepo({

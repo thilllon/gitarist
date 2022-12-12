@@ -11,8 +11,9 @@ To proved that Github green grass("planting grass") means nothing
 ## How to use
 
 1. create a secret
+   permission to `repo` must be inluded to control workflow
 
-   https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo
+   https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow
 
 2. set the secret to the target repository
 

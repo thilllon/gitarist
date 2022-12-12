@@ -4,7 +4,8 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "dev:init": "gitarist init",
+    "clean": "rm -rf ./node_modules .github .gitarist .env && pnpm install",
+    "dev:init": "pnpm clean && gitarist init",
     "dev": "gitarist run"
   },
   "dependencies": {

@@ -2,6 +2,8 @@
 
 To proved that Github green grass("planting grass") means nothing
 
+[![npm version](https://badge.fury.io/js/gitt-cli.svg)](https://badge.fury.io/js/gitt-cli)
+
 - Multiple useful Github utilities based on `Octokit`
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.
 - Run cron job using `Github Action`
@@ -14,25 +16,24 @@ To proved that Github green grass("planting grass") means nothing
 
 ```sh
 # development
-yarn dev
+pnpm dev
 
 # production
-yarn build
-yarn start
+pnpm build
+pnpm start
 ```
 
 ## How to make a clean git history
 
 ```sh
 # interactive rebase and squash all except root commit
+# or, git rebase -i HEAD~11
 git rebase -i --root
-# git rebase -i HEAD~11
 
-# force push
-git push origin -f main
+git push origin --force main
 ```
 
-## setup Yarn berry
+<!-- ## setup Yarn berry
 
 ```sh
 # "packageManager": "yarn@3.3.0",
@@ -49,6 +50,4 @@ yarn plugin import typescript
 yarn add --dev typescript
 yarn add @yarnpkg/sdks -D
 yarn dlx @yarnpkg/sdks vscode
-```
-
-¡
+``` -->

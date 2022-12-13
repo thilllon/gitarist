@@ -1,19 +1,23 @@
 {
   "name": "gitarist",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "main": "./dist/index.js",
   "description": "A CLI tool to utilize Octokit",
   "repository": "git@github.com:thilllon/gitarist.git",
   "bugs": {
     "url": "https://github.com/thilllon/gitarist/issues"
   },
+  "packageManager": "pnpm@7.18.1",
   "contributors": [
     "thilllon <thilllon970@gmail.com>"
   ],
-  "author": "thilllon <thilllon970@gmail.com>",
+  "author": {
+    "name": "thilllon",
+    "email": "thilllon970@gmail.com",
+    "url": "https://github.com/thilllon"
+  },
   "license": "MIT",
   "types": "./dist/index.d.ts",
-  "packageManager": "pnpm@7.18.1",
   "files": [
     "dist"
   ],
@@ -36,6 +40,7 @@
   },
   "dependencies": {
     "@octokit/types": "^8.0.0",
+    "chalk": "4",
     "commander": "^9.4.1",
     "dotenv": "^16.0.3",
     "fast-glob": "^3.2.12",

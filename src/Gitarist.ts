@@ -611,7 +611,7 @@ export class Gitarist {
     });
 
     if (pullRequest) {
-      console.log(pullRequest.data.number);
+      console.log('PR #' + pullRequest.data.number);
     }
 
     console.groupEnd();

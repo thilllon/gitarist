@@ -1,15 +1,15 @@
 {
   "name": "example",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf ./node_modules .github .gitarist .env && pnpm install",
-    "dev:init": "pnpm clean && gitarist init",
-    "dev": "dotenv -e .env gitarist run --token $GITARIST_TOKEN --owner $GITARIST_OWNER --repo $GITARIST_REPO"
+    "start:init": "pnpm clean && gitarist init",
+    "start": "dotenv -e .env gitarist run --token $GITARIST_TOKEN --owner $GITARIST_OWNER --repo $GITARIST_REPO"
   },
   "dependencies": {
-    "dotenv-cli": "^6.0.0",
+    "dotenv-cli": "6.0.0",
     "gitarist": "link:../."
   }
 }

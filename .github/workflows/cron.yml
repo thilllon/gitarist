@@ -1,9 +1,9 @@
 name: Cron Jobs
 
 on:
-  schedule:
-    # for every day N hours except sunday
-    - cron: '0 */4 * * 1-6'
+  # schedule:
+  #   # for every day N hours except sunday
+  #   - cron: '0 */4 * * 1-6'
   workflow_dispatch:
 
 env:

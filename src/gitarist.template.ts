@@ -20,3 +20,21 @@ GITARIST_TOKEN=""
 GITARIST_OWNER=""
 GITARIST_REPO=""
 `;
+
+export const getPackageJsonTemplate = (projectName: string) => `{
+  "name": "${projectName}",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "start": "dotenv -e .env gitarist run --token $GITARIST_TOKEN --owner $GITARIST_OWNER --repo $GITARIST_REPO"
+  },
+  "dependencies": {
+    "gitarist": "latest",
+    "dotenv-cli": "latest"
+  }
+}
+`;
+
+export const getReadmeTemplate = (projectName: string) => `# ${projectName}
+`;

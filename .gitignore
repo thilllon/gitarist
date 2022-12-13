@@ -3,3 +3,6 @@ dist
 .env*
 !.env.example
 **/__tmp
+
+example/.gitarist
+example/.github

@@ -1,11 +1,11 @@
 {
   "name": "gitarist",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "main": "./dist/index.js",
   "description": "A CLI tool to utilize Octokit",
   "repository": "git@github.com:thilllon/gitarist.git",
   "bugs": {
-    "url": "https://github.com/thilllon/gitarist"
+    "url": "https://github.com/thilllon/gitarist/issues"
   },
   "contributors": [
     "thilllon <thilllon970@gmail.com>"

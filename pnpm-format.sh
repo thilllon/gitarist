@@ -2,10 +2,11 @@ pnpm add -D husky lint-staged prettier commitlint @commitlint/config-conventiona
 
 # husky https://typicode.github.io/husky/#/
 pnpm dlx husky-init
-pnpm install
 npx npm-add-script --force --key "prepare" --value "husky install && chmod +x .husky/*"
+pnpm install
 
 # lint-staged https://github.com/okonet/lint-staged#configuration
+echo 'echo "##  .husky/$(basename "$0") (node $(node -v))"' >>.husky/pre-commit
 echo "pnpm lint-staged" >>.husky/pre-commit
 echo '{
   "./**/src/**/*": ["prettier -w -l", "eslint --fix"]
@@ -17,7 +18,9 @@ echo '{
 }' >.czrc
 
 # commitlint https://github.com/conventional-changelog/commitlint
-npx husky add .husky/commit-msg 'pnpm commitlint --edit ${1}'
+npx husky add .husky/commit-msg 'pnpm commitlint --edit $1'
+echo 'echo "##  .husky/$(basename "$0") (node $(node -v))"' >>.husky/commit-msg
+echo 'echo "##  .husky/$(basename "$0") (node $(node -v))"' >>.husky/prepare-commit-msg
 echo "module.exports = {extends: ['@commitlint/config-conventional']}" >commitlint.config.js
 
 # prettier

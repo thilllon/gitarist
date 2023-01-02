@@ -2,4 +2,3 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 echo "##  .husky/$(basename "$0") (node $(node -v))"
-pnpm commitlint --edit $1

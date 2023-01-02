@@ -40,12 +40,10 @@
     "singleQuote": true
   },
   "dependencies": {
-    "@octokit/types": "^8.0.0",
     "chalk": "4",
     "commander": "^9.4.1",
     "dotenv": "^16.0.3",
     "fast-glob": "^3.2.12",
-    "figlet": "^1.5.2",
     "octokit": "^2.0.10",
     "octokit-plugin-create-pull-request": "^4.0.0"
   },
@@ -55,8 +53,8 @@
     "@jest/globals": "^29.3.1",
     "@octokit/core": "^4.1.0",
     "@octokit/request-error": "^3.0.2",
+    "@octokit/types": "^8.0.0",
     "@octokit/webhooks": "^10.3.1",
-    "@types/figlet": "^1.5.5",
     "@types/jest": "^29.2.4",
     "@types/node": "^18.11.13",
     "@types/yargs": "^17.0.17",

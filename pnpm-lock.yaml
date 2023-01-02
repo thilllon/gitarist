@@ -8,7 +8,6 @@ specifiers:
   '@octokit/request-error': ^3.0.2
   '@octokit/types': ^8.0.0
   '@octokit/webhooks': ^10.3.1
-  '@types/figlet': ^1.5.5
   '@types/jest': ^29.2.4
   '@types/node': ^18.11.13
   '@types/yargs': ^17.0.17
@@ -21,7 +20,6 @@ specifiers:
   dotenv: ^16.0.3
   eslint: ^8.29.0
   fast-glob: ^3.2.12
-  figlet: ^1.5.2
   git-cz: ^4.9.0
   husky: ^8.0.0
   jest: ^29.3.1
@@ -36,12 +34,10 @@ specifiers:
   typescript: ^4.9.4
 
 dependencies:
-  '@octokit/types': 8.0.0
   chalk: 4.1.2
   commander: 9.4.1
   dotenv: 16.0.3
   fast-glob: 3.2.12
-  figlet: 1.5.2
   octokit: 2.0.10
   octokit-plugin-create-pull-request: 4.0.0
 
@@ -51,8 +47,8 @@ devDependencies:
   '@jest/globals': 29.3.1
   '@octokit/core': 4.1.0
   '@octokit/request-error': 3.0.2
+  '@octokit/types': 8.0.0
   '@octokit/webhooks': 10.4.0
-  '@types/figlet': 1.5.5
   '@types/jest': 29.2.5
   '@types/node': 18.11.18
   '@types/yargs': 17.0.18
@@ -1301,10 +1297,6 @@ packages:
   /@types/btoa-lite/1.0.0:
     resolution: {integrity: sha512-wJsiX1tosQ+J5+bY5LrSahHxr2wT+uME5UDwdN1kg4frt40euqA+wzECkmq4t5QbveHiJepfdThgQrPw6KiSlg==}
     dev: false
-
-  /@types/figlet/1.5.5:
-    resolution: {integrity: sha512-0sMBeFoqdGgdXoR/hgKYSWMpFufSpToosNsI2VgmkPqZJgeEXsXNu2hGr0FN401dBro2tNO5y2D6uw3UxVaxbg==}
-    dev: true
 
   /@types/graceful-fs/4.1.5:
     resolution: {integrity: sha512-anKkLmZZ+xm4p8JWBf4hElkM4XR+EZeA2M9BAkkTldmcyDY4mbdIJnRghDJH3Ov5ooY7/UAoENtmdMSkaAd7Cw==}
@@ -3073,11 +3065,6 @@ packages:
       node-domexception: 1.0.0
       web-streams-polyfill: 3.2.1
     dev: true
-
-  /figlet/1.5.2:
-    resolution: {integrity: sha512-WOn21V8AhyE1QqVfPIVxe3tupJacq1xGkPTB4iagT6o+P2cAgEOOwIxMftr4+ZCTI6d551ij9j61DFr0nsP2uQ==}
-    engines: {node: '>= 0.4.0'}
-    dev: false
 
   /figures/3.2.0:
     resolution: {integrity: sha512-yaduQFRKLXYOGgEn6AZau90j3ggSOyiqXU0F9JZfeXYhNa+Jk4X+s45A2zg5jns87GAFa34BBm2kXw4XpNcbdg==}

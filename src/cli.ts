@@ -2,7 +2,6 @@
 
 import chalk from 'chalk';
 import { Command } from 'commander';
-import figlet from 'figlet';
 import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import packageJson from '../package.json';
@@ -14,7 +13,17 @@ import {
 } from './gitarist.template';
 import { runner } from './runner';
 
-console.log(figlet.textSync(packageJson.name, { font: 'Slant' }));
+// eslint-disable-next-line no-useless-escape
+const logo = `
+          _ __             _      __ 
+   ____ _(_) /_____ ______(_)____/ /_
+  / __ \`/ / __/ __ \`/ ___/ / ___/ __/
+ / /_/ / / /_/ /_/ / /  / (__  ) /_
+ \__, /_/\__/\__,_/_/  /_/____/\__/
+/____/
+`;
+
+console.log(logo);
 
 const program = new Command();
 

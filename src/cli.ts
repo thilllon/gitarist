@@ -8,8 +8,8 @@ import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import packageJson from '../package.json';
 import {
-  actionTemplate,
-  envTemplate,
+  getActionTemplate,
+  getEnvTemplate,
   getPackageJsonTemplate,
   getReadmeTemplate,
 } from './gitarist.template';
@@ -59,12 +59,12 @@ const initCmd = (dir = '') => {
   const workflowDir = path.join(process.cwd(), dir, '.github', 'workflows');
   mkdirSync(workflowDir, { recursive: true });
 
-  writeFileSync(path.join(workflowDir, 'gitarist.yml'), actionTemplate, {
+  writeFileSync(path.join(workflowDir, 'gitarist.yml'), getActionTemplate(), {
     encoding: 'utf8',
     flag: 'w+',
   });
 
-  writeFileSync(path.join(process.cwd(), dir, '.env'), envTemplate, {
+  writeFileSync(path.join(process.cwd(), dir, '.env'), getEnvTemplate(), {
     encoding: 'utf8',
     flag: 'a+',
   });
@@ -96,23 +96,23 @@ program
   .option('-o,--owner <string>', 'github owner')
   .option('-r,--repo <string>', 'github repo')
   .action((options) => {
-    process.env.GITARIST_TOKEN = options.token;
-    process.env.GITARIST_OWNER = options.owner;
-    process.env.GITARIST_REPO = options.repo;
+    const owner = (process.env.GITARIST_OWNER = options.owner);
+    const repo = (process.env.GITARIST_REPO = options.repo);
+    const token = (process.env.GITARIST_TOKEN = options.token);
 
-    if (!process.env.GITARIST_TOKEN) {
-      throw new Error(
-        'Missing required environment variables: "GITARIST_TOKEN"'
-      );
-    }
-    if (!process.env.GITARIST_OWNER) {
+    if (!owner) {
       throw new Error(
         'Missing required environment variables: "GITARIST_OWNER"'
       );
     }
-    if (!process.env.GITARIST_REPO) {
+    if (!repo) {
       throw new Error(
         'Missing required environment variables: "GITARIST_REPO"'
+      );
+    }
+    if (!token) {
+      throw new Error(
+        'Missing required environment variables: "GITARIST_TOKEN"'
       );
     }
 

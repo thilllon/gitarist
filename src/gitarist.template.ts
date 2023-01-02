@@ -1,10 +1,27 @@
-export const actionTemplate = `name: Gitarist
+// export const getActionTemplate = (cron = '0 */4 * * 1-6') => `name: Gitarist
+
+// on:
+//   workflow_dispatch:
+//   schedule:
+//     # for every N hours Monday to Saturday
+//     - cron: '${cron}'
+
+// jobs:
+//   start:
+//     runs-on: ubuntu-latest
+//     steps:
+//       - uses: actions/checkout@v3
+//       - uses: actions/setup-node@v3
+//       - run: npx gitarist run --owner $GITHUB_REPOSITORY_OWNER --repo \${{ github.event.repository.name }} --token \${{ secrets.GITARIST_TOKEN }}
+// `;
+
+export const getActionTemplate = (cron = '0 */4 * * 1-6') => `name: Gitarist
 
 on:
   workflow_dispatch:
   schedule:
     # for every N hours Monday to Saturday
-    - cron: '0 */4 * * 1-6'
+    - cron: '${cron}'
 
 jobs:
   start:
@@ -12,13 +29,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: npx gitarist run --token \${{ secrets.GITARIST_TOKEN }} --owner $GITHUB_REPOSITORY_OWNER --repo \${{ github.event.repository.name }}
+      - run: |
+          npx gitarist run \
+          --owner $GITHUB_REPOSITORY_OWNER \  
+          --repo \${{ github.event.repository.name }} \
+          --token \${{ secrets.GITARIST_TOKEN }}
 `;
 
-export const envTemplate = `
-GITARIST_TOKEN=""
-GITARIST_OWNER=""
-GITARIST_REPO=""
+export const getEnvTemplate = (owner = '', repo = '', token = '') => `
+GITARIST_TOKEN="${token}"
+GITARIST_OWNER="${owner}"
+GITARIST_REPO="${repo}"
 `;
 
 export const getPackageJsonTemplate = (projectName: string) => `{
@@ -27,7 +48,7 @@ export const getPackageJsonTemplate = (projectName: string) => `{
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "start": "dotenv -e .env gitarist run --token $GITARIST_TOKEN --owner $GITARIST_OWNER --repo $GITARIST_REPO"
+    "start": "dotenv -e .env gitarist run --owner $GITARIST_OWNER --repo $GITARIST_REPO" --token $GITARIST_TOKEN
   },
   "dependencies": {
     "gitarist": "latest",

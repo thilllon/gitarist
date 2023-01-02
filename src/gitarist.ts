@@ -29,19 +29,22 @@ export class Gitarist {
   private readonly perPage = 100;
 
   constructor({ token }: { token?: string } = {}) {
+    if (!process.env.GITARIST_OWNER) {
+      throw new Error('environment variable is not defined: "GITARIST_OWNER"');
+    }
+
+    if (!process.env.GITARIST_REPO) {
+      throw new Error('environment variable is not defined: "GITARIST_REPO"');
+    }
+
     if (!token) {
-      token = process.env.GITARIST_TOKEN;
-      if (!token) {
+      if (!process.env.GITARIST_TOKEN) {
         throw new Error(
           'environment variable is not defined: "GITARIST_TOKEN"'
         );
       }
-    }
 
-    if (!process.env.GITARIST_OWNER) {
-      throw new Error('environment variable is not defined: "GITARIST_OWNER"');
-    } else if (!process.env.GITARIST_REPO) {
-      throw new Error('environment variable is not defined: "GITARIST_REPO"');
+      token = process.env.GITARIST_TOKEN;
     }
 
     this._owner = process.env.GITARIST_OWNER;

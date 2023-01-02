@@ -4,12 +4,18 @@ import { Gitarist } from './gitarist';
 export const runner = async () => {
   dotenv.config();
 
-  const token = process.env.GITARIST_TOKEN;
   const owner = process.env.GITARIST_OWNER;
   const repo = process.env.GITARIST_REPO;
+  const token = process.env.GITARIST_TOKEN;
 
-  if (!token || !owner || !repo) {
-    throw new Error('Missing required environment variables');
+  if (!owner) {
+    throw new Error('Missing required environment variables: "GITARIST_OWNER"');
+  }
+  if (!repo) {
+    throw new Error('Missing required environment variables: "GITARIST_REPO"');
+  }
+  if (!token) {
+    throw new Error('Missing required environment variables: "GITARIST_TOKEN"');
   }
 
   const gitarist = new Gitarist({ token });

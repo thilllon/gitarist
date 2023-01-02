@@ -1,10 +1,12 @@
 # Gitarist
 
-Github green grass means NOTHING
+A CLI tool to utilize Octokit
 
-[![npm version ](https://img.shields.io/npm/v/gitarist)](https://img.shields.io/npm/v/gitarist)
-[![npm bundle size](https://img.shields.io/bundlephobia/min/gitarist)](https://img.shields.io/bundlephobia/min/gitarist)
-[![npm download](https://img.shields.io/npm/dw/gitarist)](https://img.shields.io/npm/dw/gitarist)
+_Commit everyday does not prove anything_
+
+[![npm version ](https://img.shields.io/npm/v/gitarist)](https://www.npmjs.com/package/gitarist)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/gitarist)](https://www.npmjs.com/package/gitarist?activeTab=explore)
+![npm download](https://img.shields.io/npm/dw/gitarist)
 
 - Multiple useful Github utilities based on `Octokit`
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.

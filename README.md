@@ -1,6 +1,6 @@
 # Gitarist
 
-To proved that Github green grass("planting grass") means nothing
+Github green grass means NOTHING
 
 [![npm version ](https://img.shields.io/npm/v/gitarist)](https://img.shields.io/npm/v/gitarist)
 [![npm bundle size](https://img.shields.io/bundlephobia/min/gitarist)](https://img.shields.io/bundlephobia/min/gitarist)
@@ -49,4 +49,4 @@ git config pull.rebase true && git pull --prune && git branch -r | grep --only "
 
 ## Contribution
 
-https://github.com/thilllon/gitarist/blob/main/CONTRIBUTING.md
+[CONTRIBUTING.md](https://github.com/thilllon/gitarist/blob/main/CONTRIBUTING.md)

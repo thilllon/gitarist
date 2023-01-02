@@ -17,7 +17,7 @@ import {
   TreeParam,
   Workflow,
   __Run,
-} from './Gitarist.interface';
+} from './gitarist.type';
 
 // https://octokit.github.io/rest.js/v19
 // https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps

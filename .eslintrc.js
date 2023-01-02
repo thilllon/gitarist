@@ -8,5 +8,10 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
   },
-  ignorePatterns: ['.eslintrc*', 'jest.config.js', 'dist'],
+  ignorePatterns: [
+    '.eslintrc*',
+    'jest.config.js',
+    'dist',
+    'commitlint.config.js',
+  ],
 };

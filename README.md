@@ -10,7 +10,7 @@ To proved that Github green grass("planting grass") means nothing
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.
 - Run cron job using `Github Action`
 
-## Basic Usage
+## Basic usage
 
 1. Create a secret
    Permission to `repo` must be inluded to control workflow
@@ -35,30 +35,18 @@ To proved that Github green grass("planting grass") means nothing
 
 ```sh
 # interactive rebase and squash all except root commit
-git rebase -i --root # or, git rebase -i HEAD~11
+git rebase -i --root # or, git rebase -i HEAD~12
 git push origin --force main
 ```
 
 ## Make PR history clean
 
 ```sh
-git config pull.rebase true && git pull --prune && git branch -r | grep --only "commit\/167.*" | xargs git push --delete origin && git pull --prune
+git config pull.rebase true && git pull --prune && git branch -r | grep --only "commit\/1672.*" | xargs git push --delete origin && git pull --prune
 # git push --delete origin SOME_TAG_NAME
 # git tag --delete SOME_TAG_NAME
 ```
 
-## Contributing
+## Contribution
 
-Rename `.env.example` to `.env` and fill the environment values by following instructions.
-
-```sh
-# install dependencies
-pnpm
-
-# development
-pnpm dev
-
-# production
-pnpm build
-pnpm start
-```
+https://github.com/thilllon/gitarist/blob/main/CONTRIBUTING.md

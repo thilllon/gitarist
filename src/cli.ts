@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-useless-escape */
+
 import chalk from 'chalk';
 import { Command } from 'commander';
 import { mkdirSync, writeFileSync } from 'fs';
@@ -13,7 +15,6 @@ import {
 } from './gitarist.template';
 import { runner } from './runner';
 
-// eslint-disable-next-line no-useless-escape
 const logo = `
           _ __             _      __ 
    ____ _(_) /_____ ______(_)____/ /_

@@ -37,7 +37,7 @@ pnpm format
 npx npm-add-script --force --key "release" --value "pnpm format && pnpm lint && pnpm test && pnpm build && release-it"
 echo '{
   "git": {
-    "commitMessage": "chore: Release v${version}"
+    "commitMessage": "chore: release v${version}"
   },
   "github": {
     "release": true

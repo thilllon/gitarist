@@ -2,7 +2,7 @@ import { describe, expect, test } from '@jest/globals';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
-import { Gitarist } from './gitarist.main';
+import { Gitarist } from './gitarist';
 
 let gitarist: Gitarist;
 

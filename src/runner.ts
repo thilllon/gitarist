@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { Gitarist } from './gitarist.main';
+import { Gitarist } from './gitarist';
 
 export const runner = async () => {
   dotenv.config();

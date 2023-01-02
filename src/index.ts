@@ -1,4 +1,4 @@
-import { Gitarist } from './gitarist.main';
+import { Gitarist } from './gitarist';
 import { runner } from './runner';
 
 export { Gitarist, runner };

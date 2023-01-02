@@ -1,4 +1,4 @@
-pnpm add -D husky lint-staged prettier commitlint @commitlint/config-conventional @commitlint/cli commitizen git-cz
+pnpm add -D husky lint-staged prettier commitlint @commitlint/config-conventional @commitlint/cli commitizen git-cz release-it
 
 # husky https://typicode.github.io/husky/#/
 pnpm dlx husky-init
@@ -32,3 +32,15 @@ echo 'dist' >>.prettierignore
 echo 'pnpm-lock.yaml' >>.prettierignore
 npx npm-add-script --force --key "format" --value "prettier --write --list-different ."
 pnpm format
+
+# release-it https://github.com/release-it/release-it
+npx npm-add-script --force --key "release" --value "pnpm format && pnpm lint && pnpm test && pnpm build && release-it"
+echo '{
+  "git": {
+    "commitMessage": "chore: Release v${version}"
+  },
+  "github": {
+    "release": true
+  }
+}
+' >.release-it.json

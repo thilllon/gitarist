@@ -119,7 +119,7 @@ export type CreatePullRequestOptions = {
 // --------------------------------
 
 // TODO: @octokit/type 값으로 변경하기
-export type User__ = {
+export type __User = {
   login: string;
   id: number;
   node_id: string;
@@ -141,13 +141,13 @@ export type User__ = {
 };
 
 // TODO: @octokit/type 값으로 변경하기
-export type Repository__ = {
+export type __Repository = {
   id: number;
   node_id: string;
   name: string;
   full_name: string;
   private: boolean;
-  owner: User__;
+  owner: __User;
   html_url: string;
   description: string | null;
   fork: boolean;
@@ -191,10 +191,10 @@ export type Repository__ = {
 };
 
 // TODO: @octokit/type 값으로 변경하기
-export type PullRequest__ = any;
+export type __PullRequest = any;
 
 // TODO: @octokit/type 값으로 변경하기
-export type Run__ = {
+export type __Run = {
   id: number;
   name: string;
   node_id: string;
@@ -209,13 +209,13 @@ export type Run__ = {
   check_suite_node_id: string;
   url: string;
   html_url: string;
-  pull_requests: PullRequest__[];
+  pull_requests: __PullRequest[];
   created_at: string;
   updated_at: string;
-  actor: User__;
+  actor: __User;
   run_attempt: 1;
   run_started_at: string;
-  triggering_actor: User__;
+  triggering_actor: __User;
   jobs_url: string;
   logs_url: string;
   check_suite_url: string;
@@ -238,8 +238,8 @@ export type Run__ = {
       email: string;
     };
   };
-  repository: Repository__;
-  head_repository: Repository__;
+  repository: __Repository;
+  head_repository: __Repository;
 };
 
 // TODO: @octokit/type 값으로 변경하기

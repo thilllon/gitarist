@@ -14,7 +14,11 @@ export const runner = async () => {
 
   const gitarist = new Gitarist({ token });
 
-  await gitarist.createCommits({
+  gitarist.mimicIssue({ owner, repo });
+
+  gitarist.mimicPullRequest({ owner, repo });
+
+  gitarist.createCommits({
     owner,
     repo,
     branch: 'main',
@@ -25,26 +29,9 @@ export const runner = async () => {
     },
   });
 
-  await gitarist.createIssues({
-    owner,
-    repo,
-    numIssues: 3,
-  });
-
-  await gitarist.closeIssues({
-    owner,
-    repo,
-    staleTimeMs: 0,
-  });
-
-  await gitarist.deleteRepoWorkflowLogs({
+  gitarist.deleteRepoWorkflowLogs({
     owner,
     repo,
     staleTimeMs: 86400 * 1000,
-  });
-
-  await gitarist.createPullRequest({
-    owner,
-    repo,
   });
 };

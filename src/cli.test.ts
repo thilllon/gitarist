@@ -3,10 +3,6 @@ import dotenv from 'dotenv';
 
 beforeAll(async () => {
   dotenv.config({ path: '.env.test' });
-  const auth = process.env.GITARIST_TOKEN;
-  if (!auth) {
-    throw new Error('No auth token found');
-  }
 });
 
 describe('dummy', () => {

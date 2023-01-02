@@ -1,5 +1,5 @@
 {
   "search.exclude": {
-    "**/.pnp.*": true  
-  } 
+    "**/.pnp.*": true
+  }
 }

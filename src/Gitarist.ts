@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-namespace */
 import glob from 'fast-glob';
 import fs, { existsSync, mkdirSync, readFileSync } from 'fs';
 import { Octokit } from 'octokit';
@@ -15,9 +14,9 @@ import {
   FindWastedActionsOptions,
   ListRepositoriesOptions,
   RemoveStaleFilesOptions,
-  Run__,
   TreeParam,
   Workflow,
+  __Run,
 } from './Gitarist.interface';
 
 // https://octokit.github.io/rest.js/v19
@@ -555,7 +554,7 @@ export class Gitarist {
   }
 
   // https://www.npmjs.com/package/octokit-plugin-create-pull-request
-  async createPullRequest({
+  async createPR({
     owner,
     repo,
     head,
@@ -566,6 +565,7 @@ export class Gitarist {
 
     const now = Date.now().toString();
     const iso = new Date().toISOString();
+    const content = Array(100).fill(now).join('\n');
 
     const pullRequest = await this.octokit.createPullRequest({
       owner,
@@ -580,7 +580,7 @@ export class Gitarist {
           commit: '[PR]' + iso,
           /* optional: if `files` is not passed, an empty commit is created instead */
           files: {
-            [`.gitarist/${subpath}/${now}`]: now,
+            [`.gitarist/${subpath}/${now}`]: content,
 
             // 'path/to/file2.png': {
             //   content: '_base64_encoded_content_',
@@ -615,6 +615,8 @@ export class Gitarist {
     }
 
     console.groupEnd();
+
+    return pullRequest?.data;
   }
 
   async removeCommentsOnIssueByBot({
@@ -845,7 +847,7 @@ export class Gitarist {
    * @returns
    */
   async getStaleWorkflowRuns(
-    runs: Run__[],
+    runs: __Run[],
     {
       exceptRecent,
       ignoreBranches,
@@ -874,5 +876,88 @@ export class Gitarist {
     //     })
     //     .flat();
     //   return targetRunList;
+  }
+
+  async mimicIssue({ owner, repo }: { owner: string; repo: string }) {
+    // create issue
+    // create comment
+    // close issue
+
+    await this.createIssues({
+      owner,
+      repo,
+      numIssues: 3,
+    });
+
+    await this.closeIssues({
+      owner,
+      repo,
+      staleTimeMs: 0,
+    });
+  }
+
+  async mimicPullRequest({ owner, repo }: any) {
+    // create PR
+    // create review
+    // submit review
+    // merge PR
+
+    // TODO: reviewer, assignee 설정, viewed 체크하는 로직, resolve conversation 로직
+
+    const subpath = '__pullrequest';
+
+    const pr = await this.createPR({ owner, repo });
+
+    if (!pr) {
+      return;
+    }
+
+    const pullNumber = pr.number;
+
+    const { data: prData } = await this.octokit.rest.pulls.get({
+      owner,
+      repo,
+      pull_number: pullNumber,
+    });
+
+    const reviewContent = 'hello world';
+
+    const review = await this.octokit.rest.pulls.createReview({
+      owner,
+      repo,
+      pull_number: pullNumber,
+      event: 'COMMENT',
+      comments: [
+        {
+          path: `.gitarist/${subpath}/${prData.title}`, // FIXME: relative file path
+          body: reviewContent,
+          line: 1,
+        },
+      ],
+    });
+
+    const reviewId = review.data.id;
+
+    // const { data: submitData } = await this.octokit.rest.pulls.submitReview({
+    //   owner,
+    //   repo,
+    //   pull_number: pullNumber,
+    //   review_id: reviewId,
+    //   event: 'APPROVE',
+    // });
+
+    const { data: mergeData } = await this.octokit.rest.pulls.merge({
+      owner,
+      repo,
+      pull_number: pullNumber,
+      merge_method: 'rebase',
+    });
+
+    return { mergeData };
+  }
+
+  async getRateLimit() {
+    const { data: rateLimit } = await this.octokit.rest.rateLimit.get();
+    return rateLimit;
   }
 }

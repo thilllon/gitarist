@@ -25,7 +25,7 @@
     "build:tsc": "tsc",
     "build": "tsup",
     "start": "node ./dist/index.js",
-    "format": "prettier -w -l \"src/**/*\"",
+    "format": "prettier -w -l .",
     "release": "pnpm format && pnpm lint && pnpm test && pnpm build && release-it",
     "lint": "eslint --fix .",
     "test": "jest"
@@ -35,6 +35,7 @@
     "singleQuote": true
   },
   "dependencies": {
+    "@octokit/types": "^8.0.0",
     "commander": "^9.4.1",
     "dotenv": "^16.0.3",
     "fast-glob": "^3.2.12",

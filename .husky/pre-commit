@@ -2,5 +2,15 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 echo "##  .husky/$(basename "$0") (node $(node -v))"
+
+# # Check if any staged files contain .env*
+# env_files=$(git diff --cached --name-only | grep '.env*')
+
+# if [ -n "$env_files" ]; then
+#   echo "#############"
+#   echo "Error: Cannot commit .env files"
+#   exit 1
+# fi
+
 # pnpm test
 pnpm lint-staged

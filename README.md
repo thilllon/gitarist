@@ -6,7 +6,7 @@ _Commit everyday does not prove anything_
 
 [![npm version ](https://img.shields.io/npm/v/gitarist)](https://www.npmjs.com/package/gitarist)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/gitarist)](https://www.npmjs.com/package/gitarist?activeTab=explore)
-![npm download](https://img.shields.io/npm/dw/gitarist)
+[![npm download](https://img.shields.io/npm/dw/gitarist)](https://www.npmjs.com/package/gitarist)
 
 - Multiple useful Github utilities based on `Octokit`
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.

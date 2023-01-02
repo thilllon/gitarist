@@ -1,6 +1,6 @@
 {
   "name": "gitarist",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "main": "./dist/index.js",
   "description": "A CLI tool to utilize Octokit",
   "repository": "git@github.com:thilllon/gitarist.git",

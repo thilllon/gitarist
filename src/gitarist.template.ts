@@ -1,26 +1,13 @@
-// export const getActionTemplate = (cron = '0 */4 * * 1-6') => `name: Gitarist
-
-// on:
-//   workflow_dispatch:
-//   schedule:
-//     # for every N hours Monday to Saturday
-//     - cron: '${cron}'
-
-// jobs:
-//   start:
-//     runs-on: ubuntu-latest
-//     steps:
-//       - uses: actions/checkout@v3
-//       - uses: actions/setup-node@v3
-//       - run: npx gitarist run --owner $GITHUB_REPOSITORY_OWNER --repo \${{ github.event.repository.name }} --token \${{ secrets.GITARIST_TOKEN }}
-// `;
-
+/**
+ *
+ * @param {string} cron e.g., '0 \*\/4 \* \* 1-6' means 'for every N hours Monday to Saturday'
+ * @returns {string}
+ */
 export const getActionTemplate = (cron = '0 */4 * * 1-6') => `name: Gitarist
 
 on:
   workflow_dispatch:
   schedule:
-    # for every N hours Monday to Saturday
     - cron: '${cron}'
 
 jobs:
@@ -29,11 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: |
-          npx gitarist run \
-          --owner $GITHUB_REPOSITORY_OWNER \  
-          --repo \${{ github.event.repository.name }} \
-          --token \${{ secrets.GITARIST_TOKEN }}
+      - run: npx gitarist run --owner $GITHUB_REPOSITORY_OWNER --repo \${{ github.event.repository.name }} --token \${{ secrets.GITARIST_TOKEN }}
 `;
 
 export const getEnvTemplate = (owner = '', repo = '', token = '') => `

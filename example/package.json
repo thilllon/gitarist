@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf ./node_modules .github .gitarist .env && pnpm install",
-    "start:init": "pnpm clean && gitarist init",
-    "start": "dotenv -e .env gitarist run --owner $GITARIST_OWNER --repo $GITARIST_REPO --token $GITARIST_TOKEN"
+    "start:init": "pnpm clean && cd .. && pnpm build && cd example && gitarist init",
+    "start:run": "pnpm clean && dotenv -e .env gitarist run --owner $GITARIST_OWNER --repo $GITARIST_REPO --token $GITARIST_TOKEN"
   },
   "dependencies": {
     "dotenv-cli": "6.0.0",

@@ -33,7 +33,9 @@ _Commit everyday does not prove anything_
    npx gitarist init
    ```
 
-## Make git history clean
+## Misc
+
+### Make git history clean
 
 ```sh
 # interactive rebase and squash all except root commit
@@ -41,7 +43,7 @@ git rebase -i --root # or, git rebase -i HEAD~12
 git push origin --force main
 ```
 
-## Make PR history clean
+### Make PR history clean
 
 ```sh
 git config pull.rebase true && git pull --prune && git branch -r | grep --only "commit\/1672.*" | xargs git push --delete origin && git pull --prune

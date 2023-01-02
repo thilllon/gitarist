@@ -8,18 +8,19 @@
 6. Push to the branch (`git push origin my-new-feature`)
 7. [Create new Pull Request](https://help.github.com/articles/creating-a-pull-request/)
 
-## Dev
-
-Rename `.env.example` to `.env` and fill the environment values by following instructions.
+## Quick start
 
 ```sh
-# install dependencies
+# Rename `.env.example` to `.env` and fill the environment variables
+cp .env.example .env
+
+# Install dependencies
 pnpm
 
-# development
+# In development
 pnpm dev
 
-# production
+# In production
 pnpm build
 pnpm start
 ```

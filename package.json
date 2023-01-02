@@ -7,7 +7,7 @@
   "repository": "git@github.com:thilllon/gitarist.git",
   "homepage": "https://github.com/thilllon/gitarist#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "access": "public"
   },
   "bugs": {
     "url": "https://github.com/thilllon/gitarist/issues"

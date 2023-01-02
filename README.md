@@ -2,7 +2,9 @@
 
 To proved that Github green grass("planting grass") means nothing
 
-[![npm version](https://badge.fury.io/js/gitarist.svg)](https://badge.fury.io/js/gitarist)
+[![npm version ](https://img.shields.io/npm/v/gitarist)](https://img.shields.io/npm/v/gitarist)
+[![npm bundle size](https://img.shields.io/bundlephobia/min/gitarist)](https://img.shields.io/bundlephobia/min/gitarist)
+[![npm download](https://img.shields.io/npm/dw/gitarist)](https://img.shields.io/npm/dw/gitarist)
 
 - Multiple useful Github utilities based on `Octokit`
 - Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.
@@ -33,9 +35,7 @@ To proved that Github green grass("planting grass") means nothing
 
 ```sh
 # interactive rebase and squash all except root commit
-# or, git rebase -i HEAD~11
-git rebase -i --root
-
+git rebase -i --root # or, git rebase -i HEAD~11
 git push origin --force main
 ```
 
@@ -46,15 +46,6 @@ git config pull.rebase true && git pull --prune && git branch -r | grep --only "
 # git push --delete origin SOME_TAG_NAME
 # git tag --delete SOME_TAG_NAME
 ```
-
-## Roadmap
-
-- [ ] husky, lintstaged, commitizen, commitlint
-- [ ] fix the malfunction of `rename stale file`. idea: tree update after set 'sha' as null..
-- [ ] how to make user configurable `runner.ts`
-- [ ] branch is not configurable now, but should be configurable. currently `main` by default
-- [ ] `npx gitarist init` does not work and throws error that can't find directory `./.github/workflows/gitarist.yml`
-- [ ] connect github action with NPM to publish whenever `git push` occurs to specific branch, such as `release` branch
 
 ## Contributing
 

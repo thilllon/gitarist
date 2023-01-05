@@ -22,7 +22,7 @@ export const runner = async () => {
 
   await gitarist.mimicIssue({ owner, repo });
 
-  await gitarist.mimicPullRequest({ owner, repo });
+  await gitarist.mimicPullRequest({ owner, repo, reviewOptions: {} });
 
   await gitarist.createCommits({
     owner,

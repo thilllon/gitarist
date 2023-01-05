@@ -6,7 +6,7 @@ export const runner = async () => {
 
   const owner = process.env.GITARIST_OWNER;
   const repo = process.env.GITARIST_REPO;
-  const token = process.env.GITARIST_TOKEN;
+  const authToken = process.env.GITARIST_TOKEN;
 
   if (!owner) {
     throw new Error('Missing required environment variables: "GITARIST_OWNER"');
@@ -14,11 +14,11 @@ export const runner = async () => {
   if (!repo) {
     throw new Error('Missing required environment variables: "GITARIST_REPO"');
   }
-  if (!token) {
+  if (!authToken) {
     throw new Error('Missing required environment variables: "GITARIST_TOKEN"');
   }
 
-  const gitarist = new Gitarist({ token });
+  const gitarist = new Gitarist({ authToken });
 
   await gitarist.mimicIssue({ owner, repo });
 
@@ -40,4 +40,11 @@ export const runner = async () => {
     repo,
     staleTimeMs: 86400 * 1000,
   });
+
+  // await gitarist.listRepositories({
+  //   owner,
+  //   ownerLogin: process.env.GITARIST_OWNER,
+  // });
+
+  // await gitarist.deleteRepos({ owner, input: 'repos.json' });
 };

@@ -6,8 +6,8 @@ module.exports = {
   rules: {
     'no-constant-condition': 'warn',
     'no-useless-escape': 'warn',
-    '@typescript-eslint/no-unused-vars': 'warn',
-    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
   },
   ignorePatterns: [
     '.eslintrc*',

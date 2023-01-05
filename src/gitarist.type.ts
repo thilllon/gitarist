@@ -79,12 +79,8 @@ export type CloseIssuesOptions = {
 
 export type ListRepositoriesOptions = {
   owner: string;
-  jsonFile: string;
-};
-
-export type DeleteReposOptions = {
-  owner: string;
-  jsonFile: string;
+  output?: string;
+  ownerLogin?: string;
 };
 
 export type FindWastedActionsOptions = {
@@ -113,6 +109,23 @@ export type CreatePullRequestOptions = {
    * subpath under the ".gitarist" directory. e.g., "__pullrequest"
    */
   subpath?: string;
+};
+
+export type RemoveCommentsOnIssueByBotOptions = {
+  owner: string;
+  repo: string;
+};
+
+export type ChangeIssueTitleAndAddLabelsOptions = {
+  owner: string;
+  repo: string;
+  changeTitle?: boolean;
+};
+
+export type DeleteReposOptions = {
+  owner: string;
+  repos?: string[];
+  input?: string;
 };
 
 // --------------------------------

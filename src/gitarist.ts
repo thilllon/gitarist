@@ -4,6 +4,7 @@ import { Octokit } from 'octokit';
 import { createPullRequest } from 'octokit-plugin-create-pull-request';
 import path from 'path';
 import {
+  ChangeIssueTitleAndAddLabelsOptions,
   CloseIssuesOptions,
   CreateCommitsOptions,
   CreateFilesOptions,
@@ -13,6 +14,7 @@ import {
   DeleteRepoWorkflowLogsOptions,
   FindWastedActionsOptions,
   ListRepositoriesOptions,
+  RemoveCommentsOnIssueByBotOptions,
   RemoveStaleFilesOptions,
   TreeParam,
   Workflow,
@@ -28,7 +30,7 @@ export class Gitarist {
   private readonly _repo?: string;
   private readonly perPage = 100;
 
-  constructor({ token }: { token?: string } = {}) {
+  constructor({ authToken }: { authToken?: string } = {}) {
     if (!process.env.GITARIST_OWNER) {
       throw new Error('environment variable is not defined: "GITARIST_OWNER"');
     }
@@ -37,21 +39,21 @@ export class Gitarist {
       throw new Error('environment variable is not defined: "GITARIST_REPO"');
     }
 
-    if (!token) {
+    if (!authToken) {
       if (!process.env.GITARIST_TOKEN) {
         throw new Error(
           'environment variable is not defined: "GITARIST_TOKEN"'
         );
       }
 
-      token = process.env.GITARIST_TOKEN;
+      authToken = process.env.GITARIST_TOKEN;
     }
 
     this._owner = process.env.GITARIST_OWNER;
     this._repo = process.env.GITARIST_REPO;
 
     const _Octokit = Octokit.plugin(createPullRequest);
-    this.octokit = new _Octokit({ auth: token });
+    this.octokit = new _Octokit({ auth: authToken });
   }
 
   get owner() {
@@ -310,14 +312,26 @@ export class Gitarist {
     }
   }
 
+  /**
+   * list repos
+   * @param owner
+   * @param output default: repos.json, relative to cwd
+   * @param ownerLogin optional. owner's login name
+   * @returns
+   */
   async listRepositories({
     owner,
-    jsonFile = 'repos.json',
+    output = 'repos.json',
+    ownerLogin,
   }: ListRepositoriesOptions) {
-    const total: string[] = [];
+    // TODO: convert to rxjs
+
+    const bigEnough = 999;
+
+    let rawDataList: any[] = [];
     let iter = 0;
 
-    while (true) {
+    for (let i = 0; i < bigEnough; i++) {
       console.log('fetching repos...');
       const { data, status } =
         await this.octokit.rest.repos.listForAuthenticatedUser({
@@ -326,36 +340,70 @@ export class Gitarist {
           page: iter++,
           type: 'all',
         });
-      console.log('status', status);
-      const repos = data.map((repo) => repo.name);
-      total.push(...repos);
+      rawDataList.push(...data);
+      console.log('status', status, 'length', data.length);
 
-      if (repos.length === 0) {
+      if (data.length === 0) {
         break;
       }
     }
 
+    if (ownerLogin) {
+      rawDataList = rawDataList.filter(
+        (repo) => repo.owner.login === ownerLogin
+      );
+    }
+
+    const repoNameList = rawDataList.map((repo) => repo.name);
+
     fs.writeFileSync(
-      path.join(process.cwd(), jsonFile),
-      JSON.stringify(total),
+      path.join(process.cwd(), output),
+      JSON.stringify(repoNameList),
       'utf8'
     );
+
+    fs.writeFileSync(
+      path.join(process.cwd(), 'raw.json'),
+      JSON.stringify(rawDataList),
+      'utf8'
+    );
+
+    return repoNameList;
   }
 
-  async deleteRepos({ owner, jsonFile = 'repos.json' }: DeleteReposOptions) {
-    const repos: string[] = JSON.parse(
-      fs.readFileSync(path.join(process.cwd(), jsonFile), 'utf8')
-    );
+  /**
+   * delete repos
+   * @param owner
+   * @param repos Optional. default: []. Repo list to be deleted which prior to input. If not provided, read from input
+   * @param input default: repos.json, relative to cwd
+   */
+  async deleteRepos({
+    owner,
+    repos,
+    input = 'repos.json',
+  }: DeleteReposOptions) {
+    if (!repos) {
+      if (!fs.existsSync(input)) {
+        console.log(`file not exist: ${input}`);
+        return [];
+      }
+      const fileData = fs.readFileSync(path.join(process.cwd(), input), 'utf8');
+      repos = JSON.parse(fileData) as string[];
+    }
+
+    if (!repos) {
+      return [];
+    }
+
     const deleted: string[] = [];
 
     for (const repo of repos) {
       try {
         const res = await this.octokit.rest.repos.delete({ owner, repo });
-        // console.log(res);
-        console.log(`deleted ${repo}`);
+        console.log(`[deleted] ${repo}`);
         deleted.push(repo);
-      } catch (error) {
-        console.log(`error deleting ${repo}`);
+      } catch (err: any) {
+        console.error(repo, err?.message);
       }
     }
 
@@ -364,6 +412,8 @@ export class Gitarist {
       JSON.stringify(deleted),
       'utf8'
     );
+
+    return deleted;
   }
 
   /**
@@ -625,10 +675,7 @@ export class Gitarist {
   async removeCommentsOnIssueByBot({
     owner,
     repo,
-  }: {
-    owner: string;
-    repo: string;
-  }) {
+  }: RemoveCommentsOnIssueByBotOptions) {
     // TODO: rxjs
     const bigEnough = 9999;
     const arr = [...Array(bigEnough).keys()];
@@ -698,14 +745,8 @@ export class Gitarist {
   async changeIssueTitleAndAddLabels({
     owner,
     repo,
-    options = {},
-  }: {
-    owner: string;
-    repo: string;
-    options?: {
-      changeTitle?: boolean;
-    };
-  }) {
+    changeTitle,
+  }: ChangeIssueTitleAndAddLabelsOptions) {
     const bigEnough = 9999;
 
     const titleToLabel = {
@@ -738,12 +779,12 @@ export class Gitarist {
             issue.title.toLowerCase().includes(title) ? label : []
         );
 
-        const newTitle = options.changeTitle
+        const newTitle = changeTitle
           ? issue.title.trim()
           : issue.title.replace(/<client>|<server>|<infra>/gi, '').trim();
 
         try {
-          if (newTitle !== issue.title && options.changeTitle) {
+          if (newTitle !== issue.title && changeTitle) {
             const updateResponse = await this.octokit.rest.issues.update({
               owner,
               repo,
@@ -765,84 +806,6 @@ export class Gitarist {
   }
 
   /**
-   * list repos
-   * @param auth
-   * @param owner
-   * @param jsonFile
-   * @returns
-   */
-  async listRepos(auth: string, owner: string) {
-    const jsonFile = 'repos.json';
-
-    const repoNames: string[] = [];
-    const iter = 0;
-
-    //   while (true) {
-    //     console.log('fetching repos...');
-
-    //     const octokit = this.getOctokit(auth);
-    //     const { data, status } =
-    //       await octokit.rest.repos.listForAuthenticatedUser({
-    //         username: owner,
-    //         per_page: this.perPage,
-    //         page: iter++,
-    //         type: 'all',
-    //       });
-    //     console.log('status', status);
-    //     const repos = data.map((repo) => repo.name);
-    //     repoNames.push(...repos);
-    //     if (repos.length === 0) {
-    //       break;
-    //     }
-    //   }
-
-    //   fs.writeFileSync(
-    //     path.join(process.cwd(), jsonFile),
-    //     JSON.stringify(repoNames),
-    //     'utf8'
-    //   );
-
-    //   return repoNames;
-  }
-
-  /**
-   * delete repos
-   * @param runs
-   * @param owner
-   */
-  async deleteRepoFromJson(
-    auth: string,
-    owner: string,
-    repos?: string[],
-    jsonFile = 'repos.json'
-  ) {
-    repos ??= JSON.parse(
-      fs.readFileSync(path.join(process.cwd(), jsonFile), 'utf8')
-    );
-
-    if (!repos) {
-      return;
-    }
-
-    const deleted = [];
-
-    for (const repo of repos) {
-      try {
-        const res = await this.octokit.rest.repos.delete({ owner, repo });
-        console.log(`deleted ${repo}`);
-        deleted.push(repo);
-      } catch (error) {
-        console.log(`error deleting ${repo}`);
-      }
-    }
-    fs.writeFileSync(
-      path.join(process.cwd(), 'deleted.json'),
-      JSON.stringify(deleted),
-      'utf8'
-    );
-  }
-
-  /**
    * get stale, error, failed workflow runs. (older than `exceptRecent` runs)
    * @example getStaleWorkflowRuns(runList, 10) means getting from recent 11st to last
    * @param runs
@@ -856,6 +819,7 @@ export class Gitarist {
       ignoreBranches,
     }: { exceptRecent: number; ignoreBranches: string[] }
   ) {
+    // TODO: rxjs
     //   type WorkflowId = number;
     //   // TODO: 동작중인 workflow 제외하기
     //   runs = runs.filter((run) => {
@@ -882,9 +846,9 @@ export class Gitarist {
   }
 
   async mimicIssue({ owner, repo }: { owner: string; repo: string }) {
-    // create issue
-    // create comment
-    // close issue
+    // 1. create issue
+    // 2. create comment
+    // 3. close issue
 
     await this.createIssues({
       owner,
@@ -900,10 +864,10 @@ export class Gitarist {
   }
 
   async mimicPullRequest({ owner, repo }: any) {
-    // create PR
-    // create review
-    // submit review
-    // merge PR
+    // 1. create PR
+    // 2. create review
+    // 3. submit review
+    // 4. merge PR
 
     // TODO: reviewer, assignee 설정, viewed 체크하는 로직, resolve conversation 로직
 

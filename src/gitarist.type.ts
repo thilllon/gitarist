@@ -1,47 +1,14 @@
-// TODO: Octokit에서 제공하는 타입을 사용하도록 변경
-export type Workflow = {
-  id: number;
-  node_id: string;
-  name: string;
-  path: string;
-  state:
-    | 'active'
-    | 'deleted'
-    | 'disabled_fork'
-    | 'disabled_inactivity'
-    | 'disabled_manually';
-  created_at: string;
-  updated_at: string;
-  url: string;
-  html_url: string;
-  badge_url: string;
-  deleted_at?: string | undefined;
-};
-
-/**
- * Parameters for create a commit
- * @reference https://docs.github.com/en/rest/git/commits#create-a-commit
- * @reference https://octokit.github.io/rest.js/v19/#git-create-tree
- */
-export type TreeParam = {
-  path: string;
-  /**
-   * 100644 for file (blob)
-   * 100755 for executable (blob)
-   * 040000 for subdirectory (tree)
-   * 160000 for submodule (commit)
-   * 120000 for a blob
-   */
-  mode: '100644' | '100755' | '040000' | '160000' | '120000';
-  type: 'blob' | 'tree' | 'commit';
-  sha: string;
-};
-
 export type RemoveStaleFilesOptions = {
+  /**
+   * The number of milliseconds to determine whether a file is stale or not.
+   */
   staleTimeMs: number;
+  /**
+   * The path list to search for stale files.
+   */
   searchingPaths?: string[];
   /**
-   * subpath under the ".gitarist" directory. e.g., "__pullrequest"
+   * subpath under the ".gitarist" directory.
    */
   subpath?: string;
 };
@@ -58,6 +25,9 @@ export type CreateCommitsOptions = {
    * subpath under the ".gitarist" directory. e.g., "__pullrequest"
    */
   subpath?: string;
+  /**
+   * remove file options
+   */
   removeOptions: RemoveStaleFilesOptions;
 };
 
@@ -128,8 +98,61 @@ export type DeleteReposOptions = {
   input?: string;
 };
 
+export type MimicPullRequestOptions = {
+  owner: string;
+  repo: string;
+  subpath?: string;
+  reviewOptions: ReviewOptions;
+};
+
+export type ReviewOptions = {
+  content?: string;
+};
+
 // --------------------------------
 // --------------------------------
+// --------------------------------
+// --------------------------------
+
+// TODO: @octokit/type 값으로 변경하기
+/**
+ * Parameters for create a commit
+ * @reference https://docs.github.com/en/rest/git/commits#create-a-commit
+ * @reference https://octokit.github.io/rest.js/v19/#git-create-tree
+ */
+export type TreeParam = {
+  path: string;
+  /**
+   * 100644 for file (blob)
+   * 100755 for executable (blob)
+   * 040000 for subdirectory (tree)
+   * 160000 for submodule (commit)
+   * 120000 for a blob
+   */
+  mode: '100644' | '100755' | '040000' | '160000' | '120000';
+  type: 'blob' | 'tree' | 'commit';
+  sha: string;
+};
+
+// TODO: @octokit/type 값으로 변경하기
+export type __Workflow = {
+  id: number;
+  node_id: string;
+  name: string;
+  path: string;
+  state:
+    | 'active'
+    | 'deleted'
+    | 'disabled_fork'
+    | 'disabled_inactivity'
+    | 'disabled_manually';
+  created_at: string;
+  updated_at: string;
+  url: string;
+  html_url: string;
+  badge_url: string;
+  deleted_at?: string | undefined;
+};
 
 // TODO: @octokit/type 값으로 변경하기
 export type __User = {
@@ -137,7 +160,7 @@ export type __User = {
   id: number;
   node_id: string;
   avatar_url: string;
-  gravatar_id: string;
+  gravatar_id: string | null;
   url: string;
   html_url: string;
   followers_url: string;

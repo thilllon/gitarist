@@ -1,7 +1,7 @@
 import glob from 'fast-glob';
 import fs, { existsSync, mkdirSync, readFileSync } from 'fs';
 import { Octokit } from 'octokit';
-import { createPullRequest } from 'octokit-plugin-create-pull-request';
+import { createPullRequest as createPullRequestPlugin } from 'octokit-plugin-create-pull-request';
 import path from 'path';
 import {
   ChangeIssueTitleAndAddLabelsOptions,
@@ -14,10 +14,12 @@ import {
   DeleteRepoWorkflowLogsOptions,
   FindWastedActionsOptions,
   ListRepositoriesOptions,
+  MimicPullRequestOptions,
   RemoveCommentsOnIssueByBotOptions,
   RemoveStaleFilesOptions,
   TreeParam,
-  Workflow,
+  __Workflow,
+  __Repository,
   __Run,
 } from './gitarist.type';
 
@@ -52,7 +54,7 @@ export class Gitarist {
     this._owner = process.env.GITARIST_OWNER;
     this._repo = process.env.GITARIST_REPO;
 
-    const _Octokit = Octokit.plugin(createPullRequest);
+    const _Octokit = Octokit.plugin(createPullRequestPlugin);
     this.octokit = new _Octokit({ auth: authToken });
   }
 
@@ -132,7 +134,13 @@ export class Gitarist {
 
   /**
    * https://dev.to/lucis/how-to-push-files-programatically-to-a-repository-using-octokit-with-typescript-1nj0
-   * @param param0
+   * @param owner
+   * @param repo
+   * @param branch
+   * @param numFiles optional
+   * @param numCommits optional
+   * @param subpath optional
+   * @param removeOptions optional
    */
   async createCommits({
     owner,
@@ -162,10 +170,11 @@ export class Gitarist {
         }
 
         this.createCommitFiles({ numFiles });
-        // FIXME: remove stale files. 삭제만 하면안되고 commit에 포함시켜야함. https://stackoverflow.com/questions/72847260/deleting-folder-from-github-using-octokit-rest
+        // FIXME: remove stale files. 삭제만 하면안되고 commit에 포함시켜야함.
+        // https://stackoverflow.com/questions/72847260/deleting-folder-from-github-using-octokit-rest
         // this.removeStaleFiles(removeOptions);
 
-        // gets commit's AND its tree's SHA
+        // get commit SHA and its tree's SHA
         const ref = `heads/${branch}`;
         const { data: refData } = await this.octokit.rest.git.getRef({
           owner,
@@ -229,7 +238,7 @@ export class Gitarist {
           sha: newCommit.sha,
         });
       } catch (err: any) {
-        console.error(err.message);
+        console.error(err?.message);
       } finally {
         const dir = path.join(process.cwd(), '.gitarist', tmpFolder);
         fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10 });
@@ -259,7 +268,7 @@ export class Gitarist {
           issue_number: issueNumber,
         });
       } catch (err: any) {
-        console.error(err.message);
+        console.error(err?.message);
       }
     }
   }
@@ -273,7 +282,7 @@ export class Gitarist {
    * @param staleTimeMs number
    */
   async closeIssues({ owner, repo, staleTimeMs }: CloseIssuesOptions) {
-    // FIXME: rxjs 로 변경
+    // TODO: convert to rxjs
 
     try {
       const issues = await this.octokit.rest.issues.list({
@@ -308,7 +317,7 @@ export class Gitarist {
         })
       );
     } catch (err: any) {
-      console.error(err.message);
+      console.error(err?.message);
     }
   }
 
@@ -328,7 +337,7 @@ export class Gitarist {
 
     const bigEnough = 999;
 
-    let rawDataList: any[] = [];
+    let rawDataList: __Repository[] = [];
     let iter = 0;
 
     for (let i = 0; i < bigEnough; i++) {
@@ -483,7 +492,7 @@ export class Gitarist {
     const maxTotalPages = 20;
 
     let wfIds: number[] = [];
-    const wfs: Workflow[] = [];
+    const wfs: __Workflow[] = [];
 
     // TODO: rxjs
     for await (const page of Array(bigEnough).keys()) {
@@ -580,7 +589,7 @@ export class Gitarist {
               `[Run Log Deleted][${repo}] ${workflow?.name} / ${wfId} / ${runId}`
             );
           } catch (err: any) {
-            console.error(err.message);
+            console.error(err?.message);
           }
           try {
             const deletedRun =
@@ -593,7 +602,7 @@ export class Gitarist {
               `[Run Deleted][${repo}] ${workflow?.name} / ${wfId} / ${runId}`
             );
           } catch (err: any) {
-            console.error(err.message);
+            console.error(err?.message);
           }
         }
 
@@ -607,7 +616,7 @@ export class Gitarist {
   }
 
   // https://www.npmjs.com/package/octokit-plugin-create-pull-request
-  async createPR({
+  async createPullRequest({
     owner,
     repo,
     head,
@@ -634,15 +643,20 @@ export class Gitarist {
           /* optional: if `files` is not passed, an empty commit is created instead */
           files: {
             [`.gitarist/${subpath}/${now}`]: content,
-
             // 'path/to/file2.png': {
             //   content: '_base64_encoded_content_',
             //   encoding: 'base64',
             // },
-            // // deletes file if it exists,
+
+            // --------------------------------
+            // // deletes file if it exists
+            // --------------------------------
             // 'path/to/file3.txt': null,
+
+            // --------------------------------
             // // updates file based on current content
-            // 'path/to/file4.txt': ({ exists, encoding, content }: anyTemp) => {
+            // --------------------------------
+            // 'path/to/file4.txt': ({ content, encoding, exists, size }) => {
             //   // do not create the file if it does not exist
             //   if (!exists) {
             //     return null;
@@ -651,6 +665,8 @@ export class Gitarist {
             //     .toString('utf-8')
             //     .toUpperCase();
             // },
+            // --------------------------------
+            // --------------------------------
             // 'path/to/file5.sh': {
             //   content: 'echo Hello World',
             //   encoding: 'utf-8',
@@ -863,17 +879,22 @@ export class Gitarist {
     });
   }
 
-  async mimicPullRequest({ owner, repo }: any) {
+  async mimicPullRequest({
+    owner,
+    repo,
+    subpath = '__pullrequest',
+    reviewOptions,
+  }: MimicPullRequestOptions) {
     // 1. create PR
     // 2. create review
     // 3. submit review
     // 4. merge PR
 
-    // TODO: reviewer, assignee 설정, viewed 체크하는 로직, resolve conversation 로직
+    // TODO: reviewer, assignee 설정
+    // TODO: 우상단 viewed 체크하는 로직
+    // TODO: resolve conversation 로직
 
-    const subpath = '__pullrequest';
-
-    const pr = await this.createPR({ owner, repo });
+    const pr = await this.createPullRequest({ owner, repo });
 
     if (!pr) {
       return;
@@ -887,8 +908,6 @@ export class Gitarist {
       pull_number: pullNumber,
     });
 
-    const reviewContent = 'hello world';
-
     const review = await this.octokit.rest.pulls.createReview({
       owner,
       repo,
@@ -897,7 +916,7 @@ export class Gitarist {
       comments: [
         {
           path: `.gitarist/${subpath}/${prData.title}`, // FIXME: relative file path
-          body: reviewContent,
+          body: reviewOptions.content ?? 'hello world',
           line: 1,
         },
       ],

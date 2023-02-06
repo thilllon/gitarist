@@ -9,7 +9,7 @@
     "start:run": "pnpm clean && dotenv -e .env gitarist run --owner $GITARIST_OWNER --repo $GITARIST_REPO --token $GITARIST_TOKEN"
   },
   "dependencies": {
-    "dotenv-cli": "6.0.0",
+    "dotenv-cli": "^7.0.0",
     "gitarist": "link:../."
   }
 }

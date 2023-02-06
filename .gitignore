@@ -1,12 +1,13 @@
-**/node_modules
+.artifacts
+.tmp
+node_modules
 dist
 .env*
 !.env.example
-**/__tmp
 
 example/.gitarist
 example/.github
 
-deleted.json
-raw.json
-repos.json
+# deleted.json
+# raw.json
+# repos.json

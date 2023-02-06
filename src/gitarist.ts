@@ -72,7 +72,7 @@ export class Gitarist {
 
   createCommitFiles({ numFiles }: CreateFilesOptions) {
     console.group('[create files]');
-    const tmpFolder = '__tmp';
+    const tmpFolder = '.tmp';
     const tmpDir = path.join(process.cwd(), '.gitarist', tmpFolder);
 
     if (!existsSync(tmpDir)) {
@@ -151,7 +151,7 @@ export class Gitarist {
     subpath = '__commit',
     removeOptions,
   }: CreateCommitsOptions) {
-    const tmpFolder = '__tmp';
+    const tmpFolder = '.tmp';
 
     if (typeof numCommits !== 'number') {
       numCommits = Math.floor(
@@ -324,13 +324,13 @@ export class Gitarist {
   /**
    * list repos
    * @param owner
-   * @param output default: repos.json, relative to cwd
+   * @param output default: ./artifacts/repos.json, relative to cwd
    * @param ownerLogin optional. owner's login name
    * @returns
    */
   async listRepositories({
     owner,
-    output = 'repos.json',
+    output = './artifacts/repos.json',
     ownerLogin,
   }: ListRepositoriesOptions) {
     // TODO: convert to rxjs
@@ -372,7 +372,7 @@ export class Gitarist {
     );
 
     fs.writeFileSync(
-      path.join(process.cwd(), 'raw.json'),
+      path.join(process.cwd(), '.artifacts', 'raw.json'),
       JSON.stringify(rawDataList),
       'utf8'
     );
@@ -384,12 +384,12 @@ export class Gitarist {
    * delete repos
    * @param owner
    * @param repos Optional. default: []. Repo list to be deleted which prior to input. If not provided, read from input
-   * @param input default: repos.json, relative to cwd
+   * @param input default: ./artifacts/repos.json, relative to cwd
    */
   async deleteRepos({
     owner,
     repos,
-    input = 'repos.json',
+    input = './artifacts/repos.json',
   }: DeleteReposOptions) {
     if (!repos) {
       if (!fs.existsSync(input)) {
@@ -417,7 +417,7 @@ export class Gitarist {
     }
 
     fs.writeFileSync(
-      path.join(process.cwd(), 'deleted.json'),
+      path.join(process.cwd(), '.artifacts', 'deleted.json'),
       JSON.stringify(deleted),
       'utf8'
     );

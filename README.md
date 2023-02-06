@@ -4,15 +4,22 @@ A CLI tool to utilize Octokit
 
 _Commit everyday does not prove anything_
 
-[![npm version ](https://img.shields.io/npm/v/gitarist)](https://www.npmjs.com/package/gitarist)
+[![npm version](https://img.shields.io/npm/v/gitarist)](https://www.npmjs.com/package/gitarist)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/gitarist)](https://www.npmjs.com/package/gitarist?activeTab=explore)
 [![npm download](https://img.shields.io/npm/dw/gitarist)](https://www.npmjs.com/package/gitarist)
 
 - Multiple useful Github utilities based on `Octokit`
-- Auto commit, auto cleaning stale workflows, auto cleaning dummy files etc.
+  - commit automatically
+  - clean up stale workflows automatically
+  - clean up dummy files automatically
+  - pull request
+  - merge
+  - comment on pull request
+  - register issues
+  - comment on issues
 - Run cron job using `Github Action`
 
-## Basic usage
+## Usage
 
 1. Create a secret
    Permission to `repo` must be inluded to control workflow
@@ -23,7 +30,7 @@ _Commit everyday does not prove anything_
 
    Go to setting page and set secret as `GITARIST_TOKEN`
 
-   https://github.com/{OWNER}/{REPO}/settings/secrets/actions
+   - `https://github.com/{OWNER}/{REPO}/settings/secrets/actions`
 
    Make sure that you are the owner of the target repository.
 
@@ -53,4 +60,4 @@ git config pull.rebase true && git pull --prune && git branch -r | grep --only "
 
 ## Contribution
 
-[CONTRIBUTING.md](https://github.com/thilllon/gitarist/blob/main/CONTRIBUTING.md)
+[Contribution guide](./CONTRIBUTING.md)

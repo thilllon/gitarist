@@ -27,7 +27,7 @@ describe('sum module', () => {
   // });
 
   test('create files', async () => {
-    const tmpFolder = '__tmp';
+    const tmpFolder = '.tmp';
     const tmpDir = path.join(process.cwd(), '.gitarist', tmpFolder);
     await gitarist.createCommitFiles({ numFiles: 10 });
 

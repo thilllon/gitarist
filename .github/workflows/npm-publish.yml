@@ -28,6 +28,25 @@ jobs:
   #       with:
   #         registry-url: https://registry.npmjs.org/
   #     - run: pnpm install --frozen-lockfile
-  #     - run: pnpm publish
+  #     - run: pnpm release
   #       env:
   #         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # if you want to set the package to be secured under 2FA, you can use this action
+  # https://github.com/marketplace/actions/npm-otp-publish
+  # https://github.com/release-it/release-it/blob/master/docs/npm.md#two-factor-authentication
+
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: git config
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+      - run: pnpm install
+      - run: pnpm release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

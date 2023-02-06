@@ -66,17 +66,23 @@ export class Gitarist {
     return this._repo;
   }
 
-  sum(a: number, b: number) {
-    return a + b;
-  }
-
-  createCommitFiles({ numFiles }: CreateFilesOptions) {
+  /**
+   * create files to be commited later
+   * @param numFiles  number of files to create
+   * @param directory relative path from process.cwd()
+   * @returns files names
+   */
+  createCommitFiles({
+    numFiles,
+    directory = '.gitarist/.tmp',
+    verbose = true,
+  }: CreateFilesOptions) {
     console.group('[create files]');
-    const tmpFolder = '.tmp';
-    const tmpDir = path.join(process.cwd(), '.gitarist', tmpFolder);
 
-    if (!existsSync(tmpDir)) {
-      mkdirSync(tmpDir, { recursive: true });
+    const directoryPath = path.join(process.cwd(), directory);
+
+    if (!existsSync(directoryPath)) {
+      mkdirSync(directoryPath, { recursive: true });
     }
 
     const files = Array.from({ length: numFiles })
@@ -85,8 +91,12 @@ export class Gitarist {
           const now = Date.now().toString();
           const iso = new Date().toISOString();
           const content = (iso + '\n').repeat(10);
-          const filePath = path.join(tmpDir, now);
-          console.debug(filePath);
+          const filePath = path.join(directoryPath, now);
+
+          if (verbose) {
+            console.debug(filePath);
+          }
+
           fs.writeFileSync(filePath, content, 'utf8');
           return filePath;
         } catch (err) {
@@ -96,11 +106,8 @@ export class Gitarist {
       .filter((file): file is string => !!file);
 
     console.groupEnd();
-    return files;
-  }
 
-  async getFileAsUTF8(filePath: string) {
-    return readFileSync(filePath, 'utf8');
+    return files;
   }
 
   /**
@@ -108,28 +115,33 @@ export class Gitarist {
    * 파일의 실제 생성시간을 확인하는 것이 아니라 폴더이름을 바탕으로 삭제한다.
    * @param staleTimeMs 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지
    */
-  removeStaleFiles({
-    staleTimeMs,
-    searchingPaths,
-    subpath = '__commit',
-  }: RemoveStaleFilesOptions) {
+  removeStaleFiles({ staleTimeMs, searchingPaths }: RemoveStaleFilesOptions) {
     console.group('[remove stale files]');
-    searchingPaths ??= [`./.gitarist/${subpath}/**`];
+    searchingPaths ??= [`./.gitarist/__commit/**`];
 
-    glob.sync(searchingPaths, { onlyFiles: true }).forEach((filePath) => {
-      const fileName = path.basename(filePath);
-      if (isNaN(parseInt(fileName))) {
+    const staleFileNames = glob
+      .sync(searchingPaths, { onlyFiles: true })
+      .map((filePath) => {
+        const fileName = path.basename(filePath);
+
+        if (isNaN(parseInt(fileName))) {
+          return;
+        }
+
+        if (new Date(parseInt(fileName)) < new Date(Date.now() - staleTimeMs)) {
+          console.debug(filePath);
+
+          fs.rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
+          return fileName;
+        }
+
         return;
-      }
-
-      if (new Date(parseInt(fileName)) < new Date(Date.now() - staleTimeMs)) {
-        console.debug(filePath);
-
-        fs.rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
-      }
-    });
+      })
+      .filter((fileName): fileName is string => !!fileName);
 
     console.groupEnd();
+
+    return staleFileNames;
   }
 
   /**
@@ -149,6 +161,7 @@ export class Gitarist {
     numFiles = 10,
     numCommits = 1,
     subpath = '__commit',
+    // FIXME: removeOptions
     removeOptions,
   }: CreateCommitsOptions) {
     const tmpFolder = '.tmp';
@@ -192,7 +205,7 @@ export class Gitarist {
         const filesPaths = glob.sync([`.gitarist/${tmpFolder}/*`]);
         const filesBlobs = await Promise.all(
           filesPaths.map(async (filePath) => {
-            const content = await this.getFileAsUTF8(filePath);
+            const content = await fs.readFileSync(filePath, 'utf8');
             const encoding = 'utf-8';
             const blobData = await this.octokit.rest.git.createBlob({
               owner,

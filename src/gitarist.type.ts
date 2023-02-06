@@ -4,13 +4,9 @@ export type RemoveStaleFilesOptions = {
    */
   staleTimeMs: number;
   /**
-   * The path list to search for stale files.
+   * A list of relative path to be searched to filter stale files.
    */
   searchingPaths?: string[];
-  /**
-   * subpath under the ".gitarist" directory.
-   */
-  subpath?: string;
 };
 
 export type NumberOrRange = number | { min: number; max: number };
@@ -33,6 +29,8 @@ export type CreateCommitsOptions = {
 
 export type CreateFilesOptions = {
   numFiles: number;
+  directory?: string;
+  verbose?: boolean;
 };
 
 export type CreateIssuesOptions = {

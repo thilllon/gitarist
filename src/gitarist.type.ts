@@ -1,4 +1,4 @@
-export type RemoveStaleFilesOptions = {
+export interface RemoveStaleFilesOptions {
   /**
    * The number of milliseconds to determine whether a file is stale or not.
    */
@@ -7,11 +7,11 @@ export type RemoveStaleFilesOptions = {
    * A list of relative path to be searched to filter stale files.
    */
   searchingPaths?: string[];
-};
+}
 
 export type NumberOrRange = number | { min: number; max: number };
 
-export type CreateCommitsOptions = {
+export interface CreateCommitsOptions {
   repo: string;
   owner: string;
   branch: string;
@@ -25,43 +25,43 @@ export type CreateCommitsOptions = {
    * remove file options
    */
   removeOptions: RemoveStaleFilesOptions;
-};
+}
 
-export type CreateFilesOptions = {
+export interface CreateFilesOptions {
   numFiles: number;
   directory?: string;
   verbose?: boolean;
-};
+}
 
-export type CreateIssuesOptions = {
+export interface CreateIssuesOptions {
   repo: string;
   owner: string;
   numIssues?: number;
-};
+}
 
-export type CloseIssuesOptions = {
+export interface CloseIssuesOptions {
   repo: string;
   owner: string;
   staleTimeMs: number;
-};
+}
 
-export type ListRepositoriesOptions = {
+export interface ListRepositoriesOptions {
   owner: string;
   output?: string;
   ownerLogin?: string;
-};
+}
 
-export type FindWastedActionsOptions = {
+export interface FindWastedActionsOptions {
   owner: string;
-};
+}
 
-export type DeleteRepoWorkflowLogsOptions = {
+export interface DeleteRepoWorkflowLogsOptions {
   repo: string;
   owner: string;
   staleTimeMs: number;
-};
+}
 
-export type CreatePullRequestOptions = {
+export interface CreatePullRequestOptions {
   owner: string;
   repo: string;
   /**
@@ -77,35 +77,35 @@ export type CreatePullRequestOptions = {
    * subpath under the ".gitarist" directory. e.g., "__pullrequest"
    */
   subpath?: string;
-};
+}
 
-export type RemoveCommentsOnIssueByBotOptions = {
+export interface RemoveCommentsOnIssueByBotOptions {
   owner: string;
   repo: string;
-};
+}
 
-export type ChangeIssueTitleAndAddLabelsOptions = {
+export interface ChangeIssueTitleAndAddLabelsOptions {
   owner: string;
   repo: string;
   changeTitle?: boolean;
-};
+}
 
-export type DeleteReposOptions = {
+export interface DeleteReposOptions {
   owner: string;
   repos?: string[];
   input?: string;
-};
+}
 
-export type MimicPullRequestOptions = {
+export interface MimicPullRequestOptions {
   owner: string;
   repo: string;
   subpath?: string;
   reviewOptions: ReviewOptions;
-};
+}
 
-export type ReviewOptions = {
+export interface ReviewOptions {
   content?: string;
-};
+}
 
 // --------------------------------
 // --------------------------------
@@ -118,7 +118,7 @@ export type ReviewOptions = {
  * @reference https://docs.github.com/en/rest/git/commits#create-a-commit
  * @reference https://octokit.github.io/rest.js/v19/#git-create-tree
  */
-export type TreeParam = {
+export interface TreeParam {
   path: string;
   /**
    * 100644 for file (blob)
@@ -130,10 +130,10 @@ export type TreeParam = {
   mode: '100644' | '100755' | '040000' | '160000' | '120000';
   type: 'blob' | 'tree' | 'commit';
   sha: string;
-};
+}
 
 // TODO: @octokit/type 값으로 변경하기
-export type __Workflow = {
+export interface __Workflow {
   id: number;
   node_id: string;
   name: string;
@@ -150,10 +150,10 @@ export type __Workflow = {
   html_url: string;
   badge_url: string;
   deleted_at?: string | undefined;
-};
+}
 
 // TODO: @octokit/type 값으로 변경하기
-export type __User = {
+export interface __User {
   login: string;
   id: number;
   node_id: string;
@@ -172,10 +172,10 @@ export type __User = {
   received_events_url: string;
   type: string;
   site_admin: boolean;
-};
+}
 
 // TODO: @octokit/type 값으로 변경하기
-export type __Repository = {
+export interface __Repository {
   id: number;
   node_id: string;
   name: string;
@@ -222,13 +222,13 @@ export type __Repository = {
   labels_url: string;
   releases_url: string;
   deployments_url: string;
-};
+}
 
 // TODO: @octokit/type 값으로 변경하기
 export type __PullRequest = any;
 
 // TODO: @octokit/type 값으로 변경하기
-export type __Run = {
+export interface __Run {
   id: number;
   name: string;
   node_id: string;
@@ -274,7 +274,7 @@ export type __Run = {
   };
   repository: __Repository;
   head_repository: __Repository;
-};
+}
 
 // TODO: @octokit/type 값으로 변경하기
 export type Conclusion__ =

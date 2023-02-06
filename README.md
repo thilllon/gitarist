@@ -28,13 +28,11 @@ _Commit everyday does not prove anything_
 
 2. Set the secret to the target repository
 
-   Go to setting page and set secret as `GITARIST_TOKEN`
+   Go to setting page and set a secret as `GITARIST_TOKEN`. Make sure that you are the owner of the target repository.
 
    - `https://github.com/{OWNER}/{REPO}/settings/secrets/actions`
 
-   Make sure that you are the owner of the target repository.
-
-3. Initialize Gitarist and check `./.github/workflows/gitarist.yml`
+3. Initialize `Gitarist` and check Github Action config `./.github/workflows/gitarist.yml`
 
    ```sh
    npx gitarist init

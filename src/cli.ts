@@ -7,12 +7,7 @@ import { Command } from 'commander';
 import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import packageJson from '../package.json';
-import {
-  getActionTemplate,
-  getEnvTemplate,
-  getPackageJsonTemplate,
-  getReadmeTemplate,
-} from './gitarist.template';
+import { Templates } from './gitarist.template';
 import { runner } from './runner';
 
 /**
@@ -47,11 +42,11 @@ program
 
     writeFileSync(
       path.join(process.cwd(), dir, 'package.json'),
-      getPackageJsonTemplate(dir)
+      Templates.getPackageJsonTemplate(dir)
     );
     writeFileSync(
       path.join(process.cwd(), dir, 'README.md'),
-      getReadmeTemplate(dir)
+      Templates.getReadmeTemplate(dir)
     );
 
     console.log(
@@ -63,15 +58,17 @@ const initCmd = (dir = '') => {
   const workflowDir = path.join(process.cwd(), dir, '.github', 'workflows');
   mkdirSync(workflowDir, { recursive: true });
 
-  writeFileSync(path.join(workflowDir, 'gitarist.yml'), getActionTemplate(), {
-    encoding: 'utf8',
-    flag: 'w+',
-  });
+  writeFileSync(
+    path.join(workflowDir, 'gitarist.yml'),
+    Templates.getActionTemplate(),
+    { encoding: 'utf8', flag: 'w+' }
+  );
 
-  writeFileSync(path.join(process.cwd(), dir, '.env'), getEnvTemplate(), {
-    encoding: 'utf8',
-    flag: 'a+',
-  });
+  writeFileSync(
+    path.join(process.cwd(), dir, '.env'),
+    Templates.getEnvTemplate(),
+    { encoding: 'utf8', flag: 'a+' }
+  );
 
   console.log(`\nGenerate a secret key settings:`);
   console.log(
@@ -96,9 +93,12 @@ program
 program
   .command('run')
   .description('run gitarist suite')
-  .option('-t,--token <string>', 'github token')
-  .option('-o,--owner <string>', 'github owner')
-  .option('-r,--repo <string>', 'github repo')
+  .option(
+    '-t,--token <string>',
+    'Github token(https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow)'
+  )
+  .option('-o,--owner <string>', 'Githb owner')
+  .option('-r,--repo <string>', 'Github repository')
   .action((options) => {
     const owner = (process.env.GITARIST_OWNER = options.owner);
     const repo = (process.env.GITARIST_REPO = options.repo);

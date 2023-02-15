@@ -10,6 +10,6 @@
     "resolveJsonModule": true,
     "removeComments": false
   },
-  "include": ["src", "tests/cli.test.ts"],
+  "include": ["src", "tests/cli.test.ts", "tests/gitarist.template.test.ts"],
   "exclude": ["dist"]
 }

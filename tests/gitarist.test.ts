@@ -77,7 +77,7 @@ describe('gitarist', () => {
       });
 
     const staleFiles = gitarist.removeStaleFiles({
-      staleTimeMs: 1000, // 1초만 지나도 stale 판정
+      staleTimeMs: 1000, // judged as stale even after 1 second
     });
 
     setTimeout(() => {
@@ -88,7 +88,7 @@ describe('gitarist', () => {
   test('removeStaleFiles with searchingPaths', async () => {
     expect(gitarist.removeStaleFiles).toBeDefined();
 
-    // TODO: 검색 폴더를 변경하고 해당 위치에서 파일을 찾는지 확인
+    // TODO: change the search target folder and see if it finds the files in that folder
     // // create fake commit files
     // // file name must be considered as linux timestamp (all numbers)
     // const numFilesForTest = 123;
@@ -116,21 +116,25 @@ describe('gitarist', () => {
   });
 
   test('createCommits', async () => {
+    // TODO: implement
     // REQUIRES mock server
     expect(gitarist.createCommits).toBeDefined();
   });
 
   test('createIssues', async () => {
+    // TODO: implement
     // REQUIRES mock server
     expect(gitarist.createIssues).toBeDefined();
   });
 
   test('closeIssues', async () => {
+    // TODO: implement
     // REQUIRES mock server
     expect(gitarist.closeIssues).toBeDefined();
   });
 
   test('listRepositories', async () => {
+    // TODO: implement
     // REQUIRES mock server
     expect(gitarist.listRepositories).toBeDefined();
   });
@@ -146,6 +150,7 @@ describe('mocking server', () => {
   });
 
   test('listRepositories', async () => {
+    // TODO: implement
     // const response = await request(mockServer)
     //   .get('/repos')
     //   .set('Accept', 'application/json');

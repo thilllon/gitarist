@@ -17,3 +17,43 @@ export const mockServer = setupServer(
 //   resolve({ status: 302, headers: { location: 'mock-url' } });
 // })
 // Octokit.mockImplementation(() => ({ request }))
+
+export const OctokitMock = jest.fn().mockImplementation(() => ({
+  repos: {
+    listForOrg: jest.fn().mockResolvedValue([1, 2]),
+  },
+  git: {
+    getRef: jest.fn().mockResolvedValue([1, 2]),
+    getCommit: jest.fn().mockResolvedValue([1, 2]),
+    createBlob: jest.fn().mockResolvedValue([1, 2]),
+    createTree: jest.fn().mockResolvedValue([1, 2]),
+    createCommit: jest.fn().mockResolvedValue([1, 2]),
+    updateRef: jest.fn().mockResolvedValue([1, 2]),
+  },
+  issues: {
+    create: jest.fn().mockResolvedValue([1, 2]),
+    createComment: jest.fn().mockResolvedValue([1, 2]),
+    list: jest.fn().mockResolvedValue([1, 2]),
+    update: jest.fn().mockResolvedValue([1, 2]),
+  },
+  actions: {
+    deleteWorkflowRun: jest.fn().mockImplementation(() => {
+      const runs: any[] = [];
+      return runs;
+    }),
+    deleteWorkflowRunLogs: jest.fn().mockResolvedValue([1, 2]),
+    getWorkflow: jest.fn().mockResolvedValue([1, 2]),
+    listRepoWorkflows: jest.fn().mockResolvedValue([1, 2]),
+    getWorkflowUsage: jest.fn().mockResolvedValue([1, 2]),
+    listWorkflowRunsForRepo: jest.fn().mockResolvedValue([1, 2]),
+  },
+  pulls: {
+    get: jest.fn().mockResolvedValue([1, 2]),
+    createReview: jest.fn().mockResolvedValue([1, 2]),
+    submitReview: jest.fn().mockResolvedValue([1, 2]),
+    merge: jest.fn().mockResolvedValue([1, 2]),
+  },
+  rateLimit: {
+    get: jest.fn().mockResolvedValue([1, 2]),
+  },
+}));

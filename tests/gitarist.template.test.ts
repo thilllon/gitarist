@@ -27,7 +27,7 @@ describe('should be able to generate templates', () => {
     // TOOD: what is suitable parser for .env file?
     // expect(template).toBe(prettier.format(template, { ...prettierConfig }));
 
-    const keys = ['GITARIST_TOKEN', 'GITARIST_OWNER', 'GITARIST_REPO'];
+    const keys = ['GITARIST_TOKEN', 'GITARIST_OWNER', 'GITARIST_REPO'] as const;
     const buf = Buffer.from(template);
     const config = dotenv.parse(buf);
     expect(config).toBeDefined();

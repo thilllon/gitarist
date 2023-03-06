@@ -980,4 +980,22 @@ export class Gitarist {
     const { data: rateLimit } = await this.octokit.rest.rateLimit.get();
     return rateLimit;
   }
+
+  async removeBranch({
+    owner,
+    repo,
+    ref,
+  }: {
+    owner: string;
+    repo: string;
+    ref: string;
+  }) {
+    const { data } = await this.octokit.rest.git.deleteRef({
+      owner,
+      repo,
+      ref,
+    });
+
+    return data;
+  }
 }

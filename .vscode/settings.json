@@ -1,1 +1,8 @@
-{}
+{
+  "search.exclude": {
+    "coverage": true,
+    "pnpm-lock.yaml": true,
+    "**/node_modules": true,
+    "**/*.code-search": true
+  }
+}

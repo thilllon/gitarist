@@ -66,6 +66,10 @@ export class Gitarist {
     return this._repo;
   }
 
+  getOctokit() {
+    return this.octokit;
+  }
+
   /**
    * create files to be commited later
    * @param numFiles  number of files to create
@@ -670,7 +674,7 @@ export class Gitarist {
       repo,
       title: now,
       body: now,
-      head: head ?? headPrefix + '/' + now,
+      head: head ?? headPrefix + '_' + now,
       update: true,
       forceFork: false,
       changes: [
@@ -983,6 +987,11 @@ export class Gitarist {
     return rateLimit;
   }
 
+  /**
+   *
+   * @param ref `refs/heads/<branch_name>` or simply `<branch_name>`
+   * @returns
+   */
   async removeBranch({
     owner,
     repo,

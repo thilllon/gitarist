@@ -113,3 +113,25 @@ export const runCleanupRepositories = async () => {
 
   await gitarist.deleteRepos({ owner, targetPath: 'repos.json' });
 };
+
+export const runListBranches = async () => {
+  throw new Error('Not implemented yet');
+
+  const { owner, repo, authToken } = validate();
+  const gitarist = new Gitarist({ authToken });
+
+  const { data } = await gitarist.getOctokit().rest.git.getRef({
+    owner,
+    repo,
+    ref: '',
+  });
+  console.log(data);
+
+  // const response = await gitarist.getOctokit().rest.git.listMatchingRefs({
+  //   owner,
+  //   repo: 'turing-incomplete',
+  //   ref: 'commit/*',
+  // });
+
+  // console.log(response.data);
+};

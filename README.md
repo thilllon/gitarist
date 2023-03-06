@@ -51,9 +51,20 @@ git push origin --force main
 ### Make PR history clean
 
 ```sh
-git config pull.rebase true && git pull --prune && git branch -r | grep --only "commit\/1672.*" | xargs git push --delete origin && git pull --prune
-# git push --delete origin SOME_TAG_NAME
-# git tag --delete SOME_TAG_NAME
+# To delete remote branches when `request_` is a branch prefix to be deleted
+git config pull.rebase true
+git pull --prune
+git branch --remotes | grep --only "request_.*" | xargs git push --delete origin
+git pull --prune
+
+# To delete local branches when `request_` is a branch prefix to be deleted
+git branch | grep --only "request_.*" | xargs git branch --delete
+
+# To delete remote tags
+git push --delete origin SOME_TAG_NAME
+
+# To delete local tags
+git tag --delete SOME_TAG_NAME
 ```
 
 ## Contribution

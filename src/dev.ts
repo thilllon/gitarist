@@ -1,3 +1,11 @@
-import { runner } from './runner';
+import {
+  runCleanupRepositories,
+  runImitateActiveUser,
+  runListRepositories,
+} from './runners';
 
-runner();
+// runImitateActiveUser();
+
+// runListRepositories();
+
+runCleanupRepositories();

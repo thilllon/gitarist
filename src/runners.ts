@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { Gitarist } from './gitarist';
 
-export const runner = async () => {
+const validate = () => {
   dotenv.config();
 
   const owner = process.env.GITARIST_OWNER;
@@ -18,11 +18,26 @@ export const runner = async () => {
     throw new Error('Missing required environment variables: "GITARIST_TOKEN"');
   }
 
+  return { owner, repo, authToken };
+};
+
+/**
+ * Imitate an active user
+ */
+export const runImitateActiveUser = async () => {
+  const { owner, repo, authToken } = validate();
+
   const gitarist = new Gitarist({ authToken });
 
   await gitarist.mimicIssue({ owner, repo });
 
-  await gitarist.mimicPullRequest({ owner, repo, reviewOptions: {} });
+  await gitarist.mimicPullRequest({
+    owner,
+    repo,
+    reviewOptions: {
+      content: 'LGTM',
+    },
+  });
 
   await gitarist.createCommits({
     owner,
@@ -40,11 +55,18 @@ export const runner = async () => {
     repo,
     staleTimeMs: 86400 * 1000,
   });
+};
 
-  // await gitarist.listRepositories({
-  //   owner,
-  //   ownerLogin: process.env.GITARIST_OWNER,
-  // });
+export const runListRepositories = async () => {
+  const { owner, repo, authToken } = validate();
+  const gitarist = new Gitarist({ authToken });
 
-  // await gitarist.deleteRepos({ owner, input: 'repos.json' });
+  await gitarist.listRepositories({ owner, ownerLogin: owner });
+};
+
+export const runCleanupRepositories = async () => {
+  const { owner, repo, authToken } = validate();
+  const gitarist = new Gitarist({ authToken });
+
+  await gitarist.deleteRepos({ owner, targetPath: 'repos.json' });
 };

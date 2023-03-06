@@ -4,11 +4,10 @@ dist
 !.env.example
 
 .artifacts
-.gitarist/.tmp*
-.gitarist/__commit*
-# deleted.json
-# raw.json
-# repos.json
+
+.gitarist
 
 example/.gitarist
 example/.github
+
+coverage

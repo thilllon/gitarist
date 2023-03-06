@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -18,9 +18,9 @@ describe('gitarist', () => {
 
   test('check env', async () => {
     expect(fs.existsSync(path.join(process.cwd(), '.env.test'))).toBeTruthy();
-    expect(process.env.GITARIST_OWNER).toBeDefined();
-    expect(process.env.GITARIST_REPO).toBeDefined();
-    expect(process.env.GITARIST_TOKEN).toBeDefined();
+    expect(typeof process.env.GITARIST_OWNER).toBe('string');
+    expect(typeof process.env.GITARIST_REPO).toBe('string');
+    expect(typeof process.env.GITARIST_TOKEN).toBe('string');
   });
 
   test('check owner, repo', async () => {
@@ -35,7 +35,7 @@ describe('gitarist', () => {
 
     // cleanup
     try {
-      fs.rmdirSync(directoryPath, { recursive: true });
+      fs.rmSync(directoryPath, { recursive: true });
     } catch (err) {
       /* empty */
     }
@@ -53,7 +53,7 @@ describe('gitarist', () => {
 
     // cleanup
     try {
-      fs.rmdirSync(directoryPath, { recursive: true });
+      fs.rmSync(directoryPath, { recursive: true });
     } catch (err) {
       /* empty */
     }

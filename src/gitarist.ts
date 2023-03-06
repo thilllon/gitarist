@@ -21,7 +21,7 @@ import {
   __Workflow,
   __Repository,
   __Run,
-} from './gitarist.type';
+} from './gitarist.interface';
 
 // https://octokit.github.io/rest.js/v19
 // https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
@@ -111,9 +111,11 @@ export class Gitarist {
   }
 
   /**
+   *
    * 현재 프로젝트에서 일정 기간이 지난 파일을 삭제하는 함수
    * 파일의 실제 생성시간을 확인하는 것이 아니라 폴더이름을 바탕으로 삭제한다.
-   * @param staleTimeMs 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지
+   * @param staleTimeMs 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지 The number of milliseconds to determine whether a file is stale or not.
+   * @param searchingPaths 삭제할 파일을 찾을 경로. glob pattern을 사용할 수 있다. The paths to find files to delete. A list of relative path to be searched to filter stale files.
    */
   removeStaleFiles({ staleTimeMs, searchingPaths }: RemoveStaleFilesOptions) {
     console.group('[remove stale files]');
@@ -146,13 +148,15 @@ export class Gitarist {
 
   /**
    * https://dev.to/lucis/how-to-push-files-programatically-to-a-repository-using-octokit-with-typescript-1nj0
-   * @param owner
-   * @param repo
-   * @param branch
-   * @param numFiles optional
-   * @param numCommits optional
-   * @param subpath optional
-   * @param removeOptions optional
+   * @param repo: string;
+   * @param owner: string;
+   * @param branch: string;
+   * @param numFiles?: NumberOrRange;
+   * @param numCommits?: NumberOrRange;
+   * @param staleTimeMs 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지 The number of milliseconds to determine whether a file is stale or not.
+   * @param searchingPaths 삭제할 파일을 찾을 경로. glob pattern을 사용할 수 있다. The paths to find files to delete. A list of relative path to be searched to filter stale files.
+   * @param subpath subpath under the ".gitarist" directory. e.g., "__pullrequest"
+   * @param removeOptions RemoveStaleFilesOptions remove file options
    */
   async createCommits({
     owner,
@@ -337,17 +341,18 @@ export class Gitarist {
   /**
    * list repos
    * @param owner
-   * @param output default: ./artifacts/repos.json, relative to cwd
    * @param ownerLogin optional. owner's login name
+   * @param reposLogPath default: ./.artifacts/repos.json, relative to cwd
+   * @param rawLogPath default: ./.artifacts/raw.json, relative to cwd
    * @returns
    */
   async listRepositories({
     owner,
-    output = './artifacts/repos.json',
     ownerLogin,
+    reposLogPath = './.artifacts/repos.json',
+    rawLogPath = './.artifacts/raw.json',
   }: ListRepositoriesOptions) {
     // TODO: convert to rxjs
-
     const bigEnough = 999;
 
     let rawDataList: __Repository[] = [];
@@ -376,16 +381,17 @@ export class Gitarist {
       );
     }
 
-    const repoNameList = rawDataList.map((repo) => repo.name);
+    let repoNameList = rawDataList.map((repo) => repo.name);
+    repoNameList = [...new Set(repoNameList)].sort();
 
     fs.writeFileSync(
-      path.join(process.cwd(), output),
+      path.join(process.cwd(), reposLogPath),
       JSON.stringify(repoNameList),
       'utf8'
     );
 
     fs.writeFileSync(
-      path.join(process.cwd(), '.artifacts', 'raw.json'),
+      path.join(process.cwd(), rawLogPath),
       JSON.stringify(rawDataList),
       'utf8'
     );
@@ -397,25 +403,32 @@ export class Gitarist {
    * delete repos
    * @param owner
    * @param repos Optional. default: []. Repo list to be deleted which prior to input. If not provided, read from input
-   * @param input default: ./artifacts/repos.json, relative to cwd
+   * @param targetPath default: ./.artifacts/toBeDeleted.json, relative to cwd
+   * @param deleteLogPath default: ./.artifacts/deleted.json, relative to cwd
    */
   async deleteRepos({
     owner,
     repos,
-    input = './artifacts/repos.json',
+    targetPath = './.artifacts/toBeDeleted.json',
+    deleteLogPath = './.artifacts/deleted.json',
   }: DeleteReposOptions) {
     if (!repos) {
-      if (!fs.existsSync(input)) {
-        console.log(`file not exist: ${input}`);
+      if (!fs.existsSync(targetPath)) {
+        console.log(`file not exist: ${targetPath}`);
         return [];
       }
-      const fileData = fs.readFileSync(path.join(process.cwd(), input), 'utf8');
+      const fileData = fs.readFileSync(
+        path.join(process.cwd(), targetPath),
+        'utf8'
+      );
       repos = JSON.parse(fileData) as string[];
     }
 
     if (!repos) {
       return [];
     }
+
+    console.log('target:' + repos);
 
     const deleted: string[] = [];
 
@@ -430,7 +443,7 @@ export class Gitarist {
     }
 
     fs.writeFileSync(
-      path.join(process.cwd(), '.artifacts', 'deleted.json'),
+      path.join(process.cwd(), deleteLogPath),
       JSON.stringify(deleted),
       'utf8'
     );
@@ -450,9 +463,7 @@ export class Gitarist {
 
     console.log('Number of repositories:', res.data.length);
 
-    // res.data.map((elem) => {
-    //   // console.log(elem.name);
-    // });
+    // res.data.map((elem) => console.log(elem.name));
 
     // this.octokit.rest.actions.deleteWorkflowRun({ owner, repo, run_id });
     // this.octokit.rest.actions.deleteWorkflowRunLogs({ owner, repo, run_id });
@@ -628,7 +639,17 @@ export class Gitarist {
     console.groupEnd();
   }
 
-  // https://www.npmjs.com/package/octokit-plugin-create-pull-request
+  /**
+   * https://www.npmjs.com/package/octokit-plugin-create-pull-request
+   *
+   * @param owner string
+   * @param repo string
+   * @param head optional string PR branch name. Prior to the "prefixHead" option
+   * @param headPrefix optional string prefix for the head branch. ignored if "head" option is provided
+   * @param subpath under the ".gitarist" directory. e.g., "__pullrequest"
+   * @param subpath optional string
+   */
+
   async createPullRequest({
     owner,
     repo,

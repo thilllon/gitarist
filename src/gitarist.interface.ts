@@ -1,11 +1,5 @@
 export interface RemoveStaleFilesOptions {
-  /**
-   * The number of milliseconds to determine whether a file is stale or not.
-   */
   staleTimeMs: number;
-  /**
-   * A list of relative path to be searched to filter stale files.
-   */
   searchingPaths?: string[];
 }
 
@@ -17,13 +11,7 @@ export interface CreateCommitsOptions {
   branch: string;
   numFiles?: NumberOrRange;
   numCommits?: NumberOrRange;
-  /**
-   * subpath under the ".gitarist" directory. e.g., "__pullrequest"
-   */
   subpath?: string;
-  /**
-   * remove file options
-   */
   removeOptions: RemoveStaleFilesOptions;
 }
 
@@ -47,8 +35,9 @@ export interface CloseIssuesOptions {
 
 export interface ListRepositoriesOptions {
   owner: string;
-  output?: string;
+  reposLogPath?: string;
   ownerLogin?: string;
+  rawLogPath?: string;
 }
 
 export interface FindWastedActionsOptions {
@@ -64,18 +53,8 @@ export interface DeleteRepoWorkflowLogsOptions {
 export interface CreatePullRequestOptions {
   owner: string;
   repo: string;
-  /**
-   * PR branch name
-   * prior to the "prefixHead" option
-   */
   head?: string;
-  /**
-   * prefix for the head branch. ignored if "head" option is provided
-   */
   headPrefix?: string;
-  /**
-   * subpath under the ".gitarist" directory. e.g., "__pullrequest"
-   */
   subpath?: string;
 }
 
@@ -93,7 +72,8 @@ export interface ChangeIssueTitleAndAddLabelsOptions {
 export interface DeleteReposOptions {
   owner: string;
   repos?: string[];
-  input?: string;
+  targetPath?: string;
+  deleteLogPath?: string;
 }
 
 export interface MimicPullRequestOptions {
@@ -106,11 +86,6 @@ export interface MimicPullRequestOptions {
 export interface ReviewOptions {
   content?: string;
 }
-
-// --------------------------------
-// --------------------------------
-// --------------------------------
-// --------------------------------
 
 // TODO: @octokit/type 값으로 변경하기
 /**
@@ -277,7 +252,7 @@ export interface __Run {
 }
 
 // TODO: @octokit/type 값으로 변경하기
-export type Conclusion__ =
+export type __Conclusion =
   | 'action_required'
   | 'cancelled'
   | 'failure'

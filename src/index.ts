@@ -1,4 +1,2 @@
-import { Gitarist } from './gitarist';
-import { runner } from './runner';
-
-export { Gitarist, runner };
+export { Gitarist } from './gitarist';
+export { runImitateActiveUser as runner } from './runners';

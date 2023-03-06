@@ -4,9 +4,9 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "clean": "rm -rf ./node_modules .github .gitarist .env && pnpm install",
+    "clean": "rm -rf ./node_modules .github .gitarist && pnpm install",
     "start:init": "pnpm clean && cd .. && pnpm build && cd example && gitarist init",
-    "start:run": "pnpm clean && dotenv -e .env gitarist run --owner $GITARIST_OWNER --repo $GITARIST_REPO --token $GITARIST_TOKEN"
+    "start:run": "pnpm clean && dotenv -e .env pnpm gitarist run --owner $GITARIST_OWNER --repo $GITARIST_REPO --token $GITARIST_TOKEN --max-commit 10 --min-commit 1"
   },
   "dependencies": {
     "dotenv-cli": "^7.0.0",

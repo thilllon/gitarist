@@ -1,2 +1,2 @@
 export { Gitarist } from './gitarist';
-export { runImitateActiveUser as runner } from './runners';
+export { runImitateActiveUser as runner } from './utils';

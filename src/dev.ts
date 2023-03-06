@@ -1,8 +1,4 @@
-import {
-  runCleanupRepositories,
-  runImitateActiveUser,
-  runListRepositories,
-} from './runners';
+import { runCleanupRepositories } from './utils';
 
 // runImitateActiveUser();
 

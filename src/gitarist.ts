@@ -1,5 +1,5 @@
 import glob from 'fast-glob';
-import fs, { existsSync, mkdirSync, readFileSync } from 'fs';
+import fs, { existsSync, mkdirSync } from 'fs';
 import { Octokit } from 'octokit';
 import { createPullRequest as createPullRequestPlugin } from 'octokit-plugin-create-pull-request';
 import path from 'path';
@@ -18,9 +18,9 @@ import {
   RemoveCommentsOnIssueByBotOptions,
   RemoveStaleFilesOptions,
   TreeParam,
-  __Workflow,
   __Repository,
   __Run,
+  __Workflow,
 } from './gitarist.interface';
 
 // https://octokit.github.io/rest.js/v19
@@ -148,11 +148,11 @@ export class Gitarist {
 
   /**
    * https://dev.to/lucis/how-to-push-files-programatically-to-a-repository-using-octokit-with-typescript-1nj0
-   * @param repo: string;
-   * @param owner: string;
-   * @param branch: string;
-   * @param numFiles?: NumberOrRange;
-   * @param numCommits?: NumberOrRange;
+   * @param {string} repo
+   * @param {string} owner
+   * @param {string} branch
+   * @param {NumberOrRange=} numFiles
+   * @param {NumberOrRange=} numCommits
    * @param staleTimeMs 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지 The number of milliseconds to determine whether a file is stale or not.
    * @param searchingPaths 삭제할 파일을 찾을 경로. glob pattern을 사용할 수 있다. The paths to find files to delete. A list of relative path to be searched to filter stale files.
    * @param subpath subpath under the ".gitarist" directory. e.g., "__pullrequest"
@@ -162,10 +162,12 @@ export class Gitarist {
     owner,
     repo,
     branch,
-    numFiles = 10,
-    numCommits = 1,
+    // numFiles = 10,
+    // numCommits = 10,
+    numFiles = { min: 1, max: 10 },
+    numCommits = { min: 1, max: 20 },
     subpath = '__commit',
-    // FIXME: removeOptions
+    // FIXME: use removeOptions value
     removeOptions,
   }: CreateCommitsOptions) {
     const tmpFolder = '.tmp';

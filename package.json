@@ -4,11 +4,11 @@
   "description": "A CLI tool to utilize Octokit",
   "license": "MIT",
   "packageManager": "pnpm@7.18.1",
-  "repository": "git@github.com:thilllon/gitarist.git",
-  "homepage": "https://github.com/thilllon/gitarist#readme",
   "publishConfig": {
     "access": "public"
   },
+  "repository": "git@github.com:thilllon/gitarist.git",
+  "homepage": "https://github.com/thilllon/gitarist#readme",
   "bugs": {
     "url": "https://github.com/thilllon/gitarist/issues"
   },
@@ -20,7 +20,19 @@
     "email": "thilllon970@gmail.com",
     "url": "https://github.com/thilllon"
   },
+  "funding": [
+    {
+      "type": "github",
+      "url": "http://github.com/thilllon"
+    },
+    {
+      "type": "ko_fi",
+      "url": "https://ko-fi.com/thilllon"
+    }
+  ],
   "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "require": {
@@ -33,24 +45,12 @@
       }
     }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
   "bin": {
     "gitarist": "./dist/cli.mjs"
   },
-  "funding": [
-    {
-      "type": "github",
-      "url": "http://github.com/thilllon"
-    },
-    {
-      "type": "ko_fi",
-      "url": "https://ko-fi.com/thilllon"
-    }
-  ],
   "scripts": {
     "dev": "tsx ./src/dev.ts",
     "build:tsc": "tsc",

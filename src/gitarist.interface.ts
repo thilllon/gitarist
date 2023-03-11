@@ -1,6 +1,7 @@
 export interface RemoveStaleFilesOptions {
   staleTimeMs: number;
   searchingPaths?: string[];
+  verbose?: boolean;
 }
 
 export type NumberOrRange = number | { min: number; max: number };
@@ -24,20 +25,22 @@ export interface CreateFilesOptions {
 export interface CreateIssuesOptions {
   repo: string;
   owner: string;
-  numIssues?: number;
+  numberOfIssues?: number;
 }
 
 export interface CloseIssuesOptions {
   repo: string;
   owner: string;
   staleTimeMs: number;
+  perPage?: number;
 }
 
 export interface ListRepositoriesOptions {
   owner: string;
-  reposLogPath?: string;
   ownerLogin?: string;
+  repoLogPath?: string;
   rawLogPath?: string;
+  perPage?: number;
 }
 
 export interface FindWastedActionsOptions {
@@ -86,6 +89,29 @@ export interface MimicPullRequestOptions {
 export interface ReviewOptions {
   content?: string;
 }
+
+export interface GetStaleWorkflowRunsOptions {
+  runs: __Run[];
+  exceptRecent: number;
+  ignoreBranches: string[];
+}
+
+export interface MimicIssueReportOptions {
+  owner: string;
+  repo: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface GetRateLimitOptions {}
+
+export interface RemoveBranchOptions {
+  owner: string;
+  repo: string;
+  ref: string;
+}
+
+// --------------------------------
+// --------------------------------
 
 // TODO: @octokit/type 값으로 변경하기
 /**

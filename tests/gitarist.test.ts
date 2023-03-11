@@ -2,18 +2,22 @@ import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
-import request from 'supertest';
 import { Gitarist } from '../src/gitarist';
+import { GitaristRunner } from '../src/gitarist.runner';
 import { mockServer } from './server.mock';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe('gitarist', () => {
-  let gitarist: Gitarist;
+  let runner: GitaristRunner;
 
   beforeAll(async () => {
     dotenv.config({ path: '.env.test' });
-    gitarist = new Gitarist();
+
+    const owner = process.env.GITARIST_OWNER as string;
+    const repo = process.env.GITARIST_REPO as string;
+    const authToken = process.env.GITARIST_TOKEN as string;
+    runner = new GitaristRunner();
   });
 
   test('check env', async () => {
@@ -24,8 +28,8 @@ describe('gitarist', () => {
   });
 
   test('check owner, repo', async () => {
-    expect(gitarist.owner).toBe(process.env.GITARIST_OWNER);
-    expect(gitarist.repo).toBe(process.env.GITARIST_REPO);
+    expect(runner.owner).toBe(process.env.GITARIST_OWNER);
+    expect(runner.repo).toBe(process.env.GITARIST_REPO);
   });
 
   test('createCommitFiles', async () => {
@@ -40,7 +44,7 @@ describe('gitarist', () => {
       /* empty */
     }
 
-    await gitarist.createCommitFiles({
+    await runner.__createCommitFiles({
       numFiles: numFilesForTest,
       directory,
       verbose: false,
@@ -76,7 +80,7 @@ describe('gitarist', () => {
         });
       });
 
-    const staleFiles = gitarist.removeStaleFiles({
+    const staleFiles = await runner.__removeStaleFiles({
       staleTimeMs: 1000, // judged as stale even after 1 second
     });
 
@@ -86,7 +90,7 @@ describe('gitarist', () => {
   });
 
   test('removeStaleFiles with searchingPaths', async () => {
-    expect(gitarist.removeStaleFiles).toBeDefined();
+    expect(runner.__removeStaleFiles).toBeDefined();
 
     // TODO: change the search target folder and see if it finds the files in that folder
     // // create fake commit files
@@ -118,29 +122,29 @@ describe('gitarist', () => {
   test('createCommits', async () => {
     // TODO: implement
     // REQUIRES mock server
-    expect(gitarist.createCommits).toBeDefined();
+    expect(runner.__createCommits).toBeDefined();
   });
 
   test('createIssues', async () => {
     // TODO: implement
     // REQUIRES mock server
-    expect(gitarist.createIssues).toBeDefined();
+    expect(runner.__createIssues).toBeDefined();
   });
 
   test('closeIssues', async () => {
     // TODO: implement
     // REQUIRES mock server
-    expect(gitarist.closeIssues).toBeDefined();
+    expect(runner.__closeIssues).toBeDefined();
   });
 
   test('listRepositories', async () => {
     // TODO: implement
     // REQUIRES mock server
-    expect(gitarist.listRepositories).toBeDefined();
+    expect(runner.__listRepositories).toBeDefined();
   });
 });
 
-describe('mocking server', () => {
+describe('test with mocking server', () => {
   beforeAll(() => mockServer.listen());
 
   afterAll(() => mockServer.close());

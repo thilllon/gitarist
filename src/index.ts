@@ -1,2 +1,5 @@
 export { Gitarist } from './gitarist';
-export { runImitateActiveUser as runner } from './utils';
+export { GitaristRunner } from './gitarist.runner';
+import { GitaristRunner } from './gitarist.runner';
+
+export const runner = new GitaristRunner().runImitateActiveUser;

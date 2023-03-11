@@ -5,6 +5,7 @@ const config: Config = {
     '^.+\\.(t|j)sx?$': '@swc/jest',
   },
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  collectCoverage: false,
 };
 
 export default config;

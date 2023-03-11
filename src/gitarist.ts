@@ -13,13 +13,16 @@ import {
   DeleteReposOptions,
   DeleteRepoWorkflowLogsOptions,
   FindWastedActionsOptions,
+  GetRateLimitOptions,
+  GetStaleWorkflowRunsOptions,
   ListRepositoriesOptions,
+  MimicIssueReportOptions,
   MimicPullRequestOptions,
+  RemoveBranchOptions,
   RemoveCommentsOnIssueByBotOptions,
   RemoveStaleFilesOptions,
   TreeParam,
   __Repository,
-  __Run,
   __Workflow,
 } from './gitarist.interface';
 
@@ -28,31 +31,21 @@ import {
 
 export class Gitarist {
   private readonly octokit;
-  private readonly _owner?: string;
-  private readonly _repo?: string;
+  private readonly _owner: string;
+  private readonly _repo: string;
   private readonly perPage = 100;
 
-  constructor({ authToken }: { authToken?: string } = {}) {
-    if (!process.env.GITARIST_OWNER) {
-      throw new Error('environment variable is not defined: "GITARIST_OWNER"');
-    }
-
-    if (!process.env.GITARIST_REPO) {
-      throw new Error('environment variable is not defined: "GITARIST_REPO"');
-    }
-
-    if (!authToken) {
-      if (!process.env.GITARIST_TOKEN) {
-        throw new Error(
-          'environment variable is not defined: "GITARIST_TOKEN"'
-        );
-      }
-
-      authToken = process.env.GITARIST_TOKEN;
-    }
-
-    this._owner = process.env.GITARIST_OWNER;
-    this._repo = process.env.GITARIST_REPO;
+  constructor({
+    owner,
+    repo,
+    authToken,
+  }: {
+    owner: string;
+    repo: string;
+    authToken: string;
+  }) {
+    this._owner = owner;
+    this._repo = repo;
 
     const _Octokit = Octokit.plugin(createPullRequestPlugin);
     this.octokit = new _Octokit({ auth: authToken });
@@ -76,12 +69,14 @@ export class Gitarist {
    * @param directory relative path from process.cwd()
    * @returns files names
    */
-  createCommitFiles({
+  protected createCommitFiles({
     numFiles,
     directory = '.gitarist/.tmp',
-    verbose = true,
+    verbose,
   }: CreateFilesOptions) {
-    console.group('[create files]');
+    if (verbose) {
+      console.group('[create files]');
+    }
 
     const directoryPath = path.join(process.cwd(), directory);
 
@@ -109,7 +104,9 @@ export class Gitarist {
       })
       .filter((file): file is string => !!file);
 
-    console.groupEnd();
+    if (verbose) {
+      console.groupEnd();
+    }
 
     return files;
   }
@@ -121,8 +118,14 @@ export class Gitarist {
    * @param staleTimeMs 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지 The number of milliseconds to determine whether a file is stale or not.
    * @param searchingPaths 삭제할 파일을 찾을 경로. glob pattern을 사용할 수 있다. The paths to find files to delete. A list of relative path to be searched to filter stale files.
    */
-  removeStaleFiles({ staleTimeMs, searchingPaths }: RemoveStaleFilesOptions) {
-    console.group('[remove stale files]');
+  protected removeStaleFiles({
+    staleTimeMs,
+    searchingPaths,
+    verbose,
+  }: RemoveStaleFilesOptions) {
+    if (verbose) {
+      console.group('[remove stale files]');
+    }
     searchingPaths ??= [`./.gitarist/__commit/**`];
 
     const staleFileNames = glob
@@ -135,7 +138,9 @@ export class Gitarist {
         }
 
         if (new Date(parseInt(fileName)) < new Date(Date.now() - staleTimeMs)) {
-          console.debug(filePath);
+          if (verbose) {
+            console.debug(filePath);
+          }
 
           fs.rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
           return fileName;
@@ -145,7 +150,9 @@ export class Gitarist {
       })
       .filter((fileName): fileName is string => !!fileName);
 
-    console.groupEnd();
+    if (verbose) {
+      console.groupEnd();
+    }
 
     return staleFileNames;
   }
@@ -162,7 +169,7 @@ export class Gitarist {
    * @param subpath subpath under the ".gitarist" directory. e.g., "__pullrequest"
    * @param removeOptions RemoveStaleFilesOptions remove file options
    */
-  async createCommits({
+  protected async createCommits({
     owner,
     repo,
     branch,
@@ -269,8 +276,12 @@ export class Gitarist {
     }
   }
 
-  async createIssues({ owner, repo, numIssues = 1 }: CreateIssuesOptions) {
-    for (const _ of Array(numIssues).keys()) {
+  protected async createIssues({
+    owner,
+    repo: repo,
+    numberOfIssues = 1,
+  }: CreateIssuesOptions) {
+    for (const _ of Array(numberOfIssues).keys()) {
       try {
         const iso = new Date().toISOString();
         const content = (iso + '\n').repeat(2);
@@ -304,13 +315,18 @@ export class Gitarist {
    * @param owner string
    * @param staleTimeMs number
    */
-  async closeIssues({ owner, repo, staleTimeMs }: CloseIssuesOptions) {
+  protected async closeIssues({
+    owner,
+    repo,
+    staleTimeMs,
+    perPage = 100,
+  }: CloseIssuesOptions) {
     // TODO: convert to rxjs
 
     try {
       const issues = await this.octokit.rest.issues.list({
         owned: true,
-        per_page: this.perPage,
+        per_page: perPage,
         state: 'open',
         filter: 'created',
       });
@@ -347,16 +363,17 @@ export class Gitarist {
   /**
    * list repos
    * @param owner
-   * @param ownerLogin optional. owner's login name
-   * @param reposLogPath default: ./.artifacts/repos.json, relative to cwd
-   * @param rawLogPath default: ./.artifacts/raw.json, relative to cwd
-   * @returns
+   * @param ownerLogin optional. filter by owner's login name
+   * @param repoLogPath path where repo log will be saved which is relative to cwd. example: ./.artifacts/repos.json
+   * @param rawLogPath path where raw log will be saved which is relative to cwd. example: ./.artifacts/raw.json
+   * @returns __Repository[]
    */
-  async listRepositories({
+  protected async listRepository({
     owner,
-    ownerLogin,
-    reposLogPath = './.artifacts/repos.json',
+    ownerLogin = owner,
+    repoLogPath = './.artifacts/repos.json',
     rawLogPath = './.artifacts/raw.json',
+    perPage = 100,
   }: ListRepositoriesOptions) {
     // TODO: convert to rxjs
     const bigEnough = 999;
@@ -369,7 +386,7 @@ export class Gitarist {
       const { data, status } =
         await this.octokit.rest.repos.listForAuthenticatedUser({
           username: owner,
-          per_page: this.perPage,
+          per_page: perPage,
           page: iter++,
           type: 'all',
         });
@@ -387,15 +404,34 @@ export class Gitarist {
       );
     }
 
-    let repoNameList = rawDataList.map((repo) => repo.name);
-    repoNameList = [...new Set(repoNameList)].sort();
+    const repoNameList = [
+      ...new Set(rawDataList.map(({ name }) => name)),
+    ].sort();
 
+    if (!repoLogPath.startsWith('./')) {
+      repoLogPath = './' + repoLogPath;
+    }
+    if (!rawLogPath.startsWith('./')) {
+      rawLogPath = './' + rawLogPath;
+    }
+
+    // if directories do not exist, create those recursively
+    const reposLogFullPath = path.dirname(
+      path.join(process.cwd(), repoLogPath)
+    );
+    if (!fs.existsSync(reposLogFullPath)) {
+      fs.mkdirSync(reposLogFullPath, { recursive: true });
+    }
     fs.writeFileSync(
-      path.join(process.cwd(), reposLogPath),
+      path.join(process.cwd(), repoLogPath),
       JSON.stringify(repoNameList),
       'utf8'
     );
 
+    const rawLogFullPath = path.dirname(path.join(process.cwd(), rawLogPath));
+    if (!fs.existsSync(rawLogFullPath)) {
+      fs.mkdirSync(rawLogFullPath, { recursive: true });
+    }
     fs.writeFileSync(
       path.join(process.cwd(), rawLogPath),
       JSON.stringify(rawDataList),
@@ -412,7 +448,7 @@ export class Gitarist {
    * @param targetPath default: ./.artifacts/toBeDeleted.json, relative to cwd
    * @param deleteLogPath default: ./.artifacts/deleted.json, relative to cwd
    */
-  async deleteRepos({
+  protected async deleteRepos({
     owner,
     repos,
     targetPath = './.artifacts/toBeDeleted.json',
@@ -461,7 +497,7 @@ export class Gitarist {
    * 낭비되고 있는 github action을 감지한다.
    * @param
    */
-  async findWastedActions({ owner }: FindWastedActionsOptions) {
+  protected async findWastedActions({ owner }: FindWastedActionsOptions) {
     const res = await this.octokit.rest.repos.listForAuthenticatedUser({
       username: owner,
       per_page: this.perPage,
@@ -512,7 +548,7 @@ export class Gitarist {
   }
 
   // https://github.com/<owner>/<repo>/actions/runs/<run_id>
-  async deleteRepoWorkflowLogs({
+  protected async deleteRepoWorkflowLogs({
     owner,
     repo,
     staleTimeMs,
@@ -656,7 +692,7 @@ export class Gitarist {
    * @param subpath optional string
    */
 
-  async createPullRequest({
+  protected async createPullRequest({
     owner,
     repo,
     head,
@@ -728,7 +764,7 @@ export class Gitarist {
     return pullRequest?.data;
   }
 
-  async removeCommentsOnIssueByBot({
+  protected async removeCommentsOnIssueByBot({
     owner,
     repo,
   }: RemoveCommentsOnIssueByBotOptions) {
@@ -798,7 +834,7 @@ export class Gitarist {
    * @param org
    * @param owner
    */
-  async changeIssueTitleAndAddLabels({
+  protected async changeIssueTitleAndAddLabels({
     owner,
     repo,
     changeTitle,
@@ -868,13 +904,11 @@ export class Gitarist {
    * @param exceptRecent
    * @returns
    */
-  async getStaleWorkflowRuns(
-    runs: __Run[],
-    {
-      exceptRecent,
-      ignoreBranches,
-    }: { exceptRecent: number; ignoreBranches: string[] }
-  ) {
+  protected async getStaleWorkflowRuns({
+    runs,
+    exceptRecent,
+    ignoreBranches,
+  }: GetStaleWorkflowRunsOptions) {
     // TODO: rxjs
     //   type WorkflowId = number;
     //   // TODO: 동작중인 workflow 제외하기
@@ -901,7 +935,7 @@ export class Gitarist {
     //   return targetRunList;
   }
 
-  async mimicIssue({ owner, repo }: { owner: string; repo: string }) {
+  protected async mimicIssueReport({ owner, repo }: MimicIssueReportOptions) {
     // 1. create issue
     // 2. create comment
     // 3. close issue
@@ -909,7 +943,7 @@ export class Gitarist {
     await this.createIssues({
       owner,
       repo,
-      numIssues: 3,
+      numberOfIssues: 3,
     });
 
     await this.closeIssues({
@@ -919,7 +953,7 @@ export class Gitarist {
     });
   }
 
-  async mimicPullRequest({
+  protected async mimicPullRequest({
     owner,
     repo,
     subpath = '__pullrequest',
@@ -964,13 +998,13 @@ export class Gitarist {
 
     const reviewId = review.data.id;
 
-    // const { data: submitData } = await this.octokit.rest.pulls.submitReview({
-    //   owner,
-    //   repo,
-    //   pull_number: pullNumber,
-    //   review_id: reviewId,
-    //   event: 'APPROVE',
-    // });
+    const { data: submitData } = await this.octokit.rest.pulls.submitReview({
+      owner,
+      repo,
+      pull_number: pullNumber,
+      review_id: reviewId,
+      event: 'APPROVE',
+    });
 
     const { data: mergeData } = await this.octokit.rest.pulls.merge({
       owner,
@@ -979,12 +1013,14 @@ export class Gitarist {
       merge_method: 'rebase',
     });
 
-    return { mergeData };
+    return { mergeData, submitData };
   }
 
-  async getRateLimit() {
-    const { data: rateLimit } = await this.octokit.rest.rateLimit.get();
-    return rateLimit;
+  protected async getRateLimit(options: GetRateLimitOptions) {
+    const { data } = await this.octokit.rest.rateLimit.get({
+      ...options,
+    });
+    return data;
   }
 
   /**
@@ -992,15 +1028,7 @@ export class Gitarist {
    * @param ref `refs/heads/<branch_name>` or simply `<branch_name>`
    * @returns
    */
-  async removeBranch({
-    owner,
-    repo,
-    ref,
-  }: {
-    owner: string;
-    repo: string;
-    ref: string;
-  }) {
+  protected async removeBranch({ owner, repo, ref }: RemoveBranchOptions) {
     const { data } = await this.octokit.rest.git.deleteRef({
       owner,
       repo,

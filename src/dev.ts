@@ -1,5 +1,3 @@
-import { runCleanupRepositories, runListBranches } from './utils';
-
 // runImitateActiveUser();
 
 // runListRepositories();

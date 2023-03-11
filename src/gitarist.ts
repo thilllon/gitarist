@@ -25,6 +25,7 @@ import {
   __Repository,
   __Workflow,
 } from './gitarist.interface';
+// import ora from 'ora';
 
 // https://octokit.github.io/rest.js/v19
 // https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
@@ -59,7 +60,7 @@ export class Gitarist {
     return this._repo;
   }
 
-  getOctokit() {
+  getOctokit(): Octokit {
     return this.octokit;
   }
 
@@ -381,8 +382,11 @@ export class Gitarist {
     let rawDataList: __Repository[] = [];
     let iter = 0;
 
+    // const spinner = ora('fetching repos...').start();
+
+    let total = 0;
     for (let i = 0; i < bigEnough; i++) {
-      console.log('fetching repos...');
+      // console.log('fetching repos...');
       const { data, status } =
         await this.octokit.rest.repos.listForAuthenticatedUser({
           username: owner,
@@ -391,12 +395,20 @@ export class Gitarist {
           type: 'all',
         });
       rawDataList.push(...data);
-      console.log('status', status, 'length', data.length);
+      total += data.length;
+      const text = `status: ${status} / count: ${i + 1} / received data size: ${
+        data.length
+      } / total: ${total}`;
+      // console.log(text);
+      // spinner.text = text;
 
       if (data.length === 0) {
         break;
       }
     }
+
+    // spinner.stop();
+    // spinner.clear();
 
     if (ownerLogin) {
       rawDataList = rawDataList.filter(

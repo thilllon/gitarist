@@ -94,7 +94,6 @@ program
   .option('-d,--directory <string>', 'Directory to save repositories as a file')
   .action(async (options) => {
     const repoList = await runner.runListRepository({
-      rawLogPath: options.directory,
       repoLogPath: options.directory,
     });
 
@@ -105,7 +104,7 @@ program
   .command('repo:delete')
   .description('Delete all repositories')
   .action(async () => {
-    await runner.runDeleteRepositoryList();
+    await runner.runDeleteRepositoryList({});
   });
 
 program.parse();

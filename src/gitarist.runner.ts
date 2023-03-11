@@ -20,12 +20,17 @@ import {
   RemoveCommentsOnIssueByBotOptions,
   RemoveStaleFilesOptions,
 } from './gitarist.interface';
-import { RunListRepositoriesArgs } from './gitarist.runner.interface';
+import {
+  GitaristRunnerConfig,
+  RunDeleteRepositoryListOptions,
+  RunListBranchesOptions,
+  RunListRepositoriesArgs,
+} from './gitarist.runner.interface';
 import { Templates } from './gitarist.template';
 
 export class GitaristRunner extends Gitarist {
-  constructor() {
-    dotenv.config();
+  constructor({ dotenv: dotenvConfig = {} }: GitaristRunnerConfig = {}) {
+    dotenv.config(dotenvConfig);
 
     const owner = process.env.GITARIST_OWNER;
     const repo = process.env.GITARIST_REPO;
@@ -136,10 +141,12 @@ export class GitaristRunner extends Gitarist {
     });
   }
 
-  async runDeleteRepositoryList() {
+  async runDeleteRepositoryList({
+    targetPath,
+  }: RunDeleteRepositoryListOptions) {
     await this.deleteRepos({
       owner: this.owner,
-      targetPath: 'repos.json',
+      targetPath: targetPath ?? 'repos.json',
     });
   }
 
@@ -147,15 +154,7 @@ export class GitaristRunner extends Gitarist {
    *
    * @param ref branch name as glob pattern
    */
-  async runListBranches({
-    owner,
-    repo,
-    ref,
-  }: {
-    owner?: string;
-    repo?: string;
-    ref: string;
-  }) {
+  async runListBranches({ owner, repo, ref }: RunListBranchesOptions) {
     const { data } = await this.getOctokit().rest.git.listMatchingRefs({
       owner: owner ?? this.owner,
       repo: repo ?? this.repo,

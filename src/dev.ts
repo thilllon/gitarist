@@ -1,7 +1,13 @@
-// runImitateActiveUser();
+import { GitaristRunner } from './gitarist.runner';
 
-// runListRepositories();
+console.log('Gitarist: development mode');
 
-// runCleanupRepositories();
+const runner = new GitaristRunner();
 
-// runListBranches();
+// runner.runImitateActiveUser({});
+
+runner.runListRepository({});
+
+// runner.runDeleteRepositoryList({});
+
+// runner.runListBranches({ ref: 'commits/*' });

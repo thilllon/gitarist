@@ -20,13 +20,26 @@
     "email": "thilllon970@gmail.com",
     "url": "https://github.com/thilllon"
   },
+  "type": "commonjs",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
   "bin": {
-    "gitarist": "./dist/cli.js"
+    "gitarist": "./dist/cli.mjs"
   },
   "funding": [
     {
@@ -54,7 +67,7 @@
   },
   "dependencies": {
     "@octokit/types": "^9.0.0",
-    "chalk": "4",
+    "chalk": "^5.2.0",
     "commander": "^9.4.1",
     "cosmiconfig": "^8.0.0",
     "dotenv": "^16.0.3",

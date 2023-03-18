@@ -1,4 +1,11 @@
-import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  jest,
+  test,
+} from '@jest/globals';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -10,7 +17,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe('gitarist', () => {
   let runner: GitaristRunner;
-
+  let gitarist: Gitarist;
   beforeAll(async () => {
     dotenv.config({ path: '.env.test' });
 
@@ -18,6 +25,7 @@ describe('gitarist', () => {
     const repo = process.env.GITARIST_REPO as string;
     const authToken = process.env.GITARIST_TOKEN as string;
     runner = new GitaristRunner();
+    gitarist = new Gitarist({ owner, repo, authToken });
   });
 
   test('check env', async () => {
@@ -37,14 +45,13 @@ describe('gitarist', () => {
     const directory = '.gitarist/.tmp__createCommitFiles';
     const directoryPath = path.join(process.cwd(), directory);
 
-    // cleanup
     try {
       fs.rmSync(directoryPath, { recursive: true });
     } catch (err) {
-      /* empty */
+      console.error(err);
     }
 
-    await runner.__createCommitFiles({
+    await gitarist.createCommitFiles({
       numFiles: numFilesForTest,
       directory,
       verbose: false,
@@ -55,11 +62,10 @@ describe('gitarist', () => {
     // FIXME: why failed?
     // expect(files.length).toBe(numFilesForTest);
 
-    // cleanup
     try {
       fs.rmSync(directoryPath, { recursive: true });
     } catch (err) {
-      /* empty */
+      console.error(err);
     }
   });
 
@@ -80,18 +86,14 @@ describe('gitarist', () => {
         });
       });
 
-    const staleFiles = await runner.__removeStaleFiles({
+    const staleFiles = await gitarist.removeStaleFiles({
       staleTimeMs: 1000, // judged as stale even after 1 second
     });
 
-    setTimeout(() => {
-      expect(staleFiles.length).toBe(86);
-    }, 1000);
+    expect(staleFiles.length).toBe(86);
   });
 
   test('removeStaleFiles with searchingPaths', async () => {
-    expect(runner.__removeStaleFiles).toBeDefined();
-
     // TODO: change the search target folder and see if it finds the files in that folder
     // // create fake commit files
     // // file name must be considered as linux timestamp (all numbers)
@@ -118,42 +120,28 @@ describe('gitarist', () => {
     // });
     // expect(staleFiles.length).toBe(numFilesForTest);
   });
-
-  test('createCommits', async () => {
-    // TODO: implement
-    // REQUIRES mock server
-    expect(runner.__createCommits).toBeDefined();
-  });
-
-  test('createIssues', async () => {
-    // TODO: implement
-    // REQUIRES mock server
-    expect(runner.__createIssues).toBeDefined();
-  });
-
-  test('closeIssues', async () => {
-    // TODO: implement
-    // REQUIRES mock server
-    expect(runner.__closeIssues).toBeDefined();
-  });
-
-  test('listRepositories', async () => {
-    // TODO: implement
-    // REQUIRES mock server
-    expect(runner.__listRepositories).toBeDefined();
-  });
 });
 
 describe('test with mocking server', () => {
-  beforeAll(() => mockServer.listen());
+  let runner: GitaristRunner;
+  let gitarist: Gitarist;
+  beforeAll(async () => {
+    dotenv.config({ path: '.env.test' });
 
-  afterAll(() => mockServer.close());
+    const owner = process.env.GITARIST_OWNER as string;
+    const repo = process.env.GITARIST_REPO as string;
+    const authToken = process.env.GITARIST_TOKEN as string;
+    runner = new GitaristRunner();
+    gitarist = new Gitarist({ owner, repo, authToken });
 
-  test('createCommits', async () => {
-    // TODO: implement
+    mockServer.listen();
   });
 
-  test('listRepositories', async () => {
+  afterAll(() => {
+    mockServer.close();
+  });
+
+  test('createCommits', async () => {
     // TODO: implement
     // const response = await request(mockServer)
     //   .get('/repos')
@@ -161,6 +149,10 @@ describe('test with mocking server', () => {
     // expect(response.headers['Content-Type']).toMatch(/json/);
     // expect(response.status).toEqual(200);
     // expect(response.body.email).toEqual('foo@bar.com');
+  });
+
+  test('listRepositories', async () => {
+    // TODO: implement
   });
 
   test('deleteRepos', async () => {
@@ -196,6 +188,14 @@ describe('test with mocking server', () => {
   });
 
   test('getRateLimit', async () => {
-    // TOOD: implement
+    const getRateLimitSpy = jest
+      .spyOn(gitarist, 'getRateLimit')
+      .mockImplementation(async () => {
+        return {
+          rate: {},
+        };
+      });
+    expect(gitarist.getRateLimit({})).toBeTruthy();
+    expect(getRateLimitSpy).toHaveBeenCalled();
   });
 });

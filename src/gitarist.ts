@@ -70,7 +70,7 @@ export class Gitarist {
    * @param directory relative path from process.cwd()
    * @returns files names
    */
-  protected createCommitFiles({
+  createCommitFiles({
     numFiles,
     directory = '.gitarist/.tmp',
     verbose,
@@ -119,7 +119,7 @@ export class Gitarist {
    * @param staleTimeMs 파일이 생성된 후 몇 초가 지난 파일에 대해 삭제할 것인지 The number of milliseconds to determine whether a file is stale or not.
    * @param searchingPaths 삭제할 파일을 찾을 경로. glob pattern을 사용할 수 있다. The paths to find files to delete. A list of relative path to be searched to filter stale files.
    */
-  protected removeStaleFiles({
+  removeStaleFiles({
     staleTimeMs,
     searchingPaths,
     verbose,
@@ -1027,7 +1027,7 @@ export class Gitarist {
     return { mergeData, submitData };
   }
 
-  protected async getRateLimit(options: GetRateLimitOptions) {
+  async getRateLimit(options: GetRateLimitOptions) {
     const { data } = await this.octokit.rest.rateLimit.get({
       ...options,
     });

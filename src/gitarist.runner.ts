@@ -152,7 +152,7 @@ export class GitaristRunner extends Gitarist {
   }
 
   async runCleanupRepository() {
-    const result = await this.changeIssueTitleAndAddLabels({
+    const result = await this.addLabelsToIssue({
       owner: this.owner,
       repo: this.repo,
     });

@@ -1,10 +1,11 @@
+import { CommanderError } from 'commander';
 import glob from 'fast-glob';
 import fs, { existsSync, mkdirSync, statSync } from 'fs';
 import { Octokit } from 'octokit';
 import { createPullRequest as createPullRequestPlugin } from 'octokit-plugin-create-pull-request';
 import path from 'path';
 import {
-  ChangeIssueTitleAndAddLabelsOptions,
+  ChangeIssueTitleAndAddLabelsOptions as AddLabelsToIssueOptions,
   CloseIssuesOptions,
   CreateCommitsOptions,
   CreateFilesOptions,
@@ -330,8 +331,6 @@ export class Gitarist {
     staleTimeMs,
     perPage = 100,
   }: CloseIssuesOptions) {
-    // TODO: convert to rxjs
-
     try {
       const issues = await this.octokit.rest.issues.list({
         owned: true,
@@ -384,7 +383,6 @@ export class Gitarist {
     rawLogPath = './.artifacts/raw.json',
     perPage = 100,
   }: ListRepositoriesOptions) {
-    // TODO: convert to rxjs
     const bigEnough = 400;
 
     let rawDataList: __Repository[] = [];
@@ -582,7 +580,6 @@ export class Gitarist {
     let wfIds: number[] = [];
     const wfs: __Workflow[] = [];
 
-    // TODO: rxjs
     for await (const page of Array(bigEnough).keys()) {
       const wfResponse = await this.octokit.rest.actions.listRepoWorkflows({
         owner,
@@ -647,7 +644,6 @@ export class Gitarist {
 
         const runIds = filtered.map(({ id }) => id);
 
-        // TODO: rxjs
         // get 5 items from array and call request simultaneously using rxjs
         // and wait for all to finish
         // and retry failed ones
@@ -791,11 +787,12 @@ export class Gitarist {
     repo,
     perPage = 100,
   }: RemoveCommentsOnIssueByBotOptions) {
-    // TODO: rxjs
     const bigEnough = 9999;
-    const arr = [...Array(bigEnough).keys()];
+    const pages = [...Array(bigEnough).keys()];
 
-    for await (const page of arr) {
+    const commentIds: { issueUrl: string; id: number }[] = [];
+
+    for await (const page of pages) {
       const commentsResponse =
         await this.octokit.rest.issues.listCommentsForRepo({
           owner,
@@ -808,46 +805,33 @@ export class Gitarist {
         break;
       }
 
-      for (const comm of comments) {
-        const isBot = comm.user?.login?.includes('[bot]');
+      for (const comment of comments) {
+        const isBot = comment.user?.login?.includes('[bot]');
 
         if (isBot) {
           try {
             await this.octokit.rest.issues.deleteComment({
               owner,
               repo,
-              comment_id: comm.id,
+              comment_id: comment.id,
             });
-            console.log('deleted:', comm.id);
+            console.log('deleted comment:', comment.id);
+            commentIds.push({ issueUrl: comment.issue_url, id: comment.id });
           } catch (err) {
             console.error(err);
           }
         }
-
-        // const { title, number: issue_number } = issue;
-        // let newTitle = '';
-        // let labels: string[] = [];
-        // if (/^<client>/gi.test(title)) {
-        //   newTitle = title.replace(/^<client>/gi, '').trim();
-        //   labels = ['client'];
-        // } else if (/^<server>/gi.test(title)) {
-        //   newTitle = title.replace(/^<server>/gi, '').trim();
-        //   labels = ['server'];
-        // } else if (/^<infra>/gi.test(title)) {
-        //   newTitle = title.replace(/^<infra>/gi, '').trim();
-        //   labels = ['infra'];
-        // } else {
-        //   continue;
-        // }
-        // try {
-        //   const updateResponse = await this.octokitService.rest.issues.update({ owner, repo, issue_number, title: newTitle });
-        //   const addLabelResponse = await this.octokitService.rest.issues.addLabels({ owner, repo, issue_number, labels });
-        //   console.log('issue:', issue_number, '/', updateResponse.status, addLabelResponse.status);
-        // } catch (err) {
-        //   console.error(err);
-        // }
       }
     }
+
+    return commentIds;
+  }
+
+  removeWordFromSentence(sentence: string, words: string[]) {
+    return sentence
+      .trim()
+      .replace(new RegExp(`^(${words.join('|')})`, 'i'), '')
+      .trim();
   }
 
   /**
@@ -856,18 +840,18 @@ export class Gitarist {
    * @param org
    * @param owner
    */
-  async changeIssueTitleAndAddLabels({
+  async addLabelsToIssue({
     owner,
     repo,
     perPage = 100,
-    removeKeyFromTitle,
-    labelMap = {},
-  }: ChangeIssueTitleAndAddLabelsOptions) {
+    removeKeyFromTitle = true,
+    keyLabelsMap = {},
+  }: AddLabelsToIssueOptions) {
     console.log('[change issue title and add labels]');
 
     const bigEnough = 9999;
 
-    // const labelMap = {
+    // const keyLabelsMap = {
     //   '<client>': ['client'],
     //   '<server>': ['server'],
     //   '<infra>': ['infra'],
@@ -898,19 +882,24 @@ export class Gitarist {
       }
 
       for (const issue of issues) {
-        const labels: string[] = Object.entries(labelMap).flatMap(
-          ([title, label]) =>
-            issue.title.toLowerCase().includes(title) ? label : []
+        const labels: string[] = Object.entries(keyLabelsMap).flatMap(
+          ([key, labels]) =>
+            issue.title
+              .trim()
+              .toLowerCase()
+              .startsWith(key + ' ')
+              ? labels
+              : []
         );
-
-        const newTitle = removeKeyFromTitle
-          ? issue.title.trim()
-          : issue.title.replace(/<client>|<server>|<infra>/gi, '').trim();
 
         try {
           let title: string | undefined;
 
-          if (newTitle !== issue.title && removeKeyFromTitle) {
+          if (removeKeyFromTitle) {
+            const newTitle = this.removeWordFromSentence(
+              issue.title,
+              Object.keys(keyLabelsMap)
+            );
             const updateResponse = await this.octokit.rest.issues.update({
               owner,
               repo,
@@ -950,7 +939,6 @@ export class Gitarist {
     exceptRecent,
     ignoreBranches,
   }: GetStaleWorkflowRunsOptions) {
-    // TODO: rxjs
     //   type WorkflowId = number;
     //   // TODO: 동작중인 workflow 제외하기
     //   runs = runs.filter((run) => {

@@ -76,7 +76,7 @@ export interface ChangeIssueTitleAndAddLabelsOptions {
   repo: string;
   perPage?: number;
   removeKeyFromTitle?: boolean;
-  labelMap?: Record<string, string[]>; // { 'key': ['label1', 'label2'] }
+  keyLabelsMap?: Record<string, string[]>; // { 'key': ['label1', 'label2'] }
 }
 
 export interface DeleteReposOptions {

@@ -92,6 +92,42 @@ describe('gitarist', () => {
     expect(gitarist.getRateLimit({})).toBeTruthy();
     expect(getRateLimitSpy).toHaveBeenCalled();
   });
+
+  test.only('removeWordFromSentence', async () => {
+    const fixtures = [
+      {
+        input: '<infra>   hello world',
+        expected: 'hello world',
+        words: ['<server>', '<client>', '<infra>'],
+      },
+      {
+        input: '<infra> hello world',
+        expected: 'hello world',
+        words: ['<server>', '<client>', '<infra>'],
+      },
+      {
+        input: '<server>hello world',
+        expected: 'hello world',
+        words: ['<server>', '<client>', '<infra>'],
+      },
+      {
+        input: '<client><server><infra>',
+        expected: '<server><infra>',
+        words: ['<server>', '<client>', '<infra>'],
+      },
+      {
+        input: 'hello world <infra>',
+        expected: 'hello world <infra>',
+        words: ['<server>', '<client>', '<infra>'],
+      },
+    ];
+
+    fixtures.forEach((fixture) => {
+      expect(
+        gitarist.removeWordFromSentence(fixture.input, fixture.words)
+      ).toBe(fixture.expected);
+    });
+  });
 });
 
 describe('e2e', () => {

@@ -1,3 +1,5 @@
+import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
+
 export interface RemoveStaleFilesOptions {
   staleTimeMs: number;
   searchingPaths?: string[];
@@ -45,12 +47,14 @@ export interface ListRepositoriesOptions {
 
 export interface FindWastedActionsOptions {
   owner: string;
+  perPage?: number;
 }
 
 export interface DeleteRepoWorkflowLogsOptions {
   repo: string;
   owner: string;
   staleTimeMs: number;
+  perPage?: number;
 }
 
 export interface CreatePullRequestOptions {
@@ -64,12 +68,15 @@ export interface CreatePullRequestOptions {
 export interface RemoveCommentsOnIssueByBotOptions {
   owner: string;
   repo: string;
+  perPage?: number;
 }
 
 export interface ChangeIssueTitleAndAddLabelsOptions {
   owner: string;
   repo: string;
-  changeTitle?: boolean;
+  perPage?: number;
+  removeKeyFromTitle?: boolean;
+  labelMap?: Record<string, string[]>; // { 'key': ['label1', 'label2'] }
 }
 
 export interface DeleteReposOptions {
@@ -287,3 +294,10 @@ export type __Conclusion =
   | 'skipped'
   | 'stale'
   | 'timed_out';
+
+type ElementOfArray<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
+export type Issue = ElementOfArray<
+  RestEndpointMethodTypes['issues']['listForRepo']['response']['data']
+>;

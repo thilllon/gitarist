@@ -93,7 +93,7 @@ program
   .description('List all repositories names')
   .option('-d,--directory <string>', 'Directory to save repositories as a file')
   .action(async (options) => {
-    const repoList = await runner.runListRepository({
+    const repoList = await runner.runListRepositories({
       repoLogPath: options.directory,
     });
 

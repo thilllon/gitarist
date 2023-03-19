@@ -4,23 +4,6 @@ import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { Gitarist } from './gitarist';
 import {
-  ChangeIssueTitleAndAddLabelsOptions,
-  CloseIssuesOptions,
-  CreateCommitsOptions,
-  CreateFilesOptions,
-  CreateIssuesOptions,
-  CreatePullRequestOptions,
-  DeleteReposOptions,
-  DeleteRepoWorkflowLogsOptions,
-  FindWastedActionsOptions,
-  GetStaleWorkflowRunsOptions,
-  ListRepositoriesOptions,
-  MimicIssueReportOptions,
-  MimicPullRequestOptions,
-  RemoveCommentsOnIssueByBotOptions,
-  RemoveStaleFilesOptions,
-} from './gitarist.interface';
-import {
   GitaristRunnerConfig,
   RunDeleteRepositoryListOptions,
   RunListBranchesOptions,
@@ -127,13 +110,13 @@ export class GitaristRunner extends Gitarist {
     });
   }
 
-  async runListRepository({
+  async runListRepositories({
     owner,
     ownerLogin,
     repoLogPath,
     rawLogPath,
   }: RunListRepositoriesArgs) {
-    await this.listRepository({
+    await this.listRepositories({
       owner: owner ?? this.owner,
       ownerLogin: ownerLogin ?? owner ?? this.owner,
       repoLogPath,
@@ -162,5 +145,13 @@ export class GitaristRunner extends Gitarist {
     });
 
     return data;
+  }
+
+  async runCleanupRepository() {
+    const result = await this.changeIssueTitleAndAddLabels({
+      owner: this.owner,
+      repo: this.repo,
+    });
+    return result;
   }
 }

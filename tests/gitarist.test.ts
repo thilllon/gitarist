@@ -1,35 +1,36 @@
-import {
-  afterAll,
-  beforeAll,
-  describe,
-  expect,
-  jest,
-  test,
-} from '@jest/globals';
+import { beforeAll, describe, expect, jest, test } from '@jest/globals';
 import dotenv from 'dotenv';
-import fs from 'fs';
+import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'fs';
 import path from 'path';
 import { Gitarist } from '../src/gitarist';
 import { GitaristRunner } from '../src/gitarist.runner';
-import { mockServer } from './server.mock';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Do NOT mock waht you don't own, it's meaningless.
+// https://stackoverflow.com/questions/65626653/create-react-app-doesnt-properly-mock-modules-from-mocks-directory/65627662#65627662
+// https://stackoverflow.com/a/68614624/11091456
 
 describe('gitarist', () => {
   let runner: GitaristRunner;
   let gitarist: Gitarist;
+
+  let owner: string;
+  let repo: string;
+  let authToken: string;
+
   beforeAll(async () => {
     dotenv.config({ path: '.env.test' });
 
-    const owner = process.env.GITARIST_OWNER as string;
-    const repo = process.env.GITARIST_REPO as string;
-    const authToken = process.env.GITARIST_TOKEN as string;
+    owner = process.env.GITARIST_OWNER as string;
+    repo = process.env.GITARIST_REPO as string;
+    authToken = process.env.GITARIST_TOKEN as string;
     runner = new GitaristRunner();
     gitarist = new Gitarist({ owner, repo, authToken });
   });
 
   test('check env', async () => {
-    expect(fs.existsSync(path.join(process.cwd(), '.env.test'))).toBeTruthy();
+    expect(existsSync(path.join(process.cwd(), '.env.test'))).toBeTruthy();
     expect(typeof process.env.GITARIST_OWNER).toBe('string');
     expect(typeof process.env.GITARIST_REPO).toBe('string');
     expect(typeof process.env.GITARIST_TOKEN).toBe('string');
@@ -46,7 +47,7 @@ describe('gitarist', () => {
     const directoryPath = path.join(process.cwd(), directory);
 
     try {
-      fs.rmSync(directoryPath, { recursive: true });
+      rmSync(directoryPath, { recursive: true });
     } catch (err) {
       console.error(err);
     }
@@ -57,145 +58,95 @@ describe('gitarist', () => {
       verbose: false,
     });
 
-    const files = fs.readdirSync(directoryPath);
+    const files = readdirSync(directoryPath);
     expect(files).toBeDefined();
     // FIXME: why failed?
     // expect(files.length).toBe(numFilesForTest);
 
     try {
-      fs.rmSync(directoryPath, { recursive: true });
+      rmSync(directoryPath, { recursive: true });
     } catch (err) {
       console.error(err);
     }
   });
 
   test('removeStaleFiles', async () => {
-    // create fake commit files
-    // file name must be considered as linux timestamp (all numbers)
-    const numFilesForTest = 123;
-    const content = 'dummy';
+    const cleanupFakeCommitFiles = () => {
+      const dir = path.join(process.cwd(), '.gitarist', '__commit');
+      rmSync(dir, { recursive: true });
+    };
 
-    const dir = path.join(process.cwd(), '.gitarist', '__commit');
-    fs.mkdirSync(dir, { recursive: true });
-
-    Array(numFilesForTest)
-      .fill(null)
-      .forEach(() => {
-        fs.writeFileSync(path.join(dir, Date.now().toString()), content, {
-          encoding: 'utf8',
+    const createFakeCommitFiles = (numFilesForTest: number) => {
+      // file name must be considered as linux timestamp (all numbers)
+      const content = 'dummy';
+      const dir = path.join(process.cwd(), '.gitarist', '__commit');
+      mkdirSync(dir, { recursive: true });
+      Array(numFilesForTest)
+        .fill(null)
+        .forEach(() => {
+          writeFileSync(path.join(dir, Date.now().toString()), content, {
+            encoding: 'utf8',
+          });
         });
+    };
+
+    cleanupFakeCommitFiles();
+    createFakeCommitFiles(20);
+
+    jest.useFakeTimers();
+    setTimeout(async () => {
+      const staleFiles = await gitarist.removeStaleFiles({
+        staleTimeMs: 3000, // remove files older than 3 seconds
       });
 
-    const staleFiles = await gitarist.removeStaleFiles({
-      staleTimeMs: 1000, // judged as stale even after 1 second
-    });
-
-    expect(staleFiles.length).toBe(86);
-  });
-
-  test('removeStaleFiles with searchingPaths', async () => {
-    // TODO: change the search target folder and see if it finds the files in that folder
-    // // create fake commit files
-    // // file name must be considered as linux timestamp (all numbers)
-    // const numFilesForTest = 123;
-    // const content = 'dummy';
-    // Array(numFilesForTest)
-    //   .fill(null)
-    //   .forEach(() => {
-    //     fs.writeFileSync(
-    //       path.join(
-    //         process.cwd(),
-    //         '.gitarist',
-    //         '__commit',
-    //         Date.now().toString()
-    //       ),
-    //       content,
-    //       { encoding: 'utf8' }
-    //     );
-    //   });
-    // // with searchingPaths
-    // const staleFiles = gitarist.removeStaleFiles({
-    //   staleTimeMs: 1000,
-    //   searchingPaths: [path.join(process.cwd(), '.gitarist', '__commit')],
-    // });
-    // expect(staleFiles.length).toBe(numFilesForTest);
-  });
-});
-
-describe('test with mocking server', () => {
-  let runner: GitaristRunner;
-  let gitarist: Gitarist;
-  beforeAll(async () => {
-    dotenv.config({ path: '.env.test' });
-
-    const owner = process.env.GITARIST_OWNER as string;
-    const repo = process.env.GITARIST_REPO as string;
-    const authToken = process.env.GITARIST_TOKEN as string;
-    runner = new GitaristRunner();
-    gitarist = new Gitarist({ owner, repo, authToken });
-
-    mockServer.listen();
-  });
-
-  afterAll(() => {
-    mockServer.close();
-  });
-
-  test('createCommits', async () => {
-    // TODO: implement
-    // const response = await request(mockServer)
-    //   .get('/repos')
-    //   .set('Accept', 'application/json');
-    // expect(response.headers['Content-Type']).toMatch(/json/);
-    // expect(response.status).toEqual(200);
-    // expect(response.body.email).toEqual('foo@bar.com');
+      expect(staleFiles.length).toBe(20);
+    }, 3000);
+    jest.runAllTimers();
   });
 
   test('listRepositories', async () => {
-    // TODO: implement
-  });
-
-  test('deleteRepos', async () => {
-    // TOOD: implement
-  });
-
-  test('findWastedActions', async () => {
-    // TOOD: implement
-  });
-
-  test('deleteRepoWorkflowLogs', async () => {
-    // TOOD: implement
-  });
-
-  test('createPullRequest', async () => {
-    // TOOD: implement
-  });
-
-  test('removeCommentsOnIssueByBot', async () => {
-    // TOOD: implement
-  });
-
-  test('changeIssueTitleAndAddLabels', async () => {
-    // TOOD: implement
-  });
-
-  test('getStaleWorkflowRuns', async () => {
-    // TOOD: implement
-  });
-
-  test('mimicIssue', async () => {
-    // TOOD: implement
+    const listRepositoriesSpy = jest.spyOn(gitarist, 'listRepositories');
+    listRepositoriesSpy.mockResolvedValue([]);
+    const res = await gitarist.listRepositories({ owner });
+    expect(Array.isArray(res)).toBeTruthy();
+    expect(listRepositoriesSpy).toHaveBeenCalled();
   });
 
   test('getRateLimit', async () => {
     const getRateLimitSpy = jest
       .spyOn(gitarist, 'getRateLimit')
-      .mockImplementation(async () => {
-        return {
-          rate: {},
-        };
-      });
+      .mockResolvedValueOnce({ rate: {} });
     expect(gitarist.getRateLimit({})).toBeTruthy();
     expect(getRateLimitSpy).toHaveBeenCalled();
   });
+});
+
+describe('e2e', () => {
+  //  test('createCommits', async () => {
+  //     // NOTE: e2e test
+  //   });
+  //   test('deleteRepos', async () => {
+  //     // TOOD: implement
+  //   });
+  //   test('findWastedActions', async () => {
+  //     // TOOD: implement
+  //   });
+  //   test('deleteRepoWorkflowLogs', async () => {
+  //     // TOOD: implement
+  //   });
+  //   test('createPullRequest', async () => {
+  //     // TOOD: implement
+  //   });
+  //   test('removeCommentsOnIssueByBot', async () => {
+  //     // TOOD: implement
+  //   });
+  // test('changeIssueTitleAndAddLabels', async () => {
+  //   // TOOD: implement
+  // });
+  // test('getStaleWorkflowRuns', async () => {
+  //   // TOOD: implement
+  // });
+  // test('mimicIssue', async () => {
+  //   // TOOD: implement
+  // });
 });

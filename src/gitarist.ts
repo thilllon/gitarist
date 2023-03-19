@@ -1,5 +1,5 @@
 import glob from 'fast-glob';
-import fs, { existsSync, mkdirSync } from 'fs';
+import fs, { existsSync, mkdirSync, statSync } from 'fs';
 import { Octokit } from 'octokit';
 import { createPullRequest as createPullRequestPlugin } from 'octokit-plugin-create-pull-request';
 import path from 'path';
@@ -15,6 +15,7 @@ import {
   FindWastedActionsOptions,
   GetRateLimitOptions,
   GetStaleWorkflowRunsOptions,
+  Issue,
   ListRepositoriesOptions,
   MimicIssueReportOptions,
   MimicPullRequestOptions,
@@ -129,26 +130,35 @@ export class Gitarist {
     }
     searchingPaths ??= [`./.gitarist/__commit/**`];
 
+    const isStaleEnough = (filePath: string) => {
+      const fileName = path.basename(filePath);
+      if (statSync(filePath).birthtimeMs < Date.now() - staleTimeMs) {
+        if (verbose) {
+          console.debug(filePath);
+        }
+        fs.rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
+        return fileName;
+      }
+
+      // NOTE: based on filename
+      // const fileName = path.basename(filePath);
+      // if (isNaN(parseInt(fileName))) {
+      //   return;
+      // }
+
+      // if (new Date(parseInt(fileName)) < new Date(Date.now() - staleTimeMs)) {
+      //   if (verbose) {
+      //     console.debug(filePath);
+      //   }
+
+      //   fs.rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
+      //   return fileName;
+      // }
+    };
+
     const staleFileNames = glob
       .sync(searchingPaths, { onlyFiles: true })
-      .map((filePath) => {
-        const fileName = path.basename(filePath);
-
-        if (isNaN(parseInt(fileName))) {
-          return;
-        }
-
-        if (new Date(parseInt(fileName)) < new Date(Date.now() - staleTimeMs)) {
-          if (verbose) {
-            console.debug(filePath);
-          }
-
-          fs.rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
-          return fileName;
-        }
-
-        return;
-      })
+      .map(isStaleEnough)
       .filter((fileName): fileName is string => !!fileName);
 
     if (verbose) {
@@ -170,7 +180,7 @@ export class Gitarist {
    * @param subpath subpath under the ".gitarist" directory. e.g., "__pullrequest"
    * @param removeOptions RemoveStaleFilesOptions remove file options
    */
-  protected async createCommits({
+  async createCommits({
     owner,
     repo,
     branch,
@@ -277,7 +287,7 @@ export class Gitarist {
     }
   }
 
-  protected async createIssues({
+  async createIssues({
     owner,
     repo: repo,
     numberOfIssues = 1,
@@ -316,7 +326,7 @@ export class Gitarist {
    * @param owner string
    * @param staleTimeMs number
    */
-  protected async closeIssues({
+  async closeIssues({
     owner,
     repo,
     staleTimeMs,
@@ -369,7 +379,7 @@ export class Gitarist {
    * @param rawLogPath path where raw log will be saved which is relative to cwd. example: ./.artifacts/raw.json
    * @returns __Repository[]
    */
-  protected async listRepository({
+  async listRepositories({
     owner,
     ownerLogin = owner,
     repoLogPath = './.artifacts/repos.json',
@@ -459,7 +469,7 @@ export class Gitarist {
    * @param targetPath default: ./.artifacts/toBeDeleted.json, relative to cwd
    * @param deleteLogPath default: ./.artifacts/deleted.json, relative to cwd
    */
-  protected async deleteRepos({
+  async deleteRepos({
     owner,
     repos,
     targetPath = './.artifacts/toBeDeleted.json',
@@ -508,10 +518,10 @@ export class Gitarist {
    * 낭비되고 있는 github action을 감지한다.
    * @param
    */
-  protected async findWastedActions({ owner }: FindWastedActionsOptions) {
+  async findWastedActions({ owner, perPage = 100 }: FindWastedActionsOptions) {
     const res = await this.octokit.rest.repos.listForAuthenticatedUser({
       username: owner,
-      per_page: this.perPage,
+      per_page: perPage,
     });
 
     console.log('Number of repositories:', res.data.length);
@@ -524,14 +534,14 @@ export class Gitarist {
 
     for await (const repoResponse of this.octokit.paginate.iterator(
       this.octokit.rest.repos.listForAuthenticatedUser,
-      { username: owner, per_page: this.perPage }
+      { username: owner, per_page: perPage }
     )) {
       const repos = repoResponse.data.map((elem) => elem.name);
       for (const repo of repos) {
         try {
           for await (const wfResponse of this.octokit.paginate.iterator(
             this.octokit.rest.actions.listRepoWorkflows,
-            { owner, repo, per_page: this.perPage }
+            { owner, repo, per_page: perPage }
           )) {
             const wfs = wfResponse.data;
             for (const wf of wfs) {
@@ -559,10 +569,11 @@ export class Gitarist {
   }
 
   // https://github.com/<owner>/<repo>/actions/runs/<run_id>
-  protected async deleteRepoWorkflowLogs({
+  async deleteRepoWorkflowLogs({
     owner,
     repo,
     staleTimeMs,
+    perPage = 100,
   }: DeleteRepoWorkflowLogsOptions) {
     console.group('[deleteRepoWorkflowLogs]');
     const bigEnough = 200;
@@ -576,7 +587,7 @@ export class Gitarist {
       const wfResponse = await this.octokit.rest.actions.listRepoWorkflows({
         owner,
         repo,
-        per_page: this.perPage,
+        per_page: perPage,
         page,
       });
 
@@ -607,7 +618,7 @@ export class Gitarist {
             owner,
             repo,
             workflow_id: wfId,
-            per_page: this.perPage,
+            per_page: perPage,
             page,
           });
 
@@ -703,7 +714,7 @@ export class Gitarist {
    * @param subpath optional string
    */
 
-  protected async createPullRequest({
+  async createPullRequest({
     owner,
     repo,
     head,
@@ -775,9 +786,10 @@ export class Gitarist {
     return pullRequest?.data;
   }
 
-  protected async removeCommentsOnIssueByBot({
+  async removeCommentsOnIssueByBot({
     owner,
     repo,
+    perPage = 100,
   }: RemoveCommentsOnIssueByBotOptions) {
     // TODO: rxjs
     const bigEnough = 9999;
@@ -788,7 +800,7 @@ export class Gitarist {
         await this.octokit.rest.issues.listCommentsForRepo({
           owner,
           repo,
-          per_page: this.perPage,
+          per_page: perPage,
           page,
         });
       const comments = commentsResponse.data;
@@ -839,32 +851,41 @@ export class Gitarist {
   }
 
   /**
-   *
-   * get all issues and change title and add labels
+   * Get all issues and change title and add labels. If issue title starts with one of the KEYs of labelMap then, add labels and change title, in other word,s, remove the KEY from the title)
    * @param repo
    * @param org
    * @param owner
    */
-  protected async changeIssueTitleAndAddLabels({
+  async changeIssueTitleAndAddLabels({
     owner,
     repo,
-    changeTitle,
+    perPage = 100,
+    removeKeyFromTitle,
+    labelMap = {},
   }: ChangeIssueTitleAndAddLabelsOptions) {
+    console.log('[change issue title and add labels]');
+
     const bigEnough = 9999;
 
-    const titleToLabel = {
-      '<client>': ['client'],
-      '<server>': ['server'],
-      '<infra>': ['infra'],
-    };
+    // const labelMap = {
+    //   '<client>': ['client'],
+    //   '<server>': ['server'],
+    //   '<infra>': ['infra'],
+    // };
 
-    const arr = [...Array(bigEnough).keys()];
+    const result: {
+      success: boolean;
+      issue: Issue;
+      title: string | undefined;
+    }[] = [];
 
-    for await (const page of arr) {
+    const pages = [...Array(bigEnough).keys()];
+
+    for await (const page of pages) {
       const res = await this.octokit.rest.issues.listForRepo({
         owner,
         repo,
-        per_page: this.perPage,
+        per_page: perPage,
         page,
       });
 
@@ -877,35 +898,44 @@ export class Gitarist {
       }
 
       for (const issue of issues) {
-        const labels: string[] = Object.entries(titleToLabel).flatMap(
+        const labels: string[] = Object.entries(labelMap).flatMap(
           ([title, label]) =>
             issue.title.toLowerCase().includes(title) ? label : []
         );
 
-        const newTitle = changeTitle
+        const newTitle = removeKeyFromTitle
           ? issue.title.trim()
           : issue.title.replace(/<client>|<server>|<infra>/gi, '').trim();
 
         try {
-          if (newTitle !== issue.title && changeTitle) {
+          let title: string | undefined;
+
+          if (newTitle !== issue.title && removeKeyFromTitle) {
             const updateResponse = await this.octokit.rest.issues.update({
               owner,
               repo,
               issue_number: issue.number,
               title: newTitle,
             });
+            title = updateResponse.data.title;
           }
+
           const addLabelResponse = await this.octokit.rest.issues.addLabels({
             owner,
             repo,
             issue_number: issue.number,
             labels,
           });
+
+          result.push({ success: true, issue, title });
         } catch (err) {
           console.error(err);
+          result.push({ success: false, issue, title: undefined });
         }
       }
     }
+
+    return result;
   }
 
   /**
@@ -915,7 +945,7 @@ export class Gitarist {
    * @param exceptRecent
    * @returns
    */
-  protected async getStaleWorkflowRuns({
+  async getStaleWorkflowRuns({
     runs,
     exceptRecent,
     ignoreBranches,
@@ -946,7 +976,7 @@ export class Gitarist {
     //   return targetRunList;
   }
 
-  protected async mimicIssueReport({ owner, repo }: MimicIssueReportOptions) {
+  async mimicIssueReport({ owner, repo }: MimicIssueReportOptions) {
     // 1. create issue
     // 2. create comment
     // 3. close issue
@@ -964,7 +994,7 @@ export class Gitarist {
     });
   }
 
-  protected async mimicPullRequest({
+  async mimicPullRequest({
     owner,
     repo,
     subpath = '__pullrequest',
@@ -1039,7 +1069,7 @@ export class Gitarist {
    * @param ref `refs/heads/<branch_name>` or simply `<branch_name>`
    * @returns
    */
-  protected async removeBranch({ owner, repo, ref }: RemoveBranchOptions) {
+  async removeBranch({ owner, repo, ref }: RemoveBranchOptions) {
     const { data } = await this.octokit.rest.git.deleteRef({
       owner,
       repo,

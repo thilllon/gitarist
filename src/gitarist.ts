@@ -2,6 +2,7 @@ import glob from 'fast-glob';
 import fs, { existsSync, mkdirSync, statSync } from 'fs';
 import { Octokit } from 'octokit';
 import { createPullRequest as createPullRequestPlugin } from 'octokit-plugin-create-pull-request';
+import ora from 'ora';
 import path from 'path';
 import {
   ChangeIssueTitleAndAddLabelsOptions,
@@ -26,7 +27,6 @@ import {
   __Repository,
   __Workflow,
 } from './gitarist.interface';
-import ora from 'ora';
 
 // https://octokit.github.io/rest.js/v19
 // https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps

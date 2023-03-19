@@ -1,9 +1,9 @@
 import { beforeAll, describe, expect } from '@jest/globals';
 import { cosmiconfigSync } from 'cosmiconfig';
-import prettier from 'prettier';
-import { Templates } from '../src/gitarist.template';
 import dotenv from 'dotenv';
 import test from 'node:test';
+import prettier from 'prettier';
+import { Templates } from '../src/gitarist.template';
 
 describe('should be able to generate templates', () => {
   let prettierConfig: Record<string, unknown>;

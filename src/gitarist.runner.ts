@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+// import chalk from 'chalk';
 import dotenv from 'dotenv';
 import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
@@ -51,18 +51,22 @@ export class GitaristRunner extends Gitarist {
     );
 
     console.log(`\nGenerate a secret key settings:`);
+    // console.log(
+    //   chalk.greenBright.bold(
+    //     `https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow`
+    //   )
+    // );
     console.log(
-      chalk.greenBright.bold(
-        `https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow`
-      )
+      `https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow`
     );
 
     console.log(`\nRegister the secret key to action settings:`);
-    console.log(
-      chalk.greenBright.bold(
-        `https://github.com/<USERNAME>/${dir}/settings/new`
-      )
-    );
+    // console.log(
+    //   chalk.greenBright.bold(
+    //     `https://github.com/<USERNAME>/${dir}/settings/new`
+    //   )
+    // );
+    console.log(`https://github.com/<USERNAME>/${dir}/settings/new`);
   }
 
   /**

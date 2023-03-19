@@ -2,7 +2,6 @@ import glob from 'fast-glob';
 import fs, { existsSync, mkdirSync, statSync } from 'fs';
 import { Octokit } from 'octokit';
 import { createPullRequest as createPullRequestPlugin } from 'octokit-plugin-create-pull-request';
-import ora from 'ora';
 import path from 'path';
 import {
   ChangeIssueTitleAndAddLabelsOptions,
@@ -35,7 +34,6 @@ export class Gitarist {
   private readonly octokit;
   private readonly _owner: string;
   private readonly _repo: string;
-  private readonly perPage = 100;
 
   constructor({
     owner,
@@ -71,7 +69,7 @@ export class Gitarist {
    * @param directory relative path from process.cwd()
    * @returns files names
    */
-  createCommitFiles({
+  private createCommitFiles({
     numFiles,
     directory = '.gitarist/.tmp',
     verbose,
@@ -387,16 +385,16 @@ export class Gitarist {
     perPage = 100,
   }: ListRepositoriesOptions) {
     // TODO: convert to rxjs
-    const bigEnough = 999;
+    const bigEnough = 400;
 
     let rawDataList: __Repository[] = [];
     let iter = 0;
 
-    const spinner = ora('fetching repos...').start();
+    // const spinner = ora('fetching repos...').start();
+    console.group('fetching repos...');
 
     let total = 0;
     for (let i = 0; i < bigEnough; i++) {
-      // console.log('fetching repos...');
       const { data, status } =
         await this.octokit.rest.repos.listForAuthenticatedUser({
           username: owner,
@@ -409,15 +407,17 @@ export class Gitarist {
       const text = `status: ${status} / count: ${i + 1} / received data size: ${
         data.length
       } / total: ${total}`;
-      // console.log(text);
-      spinner.text = text;
+
+      // spinner.text = text;
+      console.log(text);
 
       if (data.length === 0) {
         break;
       }
     }
 
-    spinner.stopAndPersist();
+    // spinner.stopAndPersist();
+    console.groupEnd();
 
     if (ownerLogin) {
       rawDataList = rawDataList.filter(

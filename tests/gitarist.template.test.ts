@@ -1,7 +1,6 @@
-import { beforeAll, describe, expect } from '@jest/globals';
+import { beforeAll, describe, expect, test } from '@jest/globals';
 import { cosmiconfigSync } from 'cosmiconfig';
 import dotenv from 'dotenv';
-import test from 'node:test';
 import prettier from 'prettier';
 import { Templates } from '../src/gitarist.template';
 

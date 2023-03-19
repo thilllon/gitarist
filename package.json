@@ -61,6 +61,7 @@
     "release": "release-it",
     "lint": "eslint --fix .",
     "test": "jest",
+    "test:esm": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
     "test:cov": "jest --coverage",
     "clean": "rm -rf .artifacts",
     "prepare": "husky install && chmod +x .husky/*"
@@ -94,6 +95,7 @@
     "@typescript-eslint/parser": "^5.46.0",
     "commitizen": "^4.2.6",
     "commitlint": "^17.3.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.29.0",
     "git-cz": "^4.9.0",
     "husky": "^8.0.0",

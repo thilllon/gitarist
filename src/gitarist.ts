@@ -145,6 +145,8 @@ export class Gitarist {
     searchingPaths,
     verbose,
   }: RemoveStaleFilesOptions) {
+    this.validateEnv();
+
     if (verbose) {
       console.group('[remove stale files]');
     }
@@ -212,6 +214,8 @@ export class Gitarist {
     // FIXME: use removeOptions value
     removeOptions,
   }: CreateCommitsOptions) {
+    this.validateEnv();
+
     const tmpFolder = '.tmp';
 
     if (typeof numCommits !== 'number') {
@@ -312,6 +316,8 @@ export class Gitarist {
     repo: repo,
     numberOfIssues = 1,
   }: CreateIssuesOptions) {
+    this.validateEnv();
+
     for (const _ of Array(numberOfIssues).keys()) {
       try {
         const iso = new Date().toISOString();
@@ -352,6 +358,8 @@ export class Gitarist {
     staleTimeMs,
     perPage = 100,
   }: CloseIssuesOptions) {
+    this.validateEnv();
+
     try {
       const issues = await this.octokit.rest.issues.list({
         owned: true,
@@ -404,6 +412,8 @@ export class Gitarist {
     rawLogPath = './.artifacts/raw.json',
     perPage = 100,
   }: ListRepositoriesOptions) {
+    this.validateEnv();
+
     const bigEnough = 400;
 
     let rawDataList: __Repository[] = [];
@@ -494,6 +504,8 @@ export class Gitarist {
     targetPath = './.artifacts/toBeDeleted.json',
     deleteLogPath = './.artifacts/deleted.json',
   }: DeleteReposOptions) {
+    this.validateEnv();
+
     if (!repos) {
       if (!fs.existsSync(targetPath)) {
         console.log(`file not exist: ${targetPath}`);
@@ -538,6 +550,8 @@ export class Gitarist {
    * @param
    */
   async findWastedActions({ owner, perPage = 100 }: FindWastedActionsOptions) {
+    this.validateEnv();
+
     const res = await this.octokit.rest.repos.listForAuthenticatedUser({
       username: owner,
       per_page: perPage,
@@ -594,6 +608,8 @@ export class Gitarist {
     staleTimeMs,
     perPage = 100,
   }: DeleteRepoWorkflowLogsOptions) {
+    this.validateEnv();
+
     console.group('[deleteRepoWorkflowLogs]');
     const bigEnough = 200;
     const maxTotalPages = 20;
@@ -738,6 +754,8 @@ export class Gitarist {
     headPrefix = 'request',
     subpath = '__pullrequest',
   }: CreatePullRequestOptions) {
+    this.validateEnv();
+
     console.group('[create pull request]');
 
     const now = Date.now().toString();
@@ -808,6 +826,8 @@ export class Gitarist {
     repo,
     perPage = 100,
   }: RemoveCommentsOnIssueByBotOptions) {
+    this.validateEnv();
+
     const bigEnough = 9999;
     const pages = [...Array(bigEnough).keys()];
 
@@ -868,6 +888,8 @@ export class Gitarist {
     removeKeyFromTitle = true,
     keyLabelsMap = {},
   }: AddLabelsToIssueOptions) {
+    this.validateEnv();
+
     console.log('[change issue title and add labels]');
 
     const bigEnough = 9999;
@@ -960,6 +982,8 @@ export class Gitarist {
     exceptRecent,
     ignoreBranches,
   }: GetStaleWorkflowRunsOptions) {
+    this.validateEnv();
+
     //   type WorkflowId = number;
     //   // TODO: 동작중인 workflow 제외하기
     //   runs = runs.filter((run) => {

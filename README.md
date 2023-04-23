@@ -32,6 +32,8 @@ A CLI tool to utilize Octokit
 
    - `https://github.com/{OWNER}/{REPO}/settings/secrets/actions`
 
+   <!-- https://github.com/thilllon/gitarist/settings/secrets/actions -->
+
 3. Initialize `Gitarist` and check Github Action config `./.github/workflows/gitarist.yml`
 
    ```sh

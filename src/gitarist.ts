@@ -1,4 +1,3 @@
-import { CommanderError } from 'commander';
 import glob from 'fast-glob';
 import fs, { existsSync, mkdirSync, statSync } from 'fs';
 import { Octokit } from 'octokit';
@@ -11,8 +10,8 @@ import {
   CreateFilesOptions,
   CreateIssuesOptions,
   CreatePullRequestOptions,
-  DeleteReposOptions,
   DeleteRepoWorkflowLogsOptions,
+  DeleteReposOptions,
   FindWastedActionsOptions,
   GetRateLimitOptions,
   GetStaleWorkflowRunsOptions,
@@ -31,10 +30,13 @@ import {
 // https://octokit.github.io/rest.js/v19
 // https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
 
+type RequiredEnvParam = 'owner' | 'repo' | 'token';
+
 export class Gitarist {
   private readonly octokit;
   private readonly _owner: string;
   private readonly _repo: string;
+  private readonly _token: string;
 
   constructor({
     owner,
@@ -47,6 +49,7 @@ export class Gitarist {
   }) {
     this._owner = owner;
     this._repo = repo;
+    this._token = authToken;
 
     const _Octokit = Octokit.plugin(createPullRequestPlugin);
     this.octokit = new _Octokit({ auth: authToken });
@@ -64,6 +67,22 @@ export class Gitarist {
     return this.octokit;
   }
 
+  private validateEnv(
+    required: RequiredEnvParam[] = ['owner', 'repo', 'token']
+  ) {
+    if (required.includes('owner') && !this._owner) {
+      throw new Error('Missing environment variable: "GITARIST_OWNER"');
+    }
+
+    if (required.includes('repo') && !this._repo) {
+      throw new Error('Missing environment variable: "GITARIST_REPO"');
+    }
+
+    if (required.includes('token') && !this._token) {
+      throw new Error('Missing environment variable: "GITARIST_TOKEN"');
+    }
+  }
+
   /**
    * create files to be commited later
    * @param numFiles  number of files to create
@@ -75,6 +94,8 @@ export class Gitarist {
     directory = '.gitarist/.tmp',
     verbose,
   }: CreateFilesOptions) {
+    this.validateEnv();
+
     if (verbose) {
       console.group('[create files]');
     }

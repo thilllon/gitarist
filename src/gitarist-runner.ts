@@ -19,18 +19,6 @@ export class GitaristRunner extends Gitarist {
     const repo = process.env.GITARIST_REPO;
     const authToken = process.env.GITARIST_TOKEN;
 
-    if (!owner) {
-      throw new Error('Missing environment variable: "GITARIST_OWNER"');
-    }
-
-    if (!repo) {
-      throw new Error('Missing environment variable: "GITARIST_REPO"');
-    }
-
-    if (!authToken) {
-      throw new Error('Missing environment variable: "GITARIST_TOKEN"');
-    }
-
     super({ owner, repo, authToken });
   }
 

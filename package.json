@@ -45,12 +45,12 @@
       }
     }
   },
-  "files": [
-    "dist"
-  ],
   "bin": {
     "gitarist": "./dist/cli.mjs"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsx ./src/dev.ts",
     "build:tsc": "tsc",

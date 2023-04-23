@@ -8,8 +8,8 @@ import {
   RunDeleteRepositoryListOptions,
   RunListBranchesOptions,
   RunListRepositoriesArgs,
-} from './gitarist.runner.interface';
-import { Templates } from './gitarist.template';
+} from './gitarist-runner.interface';
+import { Templates } from './gitarist-template';
 
 export class GitaristRunner extends Gitarist {
   constructor({ dotenv: dotenvConfig = {} }: GitaristRunnerConfig = {}) {

@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'fs';
 import path from 'path';
 import { Gitarist } from '../src/gitarist';
-import { GitaristRunner } from '../src/gitarist.runner';
+import { GitaristRunner } from '../src/gitarist-runner';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -20,6 +20,9 @@ describe('gitarist', () => {
   let authToken: string;
 
   beforeAll(async () => {
+    if (!existsSync(path.join(process.cwd(), '.env.test'))) {
+      throw new Error('Missing env file');
+    }
     dotenv.config({ path: '.env.test' });
 
     owner = process.env.GITARIST_OWNER as string;

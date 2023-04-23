@@ -2,7 +2,7 @@
 
 A CLI tool to utilize Octokit
 
-_Commit everyday does not prove anything_
+> _Commit everyday does not prove anything_
 
 [![npm version](https://img.shields.io/npm/v/gitarist)](https://www.npmjs.com/package/gitarist)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/gitarist)](https://www.npmjs.com/package/gitarist?activeTab=explore)

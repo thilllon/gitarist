@@ -1,4 +1,4 @@
-import { GitaristRunner } from './gitarist.runner';
+import { GitaristRunner } from './gitarist-runner';
 
 console.log('Gitarist: development mode');
 

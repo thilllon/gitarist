@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from '@jest/globals';
+import { beforeAll, describe, expect, test, jest } from '@jest/globals';
 import dotenv from 'dotenv';
 
 beforeAll(async () => {
@@ -6,13 +6,9 @@ beforeAll(async () => {
 });
 
 describe('CLI test', () => {
-  test('trivial', () => {
-    expect(1).toBe(1);
+  test('show log', () => {
+    const consoleLogSpy = jest.spyOn(console, 'log');
+    console.log('hello');
+    expect(consoleLogSpy).toHaveBeenCalledWith('hello');
   });
-
-  // test('show log', () => {
-  //   const consoleLogSpy = jest.spyOn(console, 'log');
-  //   console.log('hello');
-  //   expect(consoleLogSpy).toHaveBeenCalledWith('hello');
-  // });
 });

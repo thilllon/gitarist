@@ -1,4 +1,3 @@
-// import chalk from 'chalk';
 import dotenv from 'dotenv';
 import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
@@ -10,6 +9,7 @@ import {
   RunListRepositoriesArgs,
 } from './gitarist-runner.interface';
 import { Templates } from './gitarist-template';
+// import chalk from 'chalk';
 
 export class GitaristRunner extends Gitarist {
   constructor({ dotenv: dotenvConfig = {} }: GitaristRunnerConfig = {}) {

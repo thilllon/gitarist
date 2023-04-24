@@ -25,6 +25,7 @@ const logo = `
 `;
 
 console.log(logo);
+console.log(`version ${packageJson.version}`);
 
 const runner = new GitaristRunner();
 const program = new Command();

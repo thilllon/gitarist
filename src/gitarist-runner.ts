@@ -75,13 +75,10 @@ export class GitaristRunner extends Gitarist {
     const repo = this.repo;
 
     await this.mimicIssueReport({ owner, repo });
-
     await this.mimicPullRequest({
       owner,
       repo,
-      reviewOptions: {
-        content: 'LGTM',
-      },
+      reviewOptions: { content: 'LGTM' },
     });
 
     await this.createCommits({
@@ -133,7 +130,7 @@ export class GitaristRunner extends Gitarist {
     const { data } = await this.getOctokit().rest.git.listMatchingRefs({
       owner: owner ?? this.owner,
       repo: repo ?? this.repo,
-      ref: ref,
+      ref,
     });
 
     return data;

@@ -311,11 +311,8 @@ export class Gitarist {
     }
   }
 
-  async createIssues({
-    owner,
-    repo: repo,
-    numberOfIssues = 1,
-  }: CreateIssuesOptions) {
+  async createIssues({ owner, repo, numberOfIssues = 1 }: CreateIssuesOptions) {
+    console.log('[createIssues]');
     this.validateEnv();
 
     for (const _ of Array(numberOfIssues).keys()) {
@@ -338,6 +335,7 @@ export class Gitarist {
           body: content,
           issue_number: issueNumber,
         });
+        console.log('[comment created]', comment);
       } catch (err: any) {
         console.error(err?.message);
       }
@@ -358,6 +356,8 @@ export class Gitarist {
     staleTimeMs,
     perPage = 100,
   }: CloseIssuesOptions) {
+    console.log('[closeIssues]');
+
     this.validateEnv();
 
     try {
@@ -379,13 +379,14 @@ export class Gitarist {
               issue.created_at &&
               new Date(issue.created_at) < new Date(Date.now() - staleTimeMs)
             ) {
-              await this.octokit.rest.issues.update({
+              const closedIssue = await this.octokit.rest.issues.update({
                 owner,
                 repo,
                 issue_number: issue.number,
                 state: 'closed',
                 state_reason: 'completed',
               });
+              console.log('[closed issue]', closedIssue);
             }
           } catch (err: any) {
             console.log(issue.number, err.message);
@@ -756,7 +757,7 @@ export class Gitarist {
   }: CreatePullRequestOptions) {
     this.validateEnv();
 
-    console.group('[create pull request]');
+    console.group('[createPullRequest]');
 
     const now = Date.now().toString();
     const iso = new Date().toISOString();
@@ -890,7 +891,8 @@ export class Gitarist {
   }: AddLabelsToIssueOptions) {
     this.validateEnv();
 
-    console.log('[change issue title and add labels]');
+    console.log('[addLabelsToIssue] change issue title and add labels');
+    console.log({ removeKeyFromTitle, keyLabelsMap });
 
     const bigEnough = 9999;
 
@@ -1010,21 +1012,14 @@ export class Gitarist {
   }
 
   async mimicIssueReport({ owner, repo }: MimicIssueReportOptions) {
+    console.log('[mimicIssueReport]');
+
     // 1. create issue
     // 2. create comment
     // 3. close issue
 
-    await this.createIssues({
-      owner,
-      repo,
-      numberOfIssues: 3,
-    });
-
-    await this.closeIssues({
-      owner,
-      repo,
-      staleTimeMs: 0,
-    });
+    await this.createIssues({ owner, repo, numberOfIssues: 3 });
+    await this.closeIssues({ owner, repo, staleTimeMs: 0 });
   }
 
   async mimicPullRequest({
@@ -1033,6 +1028,8 @@ export class Gitarist {
     subpath = '__pullrequest',
     reviewOptions,
   }: MimicPullRequestOptions) {
+    console.log('[mimicPullRequest]');
+    console.log({ owner, repo, subpath, reviewOptions });
     // 1. create PR
     // 2. create review
     // 3. submit review
@@ -1072,28 +1069,34 @@ export class Gitarist {
 
     const reviewId = review.data.id;
 
-    const { data: submitData } = await this.octokit.rest.pulls.submitReview({
-      owner,
-      repo,
-      pull_number: pullNumber,
-      review_id: reviewId,
-      event: 'APPROVE',
-    });
+    try {
+      // FIXME: 422 Unprocessable Entity
+      // RequestError [HttpError]: Validation Failed: "Could not approve pull request review."
+      const { data: submitData } = await this.octokit.rest.pulls.submitReview({
+        owner,
+        repo,
+        pull_number: pullNumber,
+        event: 'APPROVE',
+        review_id: reviewId,
+      });
+      console.log('[submitReview]');
+      console.log({ submitData });
 
-    const { data: mergeData } = await this.octokit.rest.pulls.merge({
-      owner,
-      repo,
-      pull_number: pullNumber,
-      merge_method: 'rebase',
-    });
-
-    return { mergeData, submitData };
+      const { data: mergeData } = await this.octokit.rest.pulls.merge({
+        owner,
+        repo,
+        pull_number: pullNumber,
+        merge_method: 'rebase',
+      });
+      console.log('[merge]');
+      console.log({ mergeData });
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async getRateLimit(options: GetRateLimitOptions) {
-    const { data } = await this.octokit.rest.rateLimit.get({
-      ...options,
-    });
+    const { data } = await this.octokit.rest.rateLimit.get({ ...options });
     return data;
   }
 

@@ -74,13 +74,6 @@ export class GitaristRunner extends Gitarist {
     const owner = this.owner;
     const repo = this.repo;
 
-    await this.mimicIssueReport({ owner, repo });
-    await this.mimicPullRequest({
-      owner,
-      repo,
-      reviewOptions: { content: 'LGTM' },
-    });
-
     await this.createCommits({
       owner,
       repo,
@@ -90,6 +83,13 @@ export class GitaristRunner extends Gitarist {
       removeOptions: {
         staleTimeMs: 86400 * 1000,
       },
+    });
+
+    await this.mimicIssueReport({ owner, repo });
+    await this.mimicPullRequest({
+      owner,
+      repo,
+      reviewOptions: { content: 'LGTM' },
     });
 
     await this.deleteRepoWorkflowLogs({

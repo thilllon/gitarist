@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, jest, test } from '@jest/globals';
 import dotenv from 'dotenv';
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
 import path from 'path';
 import { Gitarist } from '../src/gitarist';
 import { GitaristRunner } from '../src/gitarist-runner';
@@ -89,10 +89,8 @@ describe('gitarist', () => {
   });
 
   test('getRateLimit', async () => {
-    const getRateLimitSpy = jest
-      .spyOn(gitarist, 'getRateLimit')
-      .mockResolvedValueOnce({ rate: {} });
-    expect(gitarist.getRateLimit({})).toBeTruthy();
+    const getRateLimitSpy = jest.spyOn(gitarist, 'getRateLimit').mockResolvedValueOnce({ rate: {} });
+    expect(gitarist.getRateLimit()).toBeTruthy();
     expect(getRateLimitSpy).toHaveBeenCalled();
   });
 
@@ -126,9 +124,7 @@ describe('gitarist', () => {
     ];
 
     fixtures.forEach((fixture) => {
-      expect(
-        gitarist.removeWordFromSentence(fixture.input, fixture.words)
-      ).toBe(fixture.expected);
+      expect(gitarist.removeWordFromSentence(fixture.input, fixture.words)).toBe(fixture.expected);
     });
   });
 });

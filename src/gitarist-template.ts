@@ -1,6 +1,6 @@
-export class Templates {
+export class GitaristTemplates {
   /**
-   *
+   * Create a github action file
    * @param {string} cron e.g., '0 \*\/4 \* \* 1-6' means 'for every N hours Monday to Saturday'
    * @returns {string}
    */
@@ -24,6 +24,13 @@ jobs:
     return template;
   }
 
+  /**
+   * Create the .env file
+   * @param owner
+   * @param repo
+   * @param token
+   * @returns
+   */
   static getEnvTemplate(owner = '', repo = '', token = '') {
     const template = `
 GITARIST_TOKEN="${token}"
@@ -34,6 +41,11 @@ GITARIST_REPO="${repo}"
     return template;
   }
 
+  /**
+   * Create the package.json file
+   * @param projectName
+   * @returns
+   */
   static getPackageJsonTemplate(projectName: string) {
     const template = `{
   "name": "${projectName}",
@@ -53,6 +65,11 @@ GITARIST_REPO="${repo}"
     return template;
   }
 
+  /**
+   * Create the README.md file
+   * @param projectName
+   * @returns
+   */
   static getReadmeTemplate(projectName: string) {
     const template = `# ${projectName}
 `;

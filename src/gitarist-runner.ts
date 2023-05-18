@@ -8,8 +8,8 @@ import {
   RunListBranchesOptions,
   RunListRepositoriesArgs,
 } from './gitarist-runner.interface';
-import { Templates } from './gitarist-template';
-// import chalk from 'chalk';
+import { GitaristTemplates } from './gitarist-template';
+import { tokenIssueUrl } from './gitarist.constant';
 
 export class GitaristRunner extends Gitarist {
   constructor({ dotenv: dotenvConfig = {} }: GitaristRunnerConfig = {}) {
@@ -22,43 +22,30 @@ export class GitaristRunner extends Gitarist {
     super({ owner, repo, authToken });
   }
 
+  /**
+   * Setup a repository for gitarist which is creating a workflow file.
+   */
   runInitialize({ dir = '' }: { dir?: string }) {
-    const workflowDir = path.join(process.cwd(), dir, '.github', 'workflows');
-    mkdirSync(workflowDir, { recursive: true });
+    const githubWorkflowDirectory = path.join(process.cwd(), dir, '.github', 'workflows');
+    mkdirSync(githubWorkflowDirectory, { recursive: true });
+    writeFileSync(path.join(githubWorkflowDirectory, 'gitarist.yml'), GitaristTemplates.getActionTemplate(), {
+      encoding: 'utf8',
+      flag: 'w+',
+    });
 
-    writeFileSync(
-      path.join(workflowDir, 'gitarist.yml'),
-      Templates.getActionTemplate(),
-      { encoding: 'utf8', flag: 'w+' }
-    );
+    writeFileSync(path.join(process.cwd(), dir, '.env'), GitaristTemplates.getEnvTemplate(), {
+      encoding: 'utf8',
+      flag: 'a+',
+    });
 
-    writeFileSync(
-      path.join(process.cwd(), dir, '.env'),
-      Templates.getEnvTemplate(),
-      { encoding: 'utf8', flag: 'a+' }
-    );
-
-    console.log(`\nGenerate a secret key settings:`);
-    // console.log(
-    //   chalk.greenBright.bold(
-    //     `https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow`
-    //   )
-    // );
-    console.log(
-      `https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow`
-    );
-
+    console.log(`\nGenerate a secret key settings: ${tokenIssueUrl}`);
     console.log(`\nRegister the secret key to action settings:`);
-    // console.log(
-    //   chalk.greenBright.bold(
-    //     `https://github.com/<USERNAME>/${dir}/settings/new`
-    //   )
-    // );
     console.log(`https://github.com/<USERNAME>/${dir}/settings/new`);
   }
 
   /**
-   * Imitate an active user
+   * Imitate an active user.
+   * creating commits, issue reporting, make pull requests, and delete workflow logs.
    */
   async runImitateActiveUser({
     maxCommits,
@@ -80,53 +67,40 @@ export class GitaristRunner extends Gitarist {
       branch: 'main',
       numFiles: { min: minFiles ?? 1, max: maxFiles ?? 10 },
       numCommits: { min: minCommits ?? 1, max: maxCommits ?? 10 },
-      removeOptions: {
-        staleTimeMs: 86400 * 1000,
-      },
+      removeOptions: { staleTimeMs: 86400 * 1000 },
     });
 
     await this.mimicIssueReport({ owner, repo });
+
     await this.mimicPullRequest({
       owner,
       repo,
-      reviewOptions: { content: 'LGTM' },
+      reviewOptions: { content: 'LGTM', reviewers: [] },
+      mergeOptions: { mergeMethod: 'rebase' },
     });
 
-    await this.deleteRepoWorkflowLogs({
-      owner,
-      repo,
-      staleTimeMs: 86400 * 1000,
-    });
+    await this.deleteRepoWorkflowLogs({ owner, repo, staleTimeMs: 86400 * 1000 });
   }
 
-  async runListRepositories({
-    owner,
-    ownerLogin,
-    repoLogPath,
-    rawLogPath,
-  }: RunListRepositoriesArgs) {
+  async runListRepositories({ owner, ownerLogin, repoLogPath, rawLogPath, perPage }: RunListRepositoriesArgs) {
     await this.listRepositories({
       owner: owner ?? this.owner,
       ownerLogin: ownerLogin ?? owner ?? this.owner,
       repoLogPath,
       rawLogPath,
+      perPage,
     });
   }
 
-  async runDeleteRepositoryList({
-    targetPath,
-  }: RunDeleteRepositoryListOptions) {
-    await this.deleteRepos({
-      owner: this.owner,
-      targetPath: targetPath ?? 'repos.json',
-    });
+  async runDeleteRepositoryList({ targetPath }: RunDeleteRepositoryListOptions) {
+    await this.deleteRepositoryList({ owner: this.owner, targetPath: targetPath ?? 'repos.json' });
   }
 
   /**
    *
    * @param ref branch name as glob pattern
    */
-  async runListBranches({ owner, repo, ref }: RunListBranchesOptions) {
+  async runListGitBranch({ owner, repo, ref }: RunListBranchesOptions) {
     const { data } = await this.getOctokit().rest.git.listMatchingRefs({
       owner: owner ?? this.owner,
       repo: repo ?? this.repo,

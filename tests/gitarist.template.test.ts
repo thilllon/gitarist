@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, test } from '@jest/globals';
 import { cosmiconfigSync } from 'cosmiconfig';
 import dotenv from 'dotenv';
 import prettier from 'prettier';
-import { Templates } from '../src/gitarist-template';
+import { GitaristTemplates } from '../src/gitarist-template';
 
 describe('should be able to generate templates', () => {
   let prettierConfig: Record<string, unknown>;
@@ -14,15 +14,13 @@ describe('should be able to generate templates', () => {
   });
 
   test('getActionTemplate', async () => {
-    const template = Templates.getActionTemplate();
+    const template = GitaristTemplates.getActionTemplate();
     expect(typeof template).toBe('string');
-    expect(template).toBe(
-      prettier.format(template, { ...prettierConfig, parser: 'yaml' })
-    );
+    expect(template).toBe(prettier.format(template, { ...prettierConfig, parser: 'yaml' }));
   });
 
   test('getEnvTemplate', async () => {
-    const template = Templates.getEnvTemplate();
+    const template = GitaristTemplates.getEnvTemplate();
     expect(typeof template).toBe('string');
     // TOOD: what is suitable parser for .env file?
     // expect(template).toBe(prettier.format(template, { ...prettierConfig }));
@@ -37,15 +35,13 @@ describe('should be able to generate templates', () => {
   });
 
   test('getPackageJsonTemplate', async () => {
-    const template = Templates.getPackageJsonTemplate('test');
+    const template = GitaristTemplates.getPackageJsonTemplate('test');
     expect(typeof template).toBe('string');
-    expect(template).toBe(
-      prettier.format(template, { ...prettierConfig, parser: 'json' })
-    );
+    expect(template).toBe(prettier.format(template, { ...prettierConfig, parser: 'json' }));
   });
 
   test('getReadmeTemplate', async () => {
-    const template = Templates.getReadmeTemplate('test');
+    const template = GitaristTemplates.getReadmeTemplate('test');
     expect(typeof template).toBe('string');
     expect(template).toBe(prettier.format(template, { parser: 'markdown' }));
   });

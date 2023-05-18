@@ -5,8 +5,7 @@ import { ListRepositoriesOptions } from './gitarist.interface';
 export interface GitaristRunnerConfig {
   dotenv?: DotenvConfigOptions;
 }
-export interface RunListRepositoriesArgs
-  extends Omit<ListRepositoriesOptions, 'owner'> {
+export interface RunListRepositoriesArgs extends Omit<ListRepositoriesOptions, 'owner'> {
   owner?: string;
 }
 

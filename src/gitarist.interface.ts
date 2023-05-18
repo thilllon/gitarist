@@ -91,10 +91,16 @@ export interface MimicPullRequestOptions {
   repo: string;
   subpath?: string;
   reviewOptions: ReviewOptions;
+  mergeOptions: MergeOptions;
+}
+
+export interface MergeOptions {
+  mergeMethod?: 'merge' | 'squash' | 'rebase';
 }
 
 export interface ReviewOptions {
   content?: string;
+  reviewers?: string[];
 }
 
 export interface GetStaleWorkflowRunsOptions {
@@ -107,9 +113,6 @@ export interface MimicIssueReportOptions {
   owner: string;
   repo: string;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GetRateLimitOptions {}
 
 export interface RemoveBranchOptions {
   owner: string;
@@ -146,12 +149,7 @@ export interface __Workflow {
   node_id: string;
   name: string;
   path: string;
-  state:
-    | 'active'
-    | 'deleted'
-    | 'disabled_fork'
-    | 'disabled_inactivity'
-    | 'disabled_manually';
+  state: 'active' | 'deleted' | 'disabled_fork' | 'disabled_inactivity' | 'disabled_manually';
   created_at: string;
   updated_at: string;
   url: string;
@@ -295,9 +293,8 @@ export type __Conclusion =
   | 'stale'
   | 'timed_out';
 
-type ElementOfArray<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+type ElementOfArray<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
+  ? ElementType
+  : never;
 
-export type Issue = ElementOfArray<
-  RestEndpointMethodTypes['issues']['listForRepo']['response']['data']
->;
+export type Issue = ElementOfArray<RestEndpointMethodTypes['issues']['listForRepo']['response']['data']>;

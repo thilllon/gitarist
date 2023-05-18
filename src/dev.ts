@@ -6,7 +6,7 @@ const runner = new GitaristRunner();
 
 // runner.runImitateActiveUser({});
 
-runner.runListRepositories({});
+// runner.runListRepositories({});
 
 // runner.runDeleteRepositoryList({});
 

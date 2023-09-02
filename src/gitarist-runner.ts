@@ -12,7 +12,7 @@ import { GitaristTemplates } from './gitarist-template';
 import { tokenIssueUrl } from './gitarist.constant';
 
 export class GitaristRunner extends Gitarist {
-  constructor({ dotenv: dotenvConfig = {} }: GitaristRunnerConfig = {}) {
+  constructor({ dotenv: dotenvConfig = {}, dir }: GitaristRunnerConfig = {}) {
     dotenv.config(dotenvConfig);
 
     const owner = process.env.GITARIST_OWNER;
@@ -20,27 +20,7 @@ export class GitaristRunner extends Gitarist {
     const authToken = process.env.GITARIST_TOKEN;
 
     super({ owner, repo, authToken });
-  }
-
-  /**
-   * Setup a repository for gitarist which is creating a workflow file.
-   */
-  runInitialize({ dir = '' }: { dir?: string }) {
-    const githubWorkflowDirectory = path.join(process.cwd(), dir, '.github', 'workflows');
-    mkdirSync(githubWorkflowDirectory, { recursive: true });
-    writeFileSync(path.join(githubWorkflowDirectory, 'gitarist.yml'), GitaristTemplates.getActionTemplate(), {
-      encoding: 'utf8',
-      flag: 'w+',
-    });
-
-    writeFileSync(path.join(process.cwd(), dir, '.env'), GitaristTemplates.getEnvTemplate(), {
-      encoding: 'utf8',
-      flag: 'a+',
-    });
-
-    console.log(`\nGenerate a secret key settings: ${tokenIssueUrl}`);
-    console.log(`\nRegister the secret key to action settings:`);
-    console.log(`https://github.com/<USERNAME>/${dir}/settings/new`);
+    this.init(dir);
   }
 
   /**
@@ -110,11 +90,32 @@ export class GitaristRunner extends Gitarist {
     return data;
   }
 
-  async runCleanupRepository() {
+  async runCleanUpRepository() {
     const result = await this.addLabelsToIssue({
       owner: this.owner,
       repo: this.repo,
     });
     return result;
+  }
+
+  /**
+   * Setup a repository for gitarist which is creating a workflow file.
+   */
+  private init(dir = '') {
+    const githubWorkflowDirectory = path.join(process.cwd(), dir, '.github', 'workflows');
+    mkdirSync(githubWorkflowDirectory, { recursive: true });
+    writeFileSync(path.join(githubWorkflowDirectory, 'gitarist.yml'), GitaristTemplates.getActionTemplate(), {
+      encoding: 'utf8',
+      flag: 'w+',
+    });
+
+    writeFileSync(path.join(process.cwd(), dir, '.env'), GitaristTemplates.getEnvTemplate(), {
+      encoding: 'utf8',
+      flag: 'a+',
+    });
+
+    console.log(`\nGenerate a secret key settings: ${tokenIssueUrl}`);
+    console.log(`\nRegister the secret key to action settings:`);
+    console.log(`https://github.com/<USERNAME>/${dir}/settings/new`);
   }
 }

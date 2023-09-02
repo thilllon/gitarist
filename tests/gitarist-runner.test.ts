@@ -1,9 +1,7 @@
-import { beforeAll, describe, expect, jest, test } from '@jest/globals';
 import dotenv from 'dotenv';
-import { Gitarist } from '../src/gitarist';
 import { GitaristRunner } from '../src/gitarist-runner';
 
-jest.setTimeout(60_000);
+jest.setTimeout(300000);
 
 describe('should be able to generate templates', () => {
   let runner: GitaristRunner;
@@ -24,7 +22,7 @@ describe('should be able to generate templates', () => {
   });
 
   test.skip('runListRepositories', async () => {
-    const repositoriesFixture = [
+    const repositoriesFixture: any[] = [
       {
         id: 1,
         name: 'test',
@@ -42,13 +40,8 @@ describe('should be able to generate templates', () => {
         },
       },
     ];
-    jest
-      .mock(Gitarist, 'listRepositories')
-      .fn()
-      .mockImplementationOnce(() => {
-        return Promise.resolve(repositoriesFixture);
-      });
-    // jest.mock(runner, 'runListRepositories').
+
+    jest.spyOn(runner, 'listRepositories').mockResolvedValueOnce(repositoriesFixture);
     const response = await runner.runListRepositories({
       owner: 'test',
       ownerLogin: 'test',
@@ -58,8 +51,6 @@ describe('should be able to generate templates', () => {
     });
     expect(response).toEqual(repositoriesFixture);
   });
-
-  test.skip('runDeleteRepositoryList', async () => {});
 
   test.skip('runListBranches', async () => {
     const branches = await runner.runListGitBranch({ ref: 'commits/*' });

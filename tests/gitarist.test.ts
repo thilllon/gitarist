@@ -1,13 +1,10 @@
-import { beforeAll, describe, expect, jest, test } from '@jest/globals';
 import dotenv from 'dotenv';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
 import path from 'path';
 import { Gitarist } from '../src/gitarist';
 import { GitaristRunner } from '../src/gitarist-runner';
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Do NOT mock waht you don't own, it's meaningless.
+// Do NOT mock what you don't own, it's meaningless.
 // https://stackoverflow.com/questions/65626653/create-react-app-doesnt-properly-mock-modules-from-mocks-directory/65627662#65627662
 // https://stackoverflow.com/a/68614624/11091456
 
@@ -18,6 +15,8 @@ describe('gitarist', () => {
   let owner: string;
   let repo: string;
   let authToken: string;
+
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   beforeAll(async () => {
     if (!existsSync(path.join(process.cwd(), '.env.test'))) {

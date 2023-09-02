@@ -8,7 +8,8 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "resolveJsonModule": true,
-    "removeComments": false
+    "removeComments": false,
+    "types": ["node", "jest"]
   },
   "include": ["src", "tests/cli.test.ts", "tests/gitarist.template.test.ts"],
   "exclude": ["dist"]

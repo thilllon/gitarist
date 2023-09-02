@@ -33,8 +33,7 @@ program
   .command('init')
   .description('initialize')
   .action(() => {
-    const runner = new GitaristRunner();
-    runner.runInitialize({});
+    new GitaristRunner({});
   });
 
 program
@@ -43,9 +42,7 @@ program
   .description('generate gitarist project')
   .argument('[dir]', 'directory to create [default: .]', '.')
   .action(async (dir = '.') => {
-    const runner = new GitaristRunner();
-    runner.runInitialize(dir);
-
+    new GitaristRunner({ dir });
     writeFileSync(path.join(process.cwd(), dir, 'package.json'), GitaristTemplates.getPackageJsonTemplate(dir));
     writeFileSync(path.join(process.cwd(), dir, 'README.md'), GitaristTemplates.getReadmeTemplate(dir));
 

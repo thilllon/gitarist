@@ -1,5 +1,5 @@
 import glob from 'fast-glob';
-import fs, { existsSync, mkdirSync, statSync } from 'fs';
+import fs, { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'fs';
 import { Octokit } from 'octokit';
 import { createPullRequest as createPullRequestPlugin } from 'octokit-plugin-create-pull-request';
 import path from 'path';
@@ -103,7 +103,7 @@ export class Gitarist {
             console.debug(filePath);
           }
 
-          fs.writeFileSync(filePath, content, 'utf8');
+          writeFileSync(filePath, content, 'utf8');
           return filePath;
         } catch (err) {
           console.error(err);
@@ -139,7 +139,7 @@ export class Gitarist {
         if (verbose) {
           console.debug(filePath);
         }
-        fs.rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
+        rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
         return fileName;
       }
 
@@ -154,7 +154,7 @@ export class Gitarist {
       //     console.debug(filePath);
       //   }
 
-      //   fs.rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
+      //   rmSync(filePath, { recursive: true, force: true, maxRetries: 10 });
       //   return fileName;
       // }
     };
@@ -234,7 +234,7 @@ export class Gitarist {
         const filesPaths = glob.sync([`.gitarist/${tmpFolder}/*`]);
         const filesBlobs = await Promise.all(
           filesPaths.map(async (filePath) => {
-            const content = await fs.readFileSync(filePath, 'utf8');
+            const content = await readFileSync(filePath, 'utf8');
             const encoding = 'utf-8';
             const blobData = await this.octokit.rest.git.createBlob({
               owner,
@@ -281,7 +281,7 @@ export class Gitarist {
         console.error(err?.message);
       } finally {
         const dir = path.join(process.cwd(), '.gitarist', tmpFolder);
-        fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10 });
+        rmSync(dir, { recursive: true, force: true, maxRetries: 10 });
       }
     }
   }
@@ -371,7 +371,7 @@ export class Gitarist {
    * @param rawLogPath path where raw log will be saved which is relative to cwd. example: ./.artifacts/raw.json
    * @returns __Repository[]
    */
-  protected async listRepositories({
+  async listRepositories({
     owner,
     ownerLogin = owner,
     repoLogPath = './.artifacts/repos.json',
@@ -424,15 +424,15 @@ export class Gitarist {
     // if directories do not exist, create those recursively
     const reposLogFullPath = path.dirname(path.join(process.cwd(), repoLogPath));
     if (!fs.existsSync(reposLogFullPath)) {
-      fs.mkdirSync(reposLogFullPath, { recursive: true });
+      mkdirSync(reposLogFullPath, { recursive: true });
     }
-    fs.writeFileSync(path.join(process.cwd(), repoLogPath), JSON.stringify(repoNameList), 'utf8');
+    writeFileSync(path.join(process.cwd(), repoLogPath), JSON.stringify(repoNameList), 'utf8');
 
     const rawLogFullPath = path.dirname(path.join(process.cwd(), rawLogPath));
     if (!fs.existsSync(rawLogFullPath)) {
-      fs.mkdirSync(rawLogFullPath, { recursive: true });
+      mkdirSync(rawLogFullPath, { recursive: true });
     }
-    fs.writeFileSync(path.join(process.cwd(), rawLogPath), JSON.stringify(rawDataList), 'utf8');
+    writeFileSync(path.join(process.cwd(), rawLogPath), JSON.stringify(rawDataList), 'utf8');
 
     return repoNameList;
   }
@@ -457,7 +457,7 @@ export class Gitarist {
         console.log(`file not exist: ${targetPath}`);
         return [];
       }
-      const fileData = fs.readFileSync(path.join(process.cwd(), targetPath), 'utf8');
+      const fileData = readFileSync(path.join(process.cwd(), targetPath), 'utf8');
       repos = JSON.parse(fileData) as string[];
     }
 
@@ -479,7 +479,7 @@ export class Gitarist {
       }
     }
 
-    fs.writeFileSync(path.join(process.cwd(), deleteLogPath), JSON.stringify(deleted), 'utf8');
+    writeFileSync(path.join(process.cwd(), deleteLogPath), JSON.stringify(deleted), 'utf8');
 
     return deleted;
   }

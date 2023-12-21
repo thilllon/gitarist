@@ -77,7 +77,6 @@ export type StartCommandOptions = {
   mainBranch: MainBranch;
   stale: number;
 };
-
 export type BranchPrefix = (typeof branchPrefixes)[number]; // TypeScript 3.4+
 export type MainBranch = 'main' | 'master' | string;
 interface TreeParam {
@@ -87,6 +86,15 @@ interface TreeParam {
   sha?: string | undefined;
   content?: string | undefined;
 }
+export type IssueItem = {
+  title: string;
+  body: string;
+  assignee?: string;
+  /**
+   * comma separated string
+   */
+  labels?: string;
+};
 
 export class Gitarist {
   private readonly _octokit;
@@ -568,6 +576,35 @@ GITARIST_TOKEN="${token}"
       sha: newCommit.sha,
     });
     console.debug(`commit pushed. sha: ${pushed.object.sha}`);
+  }
+
+  async createMultipleIssues({ issueItems }: { issueItems: IssueItem[] }) {
+    for (const item of issueItems) {
+      const { data: issue } = await this.octokit.rest.issues.create({
+        owner: this.owner,
+        repo: this.repo,
+        title: item.title,
+        body: item.body,
+        labels: item.labels?.split(',').map((label) => label.trim()),
+      });
+      if (!item.assignee) {
+        continue;
+      }
+      const { status } = await this.octokit.rest.issues.checkUserCanBeAssigned({
+        owner: this.owner,
+        repo: this.repo,
+        assignee: item.assignee,
+      });
+      if (status !== 204) {
+        continue;
+      }
+      await this.octokit.rest.issues.addAssignees({
+        repo: this.repo,
+        owner: this.owner,
+        issue_number: issue.number,
+        assignees: [item.assignee],
+      });
+    }
   }
 
   /**

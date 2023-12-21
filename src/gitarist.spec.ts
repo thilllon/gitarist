@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import dotenv from 'dotenv';
 import { Octokit } from 'octokit';
-import { Gitarist } from './gitarist';
+import { Gitarist, IssueItem } from './gitarist';
 
 jest.setTimeout(999999999);
 
@@ -117,6 +117,18 @@ describe('gitarist', () => {
         }
       }
     }
+  });
+
+  it.skip('createMultipleIssues', async () => {
+    const issueItems: IssueItem[] = [
+      {
+        title: 'lorem ipsum',
+        body: '',
+        labels: undefined,
+        assignee: undefined,
+      },
+    ];
+    await gitarist.createMultipleIssues({ issueItems });
   });
 
   describe('cli test', () => {

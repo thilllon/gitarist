@@ -20,6 +20,9 @@ jobs:
         node-version: [20]
 
     steps:
+      - name: 'ci variables'
+        run: echo "${{ env.CI_GITARIST_OWNER }} ${{ env.CI_GITARIST_REPO }}"
+
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
@@ -48,9 +51,9 @@ jobs:
       - run: pnpm build
       - run: pnpm test
         env:
-          GITARIST_OWNER: ${{ github.env.CI_GITARIST_OWNER }}
-          GITARIST_REPO: ${{ github.env.CI_GITARIST_REPO }}
-          GITARIST_TOKEN: ${{ github.env.CI_GITARIST_TOKEN }}
+          GITARIST_OWNER: ${{ env.CI_GITARIST_OWNER }}
+          GITARIST_REPO: ${{ env.CI_GITARIST_REPO }}
+          GITARIST_TOKEN: ${{ env.CI_GITARIST_TOKEN }}
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master

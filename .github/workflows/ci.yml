@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   pull_request:
     branches: [main]
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
 
 jobs:
   build-and-test:
@@ -51,10 +51,6 @@ jobs:
       - run: pnpm build
       - run: pnpm test
 
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
         env:

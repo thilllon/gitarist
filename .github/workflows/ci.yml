@@ -11,9 +11,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
-      CI_GITARIST_OWNER: thilllon
-      CI_GITARIST_REPO: turing
-      CI_GITARIST_TOKEN: ${{ secrets.CI_GITARIST_TOKEN }}
+      GITARIST_OWNER: thilllon
+      GITARIST_REPO: turing
+      GITARIST_TOKEN: ${{ secrets.CI_GITARIST_TOKEN }}
 
     strategy:
       matrix:
@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: 'ci variables'
-        run: echo "${{ env.CI_GITARIST_OWNER }} ${{ env.CI_GITARIST_REPO }}"
+        run: echo "${{ env.GITARIST_OWNER }} ${{ env.GITARIST_REPO }}"
 
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -51,9 +51,9 @@ jobs:
       - run: pnpm build
       - run: pnpm test
         env:
-          GITARIST_OWNER: ${{ env.CI_GITARIST_OWNER }}
-          GITARIST_REPO: ${{ env.CI_GITARIST_REPO }}
-          GITARIST_TOKEN: ${{ env.CI_GITARIST_TOKEN }}
+          GITARIST_OWNER: ${{ env.GITARIST_OWNER }}
+          GITARIST_REPO: ${{ env.GITARIST_REPO }}
+          GITARIST_TOKEN: ${{ env.GITARIST_TOKEN }}
 
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master

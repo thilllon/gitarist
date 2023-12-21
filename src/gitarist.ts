@@ -124,6 +124,11 @@ export class Gitarist {
     },
   ];
   private assigneeCandidates: string[] = [];
+  private languageMap: Record<Language, { ext: string; comment: string }> = {
+    GO: { ext: '.go', comment: '//' },
+    PYTHON: { ext: '.py', comment: '#' },
+    JAVA: { ext: '.java', comment: '//' },
+  };
 
   constructor({
     owner,
@@ -1268,18 +1273,13 @@ GITARIST_TOKEN="${token}"
     if (!existsSync(directoryPath)) {
       mkdirSync(directoryPath, { recursive: true });
     }
-    const languageMap: Record<Language, { ext: string; comment: string }> = {
-      GO: { ext: '.go', comment: '//' },
-      PYTHON: { ext: '.py', comment: '#' },
-      JAVA: { ext: '.java', comment: '//' },
-    };
 
     return Array.from({ length: numberOfFiles })
       .map(() => {
         try {
           const filePath = path.join(
             directoryPath,
-            `${Date.now().toString()}.${languageMap[language].ext}`,
+            `${Date.now().toString()}.${this.languageMap[language].ext}`,
           );
           writeFileSync(filePath, faker.lorem.paragraphs(10), {
             encoding: 'utf8',

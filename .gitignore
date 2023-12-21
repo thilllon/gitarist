@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+.DS_store
+
+.gitarist
+
+.env.*
+!.env.example

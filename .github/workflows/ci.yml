@@ -1,0 +1,63 @@
+name: gitarist CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+  # push:
+  #   branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      CI_GITARIST_OWNER: thilllon
+      CI_GITARIST_REPO: turing
+      CI_GITARIST_TOKEN: ${{ secrets.CI_GITARIST_TOKEN }}
+      GITARIST_OWNER: ${{ github.env.CI_GITARIST_OWNER }}
+      GITARIST_REPO: ${{ github.env.CI_GITARIST_REPO }}
+      GITARIST_TOKEN: ${{ github.env.CI_GITARIST_TOKEN }}
+
+    strategy:
+      matrix:
+        node-version: [20]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - uses: pnpm/action-setup@v2
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - run: pnpm install
+      - run: pnpm build
+      - run: pnpm test
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor

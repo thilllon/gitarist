@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "outDir": "dist",
+    "lib": ["esnext", "dom"],
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "removeComments": true,
+    "allowJs": true,
+    "types": ["node", "jest"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist"]
+}

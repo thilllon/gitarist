@@ -1,0 +1,13 @@
+{
+  "search.exclude": {
+    "coverage": true,
+    "dist": true,
+    "pnpm-lock.yaml": true,
+    "**/node_modules": true,
+    "**/*.code-search": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  }
+}

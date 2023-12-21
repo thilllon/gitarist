@@ -1,0 +1,4 @@
+.gitarist
+dist
+pnpm-lock.yaml
+coverage

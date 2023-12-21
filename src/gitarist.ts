@@ -8,7 +8,7 @@ import { Octokit } from 'octokit';
 import parseGitConfig from 'parse-git-config';
 import path from 'path';
 
-type Language = 'GO' | 'PYTHON' | 'JAVA';
+type Language = 'GO' | 'PYTHON' | 'JAVA' | 'CPP' | 'TEXT';
 
 enum MODE {
   BLOB = '120000',
@@ -125,9 +125,11 @@ export class Gitarist {
   ];
   private assigneeCandidates: string[] = [];
   private languageMap: Record<Language, { ext: string; comment: string }> = {
-    GO: { ext: '.go', comment: '//' },
-    PYTHON: { ext: '.py', comment: '#' },
-    JAVA: { ext: '.java', comment: '//' },
+    GO: { ext: 'go', comment: '//' },
+    PYTHON: { ext: 'py', comment: '#' },
+    JAVA: { ext: 'java', comment: '//' },
+    CPP: { ext: 'cc', comment: '//' },
+    TEXT: { ext: 'txt', comment: '' },
   };
 
   constructor({
@@ -513,6 +515,7 @@ GITARIST_TOKEN="${token}"
     olderThan: Date;
     mainBranch?: MainBranch;
   }): Promise<void> {
+    console.debug('start to delete old files');
     const { data: branchRef } = await this.octokit.rest.git.getRef({
       owner: this.owner,
       repo: this.repo,
@@ -528,8 +531,7 @@ GITARIST_TOKEN="${token}"
     });
     const targetFilePaths = currentTree.tree
       .filter((file) => {
-        const fullPath = path.join(process.cwd(), file?.path ?? '');
-        console.debug(`${fullPath}, ${path.basename(fullPath)}`);
+        const fullPath = path.join(process.cwd(), file.path ?? '');
         const createdAt = new Date(
           Number.parseInt(path.basename(fullPath)),
         ).getTime();
@@ -538,12 +540,12 @@ GITARIST_TOKEN="${token}"
           file.path?.startsWith(`${DEFAULT.relativePath}/`) &&
           !isNaN(createdAt) &&
           createdAt < new Date(olderThan).getTime();
-        if (flag) {
-          console.debug(`${fullPath}, ${path.basename(fullPath)}`);
-        }
         return flag;
       })
-      .map(({ path }) => path);
+      .map((tree) => {
+        console.debug(`will be deleted. ${tree.path}}`);
+        return tree.path;
+      });
 
     if (targetFilePaths.length === 0) {
       return;
@@ -994,6 +996,7 @@ GITARIST_TOKEN="${token}"
       const tree: TreeParam[] = [];
       // for (const filePath of FastGlob.glob.sync([`${relativePath}/*`], { absolute: false })) { }
       for (const filePath of createdFilePathList) {
+        console.debug(`a file created. ${filePath}`);
         const { data: blob } = await this.octokit.rest.git.createBlob({
           owner: this.owner,
           repo: this.repo,

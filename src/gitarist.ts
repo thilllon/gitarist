@@ -8,6 +8,8 @@ import { Octokit } from 'octokit';
 import parseGitConfig from 'parse-git-config';
 import path from 'path';
 
+type Language = 'GO' | 'PYTHON' | 'JAVA';
+
 enum MODE {
   BLOB = '120000',
   BLOB__FILE = '100644',
@@ -55,6 +57,7 @@ export const DEFAULT = {
   remote: 'origin',
   cron: '0 */6 * * 0-6',
   stale: 2, // days
+  language: 'GO',
 } as const;
 
 export type SetupCommandOptions = {
@@ -320,6 +323,7 @@ GITARIST_TOKEN="${token}"
     workingBranchPrefix = DEFAULT.workingBranchPrefix,
     mainBranch = DEFAULT.mainBranch,
     stale = DEFAULT.stale,
+    language = DEFAULT.language,
   }: {
     maxCommits?: number;
     minCommits?: number;
@@ -329,6 +333,7 @@ GITARIST_TOKEN="${token}"
     workingBranchPrefix?: BranchPrefix; // prefix of current working branch
     mainBranch?: MainBranch; // merge target branch
     stale?: number;
+    language?: Language;
   }) {
     for (const _index of Array(numberOfIssues).keys()) {
       await this.createCommitAndMakePullRequest({
@@ -336,6 +341,7 @@ GITARIST_TOKEN="${token}"
         numberOfFiles: _.sample<any>(_.range(minFiles, maxFiles + 1)),
         workingBranchPrefix,
         mainBranch,
+        language,
       });
     }
 
@@ -862,11 +868,13 @@ GITARIST_TOKEN="${token}"
     numberOfFiles,
     mainBranch: targetBranch,
     workingBranchPrefix,
+    language,
   }: {
     numberOfCommits: number;
     numberOfFiles: number;
     mainBranch: MainBranch;
     workingBranchPrefix: BranchPrefix;
+    language: Language;
   }): Promise<number> {
     const relativePath = DEFAULT.relativePath;
 
@@ -933,7 +941,11 @@ GITARIST_TOKEN="${token}"
       );
 
       console.debug(`create files. number of files: ${numberOfFiles}`);
-      createdFilePathList = this.createFiles({ numberOfFiles, relativePath });
+      createdFilePathList = this.createFiles({
+        numberOfFiles,
+        relativePath,
+        language,
+      });
 
       // 해당 브랜치에 여러개의 파일 추가
       // 실제 파일의 폴더구조는 무시하고 깃에 포함시킬 파일의 폴더구조를 tree로 정의할 수 있다. 실제 파일은 전혀 다른 경로에 있어도 깃에는 특정 경로에 파일이 들어가도록 할 수 있다.
@@ -1209,19 +1221,29 @@ GITARIST_TOKEN="${token}"
   private createFiles({
     numberOfFiles,
     relativePath,
+    language,
   }: {
     numberOfFiles: number;
     relativePath: string;
+    language: Language;
   }) {
     const directoryPath = path.join(process.cwd(), relativePath);
     if (!existsSync(directoryPath)) {
       mkdirSync(directoryPath, { recursive: true });
     }
+    const languageMap: Record<Language, { ext: string; comment: string }> = {
+      GO: { ext: '.go', comment: '//' },
+      PYTHON: { ext: '.py', comment: '#' },
+      JAVA: { ext: '.java', comment: '//' },
+    };
 
     return Array.from({ length: numberOfFiles })
       .map(() => {
         try {
-          const filePath = path.join(directoryPath, Date.now().toString());
+          const filePath = path.join(
+            directoryPath,
+            `${Date.now().toString()}.${languageMap[language].ext}`,
+          );
           writeFileSync(filePath, faker.lorem.paragraphs(10), {
             encoding: 'utf8',
             flag: 'a+',

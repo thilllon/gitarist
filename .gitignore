@@ -3,7 +3,10 @@ dist
 coverage
 .DS_store
 
-.gitarist
-
-.env.*
+.env*
 !.env.example
+
+.gitarist
+.gitlaborator
+
+.http

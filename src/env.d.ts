@@ -4,5 +4,7 @@ declare module NodeJS {
     GITARIST_OWNER: string;
     GITARIST_REPO: string;
     GITARIST_TOKEN: string;
+    GITLAB_TOKEN: string;
+    GITLAB_PROJECT_ID: string;
   }
 }

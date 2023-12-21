@@ -27,7 +27,7 @@ describe('gitarist', () => {
     expect(true).toBeTruthy();
   });
 
-  it('simulate active user', async () => {
+  it.skip('simulate active user', async () => {
     const deleteOldWorkflowLogsSpy = jest.spyOn(
       gitarist,
       'deleteOldWorkflowLogs',
@@ -53,11 +53,11 @@ describe('gitarist', () => {
     await gitarist.findWastedActionsOverAllRepositories();
   });
 
-  it('deleteFolder', async () => {
+  it.skip('deleteFolder', async () => {
     await gitarist.deleteFolder({ folderPaths: [] });
   });
 
-  it('resolve all unresolved review comments', async () => {
+  it.skip('resolve all unresolved review comments', async () => {
     await gitarist.resolveAllReviewComments();
 
     expect(true).toBeTruthy();

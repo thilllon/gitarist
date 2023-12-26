@@ -2,22 +2,13 @@
 
 import { faker } from '@faker-js/faker';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { rm } from 'fs/promises';
+import { readFile, rm } from 'fs/promises';
 import _ from 'lodash';
 import { Octokit } from 'octokit';
 import parseGitConfig from 'parse-git-config';
 import path from 'path';
 
-type Language = 'GO' | 'PYTHON' | 'JAVA' | 'CPP' | 'TEXT';
-
-enum MODE {
-  BLOB = '120000',
-  BLOB__FILE = '100644',
-  BLOB__EXECUTABLE = '100755',
-  TREE__DIRECTORY = '040000',
-  COMMIT__SUBMODULE = '160000',
-}
-
+export const branchPrefixes = ['feature', 'hotfix'] as const;
 export const workflowStatus = [
   'completed',
   'action_required',
@@ -33,8 +24,6 @@ export const workflowStatus = [
   'requested',
   'waiting',
 ];
-
-export const branchPrefixes = ['feature', 'hotfix'] as const;
 export const commitCategories = [
   'feat',
   'fix',
@@ -60,6 +49,15 @@ export const DEFAULT = {
   language: 'GO',
 } as const;
 
+enum MODE {
+  BLOB = '120000',
+  BLOB__FILE = '100644',
+  BLOB__EXECUTABLE = '100755',
+  TREE__DIRECTORY = '040000',
+  COMMIT__SUBMODULE = '160000',
+}
+
+export type Language = 'GO' | 'PYTHON' | 'JAVA' | 'CPP' | 'TEXT';
 export type SetupCommandOptions = {
   remote: string;
 };
@@ -79,13 +77,13 @@ export type StartCommandOptions = {
 };
 export type BranchPrefix = (typeof branchPrefixes)[number]; // TypeScript 3.4+
 export type MainBranch = 'main' | 'master' | string;
-interface TreeParam {
+export type TreeParam = {
   path?: string | undefined;
   mode?: MODE;
   type?: 'blob' | 'tree' | 'commit' | undefined;
   sha?: string | undefined;
   content?: string | undefined;
-}
+};
 export type IssueItem = {
   title: string;
   body: string;
@@ -583,6 +581,18 @@ GITARIST_TOKEN="${token}"
       sha: newCommit.sha,
     });
     console.debug(`commit pushed. sha: ${pushed.object.sha}`);
+  }
+
+  async createIssuesFromJson({ relativePath }: { relativePath: string }) {
+    const data = await readFile(path.join(process.cwd(), relativePath), 'utf8');
+
+    try {
+      const issueItems = JSON.parse(data);
+      this.validateIssueTemplate(issueItems);
+      await this.createMultipleIssues({ issueItems });
+    } catch (error: any) {
+      console.error(error.message);
+    }
   }
 
   async createMultipleIssues({ issueItems }: { issueItems: IssueItem[] }) {
@@ -1089,6 +1099,26 @@ GITARIST_TOKEN="${token}"
       console.error(error.message);
     });
     return issue.number;
+  }
+
+  private validateIssueTemplate(issues: IssueItem[]) {
+    issues.forEach((issue, index) => {
+      if (!issue.title) {
+        throw new Error(
+          `[createIssuesFromJson][index: ${index}] Missing field: title`,
+        );
+      }
+      if (!issue.body) {
+        throw new Error(
+          `[createIssuesFromJson][index: ${index}] Missing field: body`,
+        );
+      }
+      if (issue.assignee === '') {
+        throw new Error(
+          `[createIssuesFromJson][index: ${index}] Invalid field: assignee`,
+        );
+      }
+    });
   }
 
   private async createPullRequestAndReviewAndMerge({

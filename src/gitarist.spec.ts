@@ -1,6 +1,8 @@
 import { execSync } from 'child_process';
 import dotenv from 'dotenv';
+import { mkdir, writeFile } from 'fs/promises';
 import { Octokit } from 'octokit';
+import { dirname } from 'path';
 import { Gitarist, IssueItem } from './gitarist';
 
 jest.setTimeout(999999999);
@@ -129,6 +131,34 @@ describe('gitarist', () => {
       },
     ];
     await gitarist.createMultipleIssues({ issueItems });
+  });
+
+  it.skip('createIssuesFromJson', async () => {
+    const issues: IssueItem[] = Array.from({ length: 4 }).map((_, index) => ({
+      title: 'title ' + index,
+      body: 'body ' + index,
+    }));
+    const filePath = './.gitarist/testIssues.json';
+    await mkdir(dirname(filePath), { recursive: true });
+    await writeFile(filePath, JSON.stringify(issues), 'utf-8');
+    await gitarist.createIssuesFromJson({ relativePath: filePath });
+
+    const errorSpy = jest.spyOn(console, 'error');
+    const invalidIssues: IssueItem[] = [
+      {
+        title: 'invalid title',
+        body: 'invalid body',
+        labels: '',
+      },
+    ];
+    const invalidFilePath = './.gitarist/testInvalidIssues.json';
+    await mkdir(dirname(invalidFilePath), { recursive: true });
+    await writeFile(invalidFilePath, JSON.stringify(invalidIssues), 'utf-8');
+    await gitarist.createIssuesFromJson({ relativePath: invalidFilePath });
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Validation Failed: {"resource":"Label","field":"name","code":"missing_field"}',
+    );
   });
 
   describe('cli test', () => {

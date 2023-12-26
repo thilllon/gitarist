@@ -16,30 +16,30 @@ describe('jira api', () => {
   });
 
   it.skip('get project', async () => {
-    const projectKey = 'OPSTOOL';
+    const projectKey = 'OPSTOOL'; // can be found in URL
 
     const response = await axios({
       baseURL: host,
-      method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      method: 'GET',
       url: `/rest/api/2/project/${projectKey}`,
     });
     console.debug(response?.data);
   });
 
-  it.skip('get active spring ID', async () => {
-    const boardId = 3036;
+  it.skip('get active sprint ID', async () => {
+    const boardId = 3036; // can be found as view or rapidView in URL. e.g., rapidView=xxxx
 
     const response = await axios({
       baseURL: host,
-      method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      method: 'GET',
       url: `/rest/agile/1.0/board/${boardId}/sprint?state=active`,
     });
     console.debug(response?.data);
@@ -47,13 +47,13 @@ describe('jira api', () => {
 
   it.skip('test', async () => {
     const response = await axios({
-      method: 'POST',
       baseURL: host,
-      url: '/rest/api/2/issue',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      method: 'POST',
+      url: '/rest/api/2/issue',
       data: {
         fields: {
           project: {
@@ -69,26 +69,18 @@ describe('jira api', () => {
           // epic
           customfield_10006: 'OPSTOOL-2348', // [운영]opstool-hub
           // sprint
-          // customfield_10004: [
-          //   'com.atlassian.greenhopper.service.sprint.Sprint@3be3908d[id=11455,rapidViewId=3036,state=ACTIVE,name=운영도구개발팀 스프린트 24,startDate=2023-12-21T12:30:00.000+09:00,endDate=2024-01-04T12:30:00.000+09:00,completeDate=<null>,activatedDate=2023-12-21T12:44:40.802+09:00,sequence=11455,goal=,autoStartStop=false]',
-          // ],
+          // customfield_10004: [],
         },
       },
     }).catch((error) => {
       console.error(error);
     });
 
-    // console.debug(response?.data);
-    const issueKey = response?.data?.key;
-    //   data: {
-    //   id: '1253532',
-    //   key: 'OPSTOOL-2904',
-    //   self: 'https://jira.woowa.in/rest/api/2/issue/1253532'
-    // }
+    const issueKey = response?.data?.key; // id, key, self
 
     if (issueKey) {
       const issueUrl = `https://jira.woowa.in/browse/${issueKey}`;
-      console.debug(issueUrl);
+      console.debug({ ...response?.data, issueUrl });
     }
   });
 });

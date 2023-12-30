@@ -1,8 +1,10 @@
 import { execSync } from 'child_process';
 import dotenv from 'dotenv';
+import { mkdirSync, rmdirSync } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
 import { Octokit } from 'octokit';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
+import { chdir } from 'process';
 import { Gitarist, IssueItem } from './gitarist';
 
 jest.setTimeout(999999999);
@@ -24,9 +26,19 @@ describe('gitarist', () => {
   });
 
   it.skip('setup', async () => {
-    Gitarist.setup({});
-
+    // FIXME: `open` is not working on commonjs
+    const targetDir = join(
+      process.cwd(),
+      '.gitarist',
+      `directory_${Date.now()}`,
+    );
+    mkdirSync(targetDir, { recursive: true });
+    chdir(targetDir);
+    execSync('git init');
+    execSync('cd');
+    await Gitarist.setup({});
     expect(true).toBeTruthy();
+    rmdirSync(targetDir);
   });
 
   it.skip('simulate active user', async () => {

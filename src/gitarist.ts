@@ -47,6 +47,8 @@ export const DEFAULT = {
   cron: '0 */6 * * 0-6',
   stale: 2, // days
   language: 'GO',
+  ownerPlaceholder: '<OWNER>',
+  repoPlaceholder: '<REPOSITORY>',
 } as const;
 
 enum MODE {
@@ -254,7 +256,9 @@ GITARIST_TOKEN="${token}"
   /**
    * Setup a repository for gitarist which is creating a workflow file.
    */
-  static setup({ remote = DEFAULT.remote }: Partial<SetupCommandOptions>) {
+  static async setup({
+    remote = DEFAULT.remote,
+  }: Partial<SetupCommandOptions>) {
     const gitConfigPath = path.join(process.cwd(), '.git', 'config');
     if (!existsSync(gitConfigPath)) {
       throw new Error(
@@ -262,12 +266,15 @@ GITARIST_TOKEN="${token}"
       );
     }
 
-    const envPath = path.join(process.cwd(), '.env');
-    console.log(`Searching .env file at ${envPath}`);
+    const dotenvFile = '.env';
+    const envPath = path.join(process.cwd(), dotenvFile);
+    console.log(`Searching ${dotenvFile} file from ${envPath} ...`);
     if (existsSync(envPath)) {
       console.log(
-        'There is a .env file already so template will be appended to the file.',
+        `\tThere is a ${dotenvFile} file already so template will be appended to the file.`,
       );
+    } else {
+      console.log(`\tCould not find a ${dotenvFile} file`);
     }
 
     const ymlPath = path.join(
@@ -276,21 +283,23 @@ GITARIST_TOKEN="${token}"
       'workflows',
       'gitarist.yml',
     );
-    console.log(`Searching gitarist workflow file at ${envPath}.`);
+    console.log(`Searching gitarist workflow file from ${envPath} ...`);
     if (existsSync(ymlPath)) {
-      console.log(`There is a gitarist workflow file already at ${ymlPath}.`);
+      console.log(`\tThere is a gitarist workflow file already at ${ymlPath}.`);
+    } else {
+      console.log(`\tCould not find a workflow file`);
     }
 
     const git = parseGitConfig.sync(
       readFileSync(path.join(process.cwd(), '.git', 'config'), 'utf8'),
     );
-    const owner = git?.user?.name ?? '';
+    const owner = git?.user?.name ?? DEFAULT.ownerPlaceholder;
     const repo =
       git[`remote "${remote}"`]?.url
         ?.split('/')
         ?.pop()
         ?.replace('.git', '')
-        .replace('/', '') ?? '';
+        .replace('/', '') ?? DEFAULT.repoPlaceholder;
     const githubWorkflowDirectory = path.join(
       process.cwd(),
       '.github',
@@ -300,10 +309,7 @@ GITARIST_TOKEN="${token}"
     writeFileSync(
       path.join(githubWorkflowDirectory, 'gitarist.yml'),
       Gitarist.getActionTemplate({ owner, repo }),
-      {
-        encoding: 'utf8',
-        flag: 'a+',
-      },
+      { encoding: 'utf8', flag: 'a+' },
     );
     writeFileSync(
       path.join(process.cwd(), '.env'),
@@ -312,13 +318,33 @@ GITARIST_TOKEN="${token}"
     );
 
     console.log(
-      [
-        'Generate a secret key settings:',
-        Gitarist.tokenIssueUrl,
-        'Register the secret key to action settings:',
-        Gitarist.tokenSettingUrl({ owner, repo }),
-      ].join('\n'),
+      ['Generate a secret key settings:', Gitarist.tokenIssueUrl].join('\n'),
     );
+    const open = await import('open');
+    await open.default(Gitarist.tokenIssueUrl, { wait: false });
+
+    console.log(
+      `Register the secret key to action settings: ${Gitarist.tokenSettingUrl({
+        owner,
+        repo,
+      })}`,
+    );
+
+    console.log(
+      'Go to repository > settings > Secrets and variables > Actions > New repository secret',
+    );
+
+    if (
+      owner !== DEFAULT.ownerPlaceholder &&
+      repo !== DEFAULT.repoPlaceholder
+    ) {
+      console.log(
+        [
+          'Register the secret key to action settings:',
+          Gitarist.tokenSettingUrl({ owner, repo }),
+        ].join('\n'),
+      );
+    }
   }
 
   /**

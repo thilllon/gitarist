@@ -1,6 +1,6 @@
 {
   "name": "gitarist",
-  "version": "1.2.9",
+  "version": "1.2.10-0",
   "description": "A CLI tool to utilize Octokit",
   "license": "MIT",
   "publishConfig": {
@@ -73,6 +73,7 @@
     "fast-glob": "^3.3.2",
     "lodash": "^4.17.21",
     "octokit": "^3.1.2",
+    "open": "^10.0.2",
     "parse-git-config": "^3.0.0",
     "zod": "^3.22.4"
   },

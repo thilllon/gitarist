@@ -1,0 +1,24 @@
+
+    
+name: Gitarist
+
+on: 
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * 0-6'
+
+jobs:
+  start:
+    runs-on: ubuntu-latest
+    env:
+      GITARIST_OWNER: ${{ github.repository_owner }}
+      GITARIST_REPO: ${{ github.event.repository.name }}
+      # Create a secret key at,
+      # https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow
+      # and register the secret key to action settings at,
+      # https://github.com/thilllon/gitarist/settings/secrets/actions/new
+      GITARIST_TOKEN: ${{ secrets.GITARIST_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - run: npx gitarist start

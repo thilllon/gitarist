@@ -16,7 +16,7 @@ dependencies:
     version: 39.28.0
   axios:
     specifier: ^1.6.3
-    version: 1.6.3(debug@4.3.4)
+    version: 1.6.5(debug@4.3.4)
   commander:
     specifier: ^11.1.0
     version: 11.1.0
@@ -37,7 +37,7 @@ dependencies:
     version: 3.1.2
   open:
     specifier: ^10.0.2
-    version: 10.0.2
+    version: 10.0.3
   parse-git-config:
     specifier: ^3.0.0
     version: 3.0.0
@@ -2550,8 +2550,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /axios@1.6.3(debug@4.3.4):
-    resolution: {integrity: sha512-fWyNdeawGam70jXSVlKl+SUNVcL6j6W79CuSIPfi6HnDUmSCH6gyUys/HrqHeA/wU0Az41rRgean494d0Jb+ww==}
+  /axios@1.6.5(debug@4.3.4):
+    resolution: {integrity: sha512-Ii012v05KEVuUoFWmMW/UQv9aRIc3ZwkWDcM+h5Il8izZCtRVpDUfwpoFf7eOtajT3QiGR4yDUx7lPqHJULgbg==}
     dependencies:
       follow-redirects: 1.15.4(debug@4.3.4)
       form-data: 4.0.0
@@ -6130,8 +6130,8 @@ packages:
       mimic-fn: 4.0.0
     dev: true
 
-  /open@10.0.2:
-    resolution: {integrity: sha512-GnYLdE+E3K8NeSE23N0g67/9q9AXRph5oTUbz6IbIgElPigEnQ2aHuqRge3y0JUr67qoc84xME5kF03fDc3fcA==}
+  /open@10.0.3:
+    resolution: {integrity: sha512-dtbI5oW7987hwC9qjJTyABldTaa19SuyJse1QboWv3b0qCcrrLNVDqBx1XgELAjh9QTVQaP/C5b1nhQebd1H2A==}
     engines: {node: '>=18'}
     dependencies:
       default-browser: 5.2.1

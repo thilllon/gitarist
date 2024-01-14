@@ -336,13 +336,18 @@ GITARIST_TOKEN="${token}"
       'Go to repository > settings > Secrets and variables > Actions > New repository secret',
     );
 
-    if (
-      owner !== DEFAULT.ownerPlaceholder &&
-      repo !== DEFAULT.repoPlaceholder
-    ) {
-      await open.default(Gitarist.tokenIssueUrl, { wait: false });
-      await open.default(envSettingPageUrl, { wait: false });
+    if (owner !== DEFAULT.ownerPlaceholder) {
+      console.error(`It is unable to find git username`);
+      return;
     }
+
+    if (repo !== DEFAULT.repoPlaceholder) {
+      console.error(`It is unable to find repository name.`);
+      return;
+    }
+
+    await open.default(Gitarist.tokenIssueUrl, { wait: false });
+    await open.default(envSettingPageUrl, { wait: false });
   }
 
   /**

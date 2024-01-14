@@ -1,32 +1,10 @@
 /**
  * https://developer.atlassian.com/server/jira/platform/rest-apis/
  *
+ *
+ *
+ * http://host:port/context/rest/api-name/api-version/resource-name
  */
-
-// http://host:port/context/rest/api-name/api-version/resource-name
-// https://jira.woowa.in/secure/RapidBoard.jspa?rapidView=3036&projectKey=OPSTOOL&view=planning.nodetail&quickFilter=16266&issueLimit=100
-
-// http://localhost:8080/rest/api/2/project
-// curl \
-//    -D- \
-//    -u charlie:charlie \
-//    -X POST \
-//    --data {see below} \
-//    -H "Content-Type: application/json" \
-//    http://localhost:8080/rest/api/2/issue/
-// {
-//     "fields": {
-//        "project":
-//        {
-//           "key": "OPSTOOL"
-//        },
-//        "summary": "test",
-//        "description": "test",
-//        "issuetype": {
-//           "name": "Task"
-//        }
-//    }
-// }
 
 export const jiraRestEndpoints = {
   issue: {
@@ -145,7 +123,7 @@ export class JiraClient {
 
 // Example usage:
 const inputString =
-  'PUT /rest/api/2/issue/{issueIdOrKey}?key=asdf&value=2020-01-01';
+  'PUT /rest/api/2/issue/{issueIdOrKey}?key=someKeyword&value=2020-01-01';
 const requestObject = parseRequestString(inputString);
 
 if (requestObject) {

@@ -11,5 +11,9 @@ declare module NodeJS {
 
     VERCEL_PROJECT_ID: string;
     VERCEL_TOKEN: string;
+
+    JIRA_TOKEN: string;
+    JIRA_HOST: string;
+    JIRA_PROJECT_KEY: string;
   }
 }

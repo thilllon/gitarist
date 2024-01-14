@@ -4,8 +4,16 @@ import { parseRequestString } from './jira-api';
 
 describe('jira api', () => {
   dotenv.config({ path: '.env.test' });
-  const token = process.env.JIRA_TOKEN;
-  const host = 'https://jira.woowa.in';
+
+  let host: string;
+  let token: string;
+  let projectKey: string;
+
+  beforeAll(async () => {
+    token = process.env.JIRA_TOKEN;
+    host = process.env.JIRA_HOST;
+    projectKey = process.env.JIRA_PROJECT_KEY;
+  });
 
   it.skip('test template', async () => {
     console.debug(
@@ -16,7 +24,7 @@ describe('jira api', () => {
   });
 
   it.skip('get project', async () => {
-    const projectKey = 'OPSTOOL'; // can be found in URL
+    const projectKey = process.env.JIRA_PROJECT_KEY; // can be found in URL
 
     const response = await axios({
       baseURL: host,
@@ -31,7 +39,8 @@ describe('jira api', () => {
   });
 
   it.skip('get active sprint ID', async () => {
-    const boardId = 3036; // can be found as view or rapidView in URL. e.g., rapidView=xxxx
+    // can be found as view or rapidView in URL. e.g., rapidView=xxxx
+    const boardId = 3036;
 
     const response = await axios({
       baseURL: host,
@@ -57,7 +66,7 @@ describe('jira api', () => {
       data: {
         fields: {
           project: {
-            key: 'OPSTOOL',
+            key: projectKey,
           },
           summary: 'Test issue',
           description:
@@ -66,8 +75,10 @@ describe('jira api', () => {
             name: 'Task',
           },
           labels: ['BE'],
+
           // epic
-          customfield_10006: 'OPSTOOL-2348', // [운영]opstool-hub
+          // customfield_10006: 'TEST_1',
+
           // sprint
           // customfield_10004: [],
         },
@@ -76,10 +87,10 @@ describe('jira api', () => {
       console.error(error);
     });
 
-    const issueKey = response?.data?.key; // id, key, self
+    const issueKey = response?.data?.key; // {id, key, self}
 
     if (issueKey) {
-      const issueUrl = `https://jira.woowa.in/browse/${issueKey}`;
+      const issueUrl = `${host}/browse/${issueKey}`;
       console.debug({ ...response?.data, issueUrl });
     }
   });

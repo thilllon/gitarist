@@ -25,8 +25,8 @@ program
       DEFAULT.remote,
     ),
   )
-  .action((options: SetupCommandOptions) => {
-    Gitarist.setup({ remote: options.remote });
+  .action(async (options: SetupCommandOptions) => {
+    await Gitarist.setup({ remote: options.remote });
   });
 
 program

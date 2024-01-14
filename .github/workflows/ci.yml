@@ -47,13 +47,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - run: pnpm install
+      # dependabot updates pnpm-lock file
+      - run: pnpm install --no-frozen-lockfile
       - run: pnpm build
       - run: pnpm test
-
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor

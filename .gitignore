@@ -10,3 +10,5 @@ coverage
 .gitlaborator
 
 .http
+
+.github/workflows/gitarist.*

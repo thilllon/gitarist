@@ -9,13 +9,13 @@ dependencies:
     specifier: ^8.3.1
     version: 8.3.1
   '@gitbeaker/requester-utils':
-    specifier: ^39.28.0
+    specifier: ^39.29.0
     version: 39.29.0
   '@gitbeaker/rest':
-    specifier: ^39.28.0
+    specifier: ^39.29.0
     version: 39.29.0
   axios:
-    specifier: ^1.6.3
+    specifier: ^1.6.5
     version: 1.6.5(debug@4.3.4)
   commander:
     specifier: ^11.1.0
@@ -49,11 +49,13 @@ devDependencies:
   '@commitlint/cli':
     specifier: ^18.4.3
     version: 18.4.4(@types/node@20.11.3)(typescript@5.3.3)
+    specifier: ^18.4.4
+    version: 18.4.4(@types/node@20.11.0)(typescript@5.3.3)
   '@commitlint/config-conventional':
-    specifier: ^18.4.3
+    specifier: ^18.4.4
     version: 18.4.4
   '@gitbeaker/core':
-    specifier: ^39.28.0
+    specifier: ^39.29.0
     version: 39.29.0
   '@octokit/core':
     specifier: ^5.0.2
@@ -2398,10 +2400,6 @@ packages:
 
   /async-sema@3.1.1:
     resolution: {integrity: sha512-tLRNUXati5MFePdAk8dw7Qt7DpxPB60ofAgn8WRhW6a2rcimZnYBP9oxHiv0OHy+Wz7kPMG+t4LGdt31+4EmGg==}
-
-  /asynckit@0.4.0:
-    resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
-    dev: false
 
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}

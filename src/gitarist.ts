@@ -188,7 +188,13 @@ export class Gitarist {
     return 'https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow';
   }
 
-  static tokenSettingUrl({ owner, repo }: { owner: string; repo: string }) {
+  static getEnvSettingPageUrl({
+    owner,
+    repo,
+  }: {
+    owner: string;
+    repo: string;
+  }) {
     return `https://github.com/${owner}/${repo}/settings/secrets/actions/new`;
   }
 
@@ -223,7 +229,7 @@ jobs:
       # Create a secret key at,
       # ${this.tokenIssueUrl}
       # and register the secret key to action settings at,
-      # ${Gitarist.tokenSettingUrl({ owner, repo })}
+      # ${Gitarist.getEnvSettingPageUrl({ owner, repo })}
       GITARIST_TOKEN: \${{ secrets.GITARIST_TOKEN }}
     steps:
       - uses: actions/checkout@v3
@@ -322,29 +328,26 @@ GITARIST_TOKEN="${token}"
     );
     const open = await import('open');
     await open.default(Gitarist.tokenIssueUrl, { wait: false });
-
+    const envSettingPageUrl = Gitarist.getEnvSettingPageUrl({ owner, repo });
     console.log(
-      `Register the secret key to action settings: ${Gitarist.tokenSettingUrl({
-        owner,
-        repo,
-      })}`,
+      `Register the secret key to action settings: ${envSettingPageUrl}`,
     );
-
     console.log(
       'Go to repository > settings > Secrets and variables > Actions > New repository secret',
     );
 
-    if (
-      owner !== DEFAULT.ownerPlaceholder &&
-      repo !== DEFAULT.repoPlaceholder
-    ) {
-      console.log(
-        [
-          'Register the secret key to action settings:',
-          Gitarist.tokenSettingUrl({ owner, repo }),
-        ].join('\n'),
-      );
+    if (owner !== DEFAULT.ownerPlaceholder) {
+      console.error(`It is unable to find git username`);
+      return;
     }
+
+    if (repo !== DEFAULT.repoPlaceholder) {
+      console.error(`It is unable to find repository name.`);
+      return;
+    }
+
+    await open.default(Gitarist.tokenIssueUrl, { wait: false });
+    await open.default(envSettingPageUrl, { wait: false });
   }
 
   /**

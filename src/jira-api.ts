@@ -1,9 +1,6 @@
 /**
  * https://developer.atlassian.com/server/jira/platform/rest-apis/
- *
- *
- *
- * http://host:port/context/rest/api-name/api-version/resource-name
+ * https://<HOST>:<PORT>/<CONTEXT>/rest/<API-NAME>/<API-VERSION>/<RESOURCE-NAME>
  */
 
 export const jiraRestEndpoints = {

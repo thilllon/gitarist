@@ -64,9 +64,9 @@
   },
   "dependencies": {
     "@faker-js/faker": "^8.3.1",
-    "@gitbeaker/requester-utils": "^39.28.0",
-    "@gitbeaker/rest": "^39.28.0",
-    "axios": "^1.6.3",
+    "@gitbeaker/requester-utils": "^39.29.0",
+    "@gitbeaker/rest": "^39.29.0",
+    "axios": "^1.6.5",
     "commander": "^11.1.0",
     "debug": "^4.3.4",
     "dotenv": "^16.3.1",
@@ -78,9 +78,9 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.4.3",
-    "@commitlint/config-conventional": "^18.4.3",
-    "@gitbeaker/core": "^39.28.0",
+    "@commitlint/cli": "^18.4.4",
+    "@commitlint/config-conventional": "^18.4.4",
+    "@gitbeaker/core": "^39.29.0",
     "@octokit/core": "^5.0.2",
     "@octokit/fixtures": "^22.0.6",
     "@octokit/plugin-rest-endpoint-methods": "^10.2.0",

@@ -10,7 +10,7 @@ dependencies:
     version: 8.3.1
   '@gitbeaker/requester-utils':
     specifier: ^39.29.0
-    version: 39.29.0
+    version: 39.30.0
   '@gitbeaker/rest':
     specifier: ^39.29.0
     version: 39.29.0
@@ -945,17 +945,17 @@ packages:
     resolution: {integrity: sha512-gDR5gBQgNsHyR18F+0g11C6uprPMnvTO/8sg3jwkE32fkF3ufz7GIWcOd2kJqWJZzGYNxIVfUnNm2wL05OPGlg==}
     engines: {node: '>=18.0.0'}
     dependencies:
-      '@gitbeaker/requester-utils': 39.29.0
+      '@gitbeaker/requester-utils': 39.30.0
       qs: 6.11.2
       xcase: 2.0.1
 
-  /@gitbeaker/requester-utils@39.29.0:
-    resolution: {integrity: sha512-g9uOk9/JNvtKlMLZigkqM88x/Ow/leC0zAN6lQ10h82+KNKUt0hdTSHNkfBcl9+DUjyOsd3phZ5+ETSevuv3/A==}
+  /@gitbeaker/requester-utils@39.30.0:
+    resolution: {integrity: sha512-VKiiICvAnnjS33yn79fX9BiF9blljyk/QTfU5ovnqu0GKQg1IevfkPTg4d6luL4tIQRXRL+Q3q2Y3vXcbkLKaw==}
     engines: {node: '>=18.0.0'}
     dependencies:
-      async-sema: 3.1.1
-      micromatch: 4.0.5
+      picomatch-browser: 2.2.6
       qs: 6.11.2
+      rate-limiter-flexible: 4.0.0
       xcase: 2.0.1
 
   /@gitbeaker/rest@39.29.0:
@@ -963,7 +963,7 @@ packages:
     engines: {node: '>=18.0.0'}
     dependencies:
       '@gitbeaker/core': 39.29.0
-      '@gitbeaker/requester-utils': 39.29.0
+      '@gitbeaker/requester-utils': 39.30.0
     dev: false
 
   /@humanwhocodes/config-array@0.11.14:
@@ -2395,9 +2395,6 @@ packages:
     dependencies:
       retry: 0.13.1
     dev: true
-
-  /async-sema@3.1.1:
-    resolution: {integrity: sha512-tLRNUXati5MFePdAk8dw7Qt7DpxPB60ofAgn8WRhW6a2rcimZnYBP9oxHiv0OHy+Wz7kPMG+t4LGdt31+4EmGg==}
 
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
@@ -6210,6 +6207,10 @@ packages:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
     dev: true
 
+  /picomatch-browser@2.2.6:
+    resolution: {integrity: sha512-0ypsOQt9D4e3hziV8O4elD9uN0z/jtUEfxVRtNaAAtXIyUx9m/SzlO020i8YNL2aL/E6blOvvHQcin6HZlFy/w==}
+    engines: {node: '>=8.6'}
+
   /picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
@@ -6361,6 +6362,9 @@ packages:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
     engines: {node: '>=10'}
     dev: true
+
+  /rate-limiter-flexible@4.0.0:
+    resolution: {integrity: sha512-SkA18LEPqJJKHixi6E7tzBKTXbj9gu5wPyfTykPVRZR5JGSw0dMCjtZsjlfuabVY940pu28Wu87NZN4FhztnyQ==}
 
   /rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}

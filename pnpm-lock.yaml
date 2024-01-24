@@ -57,13 +57,13 @@ devDependencies:
     version: 39.29.0
   '@octokit/core':
     specifier: ^5.0.2
-    version: 5.0.2
+    version: 5.1.0
   '@octokit/fixtures':
     specifier: ^22.0.6
     version: 22.0.6
   '@octokit/plugin-rest-endpoint-methods':
     specifier: ^10.2.0
-    version: 10.2.0(@octokit/core@5.0.2)
+    version: 10.2.0(@octokit/core@5.1.0)
   '@octokit/request-error':
     specifier: ^5.0.1
     version: 5.0.1
@@ -1318,9 +1318,9 @@ packages:
     dependencies:
       '@octokit/auth-app': 6.0.3
       '@octokit/auth-unauthenticated': 5.0.1
-      '@octokit/core': 5.0.2
+      '@octokit/core': 5.1.0
       '@octokit/oauth-app': 6.0.0
-      '@octokit/plugin-paginate-rest': 9.1.5(@octokit/core@5.0.2)
+      '@octokit/plugin-paginate-rest': 9.1.5(@octokit/core@5.1.0)
       '@octokit/types': 12.4.0
       '@octokit/webhooks': 12.0.11
     dev: false
@@ -1387,8 +1387,8 @@ packages:
       '@octokit/types': 12.4.0
     dev: false
 
-  /@octokit/core@5.0.2:
-    resolution: {integrity: sha512-cZUy1gUvd4vttMic7C0lwPed8IYXWYp8kHIMatyhY8t8n3Cpw2ILczkV5pGMPqef7v0bLo0pOHrEHarsau2Ydg==}
+  /@octokit/core@5.1.0:
+    resolution: {integrity: sha512-BDa2VAMLSh3otEiaMJ/3Y36GU4qf6GI+VivQ/P41NC6GHcdxpKlqV0ikSZ5gdQsmS3ojXeRx5vasgNTinF0Q4g==}
     engines: {node: '>= 18'}
     dependencies:
       '@octokit/auth-token': 4.0.0
@@ -1432,7 +1432,7 @@ packages:
       '@octokit/auth-oauth-app': 7.0.1
       '@octokit/auth-oauth-user': 4.0.1
       '@octokit/auth-unauthenticated': 5.0.1
-      '@octokit/core': 5.0.2
+      '@octokit/core': 5.1.0
       '@octokit/oauth-authorization-url': 6.0.2
       '@octokit/oauth-methods': 4.0.1
       '@types/aws-lambda': 8.10.131
@@ -1458,61 +1458,61 @@ packages:
   /@octokit/openapi-types@19.1.0:
     resolution: {integrity: sha512-6G+ywGClliGQwRsjvqVYpklIfa7oRPA0vyhPQG/1Feh+B+wU0vGH1JiJ5T25d3g1JZYBHzR2qefLi9x8Gt+cpw==}
 
-  /@octokit/plugin-paginate-graphql@4.0.0(@octokit/core@5.0.2):
+  /@octokit/plugin-paginate-graphql@4.0.0(@octokit/core@5.1.0):
     resolution: {integrity: sha512-7HcYW5tP7/Z6AETAPU14gp5H5KmCPT3hmJrS/5tO7HIgbwenYmgw4OY9Ma54FDySuxMwD+wsJlxtuGWwuZuItA==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '>=5'
     dependencies:
-      '@octokit/core': 5.0.2
+      '@octokit/core': 5.1.0
     dev: false
 
-  /@octokit/plugin-paginate-rest@9.1.5(@octokit/core@5.0.2):
+  /@octokit/plugin-paginate-rest@9.1.5(@octokit/core@5.1.0):
     resolution: {integrity: sha512-WKTQXxK+bu49qzwv4qKbMMRXej1DU2gq017euWyKVudA6MldaSSQuxtz+vGbhxV4CjxpUxjZu6rM2wfc1FiWVg==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '>=5'
     dependencies:
-      '@octokit/core': 5.0.2
+      '@octokit/core': 5.1.0
       '@octokit/types': 12.4.0
 
-  /@octokit/plugin-request-log@4.0.0(@octokit/core@5.0.2):
+  /@octokit/plugin-request-log@4.0.0(@octokit/core@5.1.0):
     resolution: {integrity: sha512-2uJI1COtYCq8Z4yNSnM231TgH50bRkheQ9+aH8TnZanB6QilOnx8RMD2qsnamSOXtDj0ilxvevf5fGsBhBBzKA==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '>=5'
     dependencies:
-      '@octokit/core': 5.0.2
+      '@octokit/core': 5.1.0
     dev: true
 
-  /@octokit/plugin-rest-endpoint-methods@10.2.0(@octokit/core@5.0.2):
+  /@octokit/plugin-rest-endpoint-methods@10.2.0(@octokit/core@5.1.0):
     resolution: {integrity: sha512-ePbgBMYtGoRNXDyKGvr9cyHjQ163PbwD0y1MkDJCpkO2YH4OeXX40c4wYHKikHGZcpGPbcRLuy0unPUuafco8Q==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '>=5'
     dependencies:
-      '@octokit/core': 5.0.2
+      '@octokit/core': 5.1.0
       '@octokit/types': 12.4.0
 
-  /@octokit/plugin-retry@6.0.1(@octokit/core@5.0.2):
+  /@octokit/plugin-retry@6.0.1(@octokit/core@5.1.0):
     resolution: {integrity: sha512-SKs+Tz9oj0g4p28qkZwl/topGcb0k0qPNX/i7vBKmDsjoeqnVfFUquqrE/O9oJY7+oLzdCtkiWSXLpLjvl6uog==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '>=5'
     dependencies:
-      '@octokit/core': 5.0.2
+      '@octokit/core': 5.1.0
       '@octokit/request-error': 5.0.1
       '@octokit/types': 12.4.0
       bottleneck: 2.19.5
     dev: false
 
-  /@octokit/plugin-throttling@8.1.3(@octokit/core@5.0.2):
+  /@octokit/plugin-throttling@8.1.3(@octokit/core@5.1.0):
     resolution: {integrity: sha512-pfyqaqpc0EXh5Cn4HX9lWYsZ4gGbjnSmUILeu4u2gnuM50K/wIk9s1Pxt3lVeVwekmITgN/nJdoh43Ka+vye8A==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': ^5.0.0
     dependencies:
-      '@octokit/core': 5.0.2
+      '@octokit/core': 5.1.0
       '@octokit/types': 12.4.0
       bottleneck: 2.19.5
     dev: false
@@ -1538,10 +1538,10 @@ packages:
     resolution: {integrity: sha512-Ux8NDgEraQ/DMAU1PlAohyfBBXDwhnX2j33Z1nJNziqAfHi70PuxkFYIcIt8aIAxtRE7KVuKp8lSR8pA0J5iOQ==}
     engines: {node: '>= 18'}
     dependencies:
-      '@octokit/core': 5.0.2
-      '@octokit/plugin-paginate-rest': 9.1.5(@octokit/core@5.0.2)
-      '@octokit/plugin-request-log': 4.0.0(@octokit/core@5.0.2)
-      '@octokit/plugin-rest-endpoint-methods': 10.2.0(@octokit/core@5.0.2)
+      '@octokit/core': 5.1.0
+      '@octokit/plugin-paginate-rest': 9.1.5(@octokit/core@5.1.0)
+      '@octokit/plugin-request-log': 4.0.0(@octokit/core@5.1.0)
+      '@octokit/plugin-rest-endpoint-methods': 10.2.0(@octokit/core@5.1.0)
     dev: true
 
   /@octokit/types@12.4.0:
@@ -5937,13 +5937,13 @@ packages:
     engines: {node: '>= 18'}
     dependencies:
       '@octokit/app': 14.0.2
-      '@octokit/core': 5.0.2
+      '@octokit/core': 5.1.0
       '@octokit/oauth-app': 6.0.0
-      '@octokit/plugin-paginate-graphql': 4.0.0(@octokit/core@5.0.2)
-      '@octokit/plugin-paginate-rest': 9.1.5(@octokit/core@5.0.2)
-      '@octokit/plugin-rest-endpoint-methods': 10.2.0(@octokit/core@5.0.2)
-      '@octokit/plugin-retry': 6.0.1(@octokit/core@5.0.2)
-      '@octokit/plugin-throttling': 8.1.3(@octokit/core@5.0.2)
+      '@octokit/plugin-paginate-graphql': 4.0.0(@octokit/core@5.1.0)
+      '@octokit/plugin-paginate-rest': 9.1.5(@octokit/core@5.1.0)
+      '@octokit/plugin-rest-endpoint-methods': 10.2.0(@octokit/core@5.1.0)
+      '@octokit/plugin-retry': 6.0.1(@octokit/core@5.1.0)
+      '@octokit/plugin-throttling': 8.1.3(@octokit/core@5.1.0)
       '@octokit/request-error': 5.0.1
       '@octokit/types': 12.4.0
     dev: false

@@ -10,7 +10,7 @@ dependencies:
     version: 8.4.0
   '@gitbeaker/requester-utils':
     specifier: ^39.34.1
-    version: 39.34.1
+    version: 39.34.2
   '@gitbeaker/rest':
     specifier: ^39.34.1
     version: 39.34.2
@@ -945,7 +945,7 @@ packages:
     resolution: {integrity: sha512-burkkdEwRzk8aJq/UF9vVH9+F3yZKXHe2tpLsIgTwXG975Q2wSYbHRIsvJeslPR4s378bXEg/KoSMYcfB7WGQg==}
     engines: {node: '>=18.0.0'}
     dependencies:
-      '@gitbeaker/requester-utils': 39.34.1
+      '@gitbeaker/requester-utils': 39.34.2
       qs: 6.11.2
       xcase: 2.0.1
     dev: true
@@ -959,15 +959,6 @@ packages:
       xcase: 2.0.1
     dev: false
 
-  /@gitbeaker/requester-utils@39.34.1:
-    resolution: {integrity: sha512-+7V7lJaIHS5L8NOi8O6THpBjB4soaCH5XEnG88uebGLCfUfvW3eR8pV02K3wS/9pVr3ASmz/7pFZnoCUUXZi8w==}
-    engines: {node: '>=18.0.0'}
-    dependencies:
-      picomatch-browser: 2.2.6
-      qs: 6.11.2
-      rate-limiter-flexible: 4.0.1
-      xcase: 2.0.1
-
   /@gitbeaker/requester-utils@39.34.2:
     resolution: {integrity: sha512-ToCwNKQe/+uHjB2kPTXY72SvbAyjsPABb9T1EiMGuVahk6rWdhtVZIM659rGuqdJGTqQ4y18wk0A+w6D3Z2lCQ==}
     engines: {node: '>=18.0.0'}
@@ -976,7 +967,6 @@ packages:
       qs: 6.11.2
       rate-limiter-flexible: 4.0.1
       xcase: 2.0.1
-    dev: false
 
   /@gitbeaker/rest@39.34.2:
     resolution: {integrity: sha512-MT4Vue1ltvsR7Nug18A6DIk+u+gu64+b0Un/R2XIsLB7eSAX8Pm/sQnYxsjHksroZJVlyGHiGsaxbllX75Pntg==}

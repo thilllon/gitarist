@@ -1,8 +1,6 @@
-import {
-  BaseRequestOptionsWithAccessToken,
-  BaseResourceOptions,
-} from '@gitbeaker/requester-utils';
+import { BaseRequestOptionsWithAccessToken, BaseResourceOptions } from '@gitbeaker/requester-utils';
 import { Gitlab } from '@gitbeaker/rest';
+import axios from 'axios';
 import { existsSync, writeFileSync } from 'fs';
 import { mkdir, rm } from 'fs/promises';
 import path, { join } from 'path';
@@ -20,9 +18,7 @@ export class Gitlaborator {
     options: BaseRequestOptionsWithAccessToken<false>;
   }) {
     this._options = options;
-    this._token = options.token
-      ? options.token.toString()
-      : process.env.GITLAB_TOKEN;
+    this._token = options.token ? options.token.toString() : process.env.GITLAB_TOKEN;
     this._projectId = projectId ?? process.env.GITLAB_PROJECT_ID;
 
     if (!this._token) {
@@ -34,7 +30,7 @@ export class Gitlaborator {
     }
   }
 
-  async createEnvByProjectVariables({
+  async createDotEnvFileByProjectVariables({
     filename = '.env',
     directory = './.gitlaborator',
     clean = false,
@@ -99,5 +95,26 @@ export class Gitlaborator {
       .join('\n');
 
     writeFileSync(destination, content, { encoding: 'utf-8' });
+  }
+
+  // FIXME: 환경변수로 변경
+  async deleteClosedMergeRequest(mergeRequestId: number) {
+    const baseURL = 'https://git.baemin.in/api';
+    const privateToken = 'glpat-xxxxxxxxxxxxxx';
+    const projectId = '4644';
+    // https://git.baemin.in/-/profile/personal_access_tokens
+    const url = `/v4/projects/${projectId}/merge_requests/${mergeRequestId}`;
+    try {
+      const response = await axios.delete(url, {
+        headers: {
+          'PRIVATE-TOKEN': privateToken,
+        },
+        baseURL,
+        data: {},
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

@@ -5,7 +5,7 @@ import { mkdir, writeFile } from 'fs/promises';
 import { Octokit } from 'octokit';
 import { dirname, join } from 'path';
 import { chdir } from 'process';
-import { Gitarist, IssueItem } from './gitarist';
+import { Gitarist, IssueItem } from './github';
 
 jest.setTimeout(999999999);
 
@@ -27,11 +27,7 @@ describe('gitarist', () => {
 
   it.skip('setup', async () => {
     // FIXME: `open` is not working on commonjs
-    const targetDir = join(
-      process.cwd(),
-      '.gitarist',
-      `directory_${Date.now()}`,
-    );
+    const targetDir = join(process.cwd(), '.gitarist', `directory_${Date.now()}`);
     mkdirSync(targetDir, { recursive: true });
     chdir(targetDir);
     execSync('git init');
@@ -42,10 +38,7 @@ describe('gitarist', () => {
   });
 
   it.skip('simulate active user', async () => {
-    const deleteOldWorkflowLogsSpy = jest.spyOn(
-      gitarist,
-      'deleteOldWorkflowLogs',
-    );
+    const deleteOldWorkflowLogsSpy = jest.spyOn(gitarist, 'deleteOldWorkflowLogs');
     const deleteOldFilesSpy = jest.spyOn(gitarist, 'deleteOldFiles');
 
     await gitarist.simulateActiveUser({
@@ -115,10 +108,10 @@ describe('gitarist', () => {
   });
 
   it.skip('delete deployments', async () => {
-    for await (const response of octokit.paginate.iterator(
-      octokit.rest.repos.listDeployments,
-      { owner, repo },
-    )) {
+    for await (const response of octokit.paginate.iterator(octokit.rest.repos.listDeployments, {
+      owner,
+      repo,
+    })) {
       for (const item of response.data) {
         try {
           await octokit.rest.repos.deleteDeployment({

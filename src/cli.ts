@@ -10,21 +10,14 @@ import {
   SetupCommandOptions,
   StartCommandOptions,
   branchPrefixes,
-} from './gitarist';
+} from './github';
 
-const program = new Command()
-  .name(name)
-  .description(description)
-  .version(version);
+const program = new Command().name(name).description(description).version(version);
 
 program
   .command('setup')
   .description('setup')
-  .addOption(
-    new Option('--remote <string>', 'the name of remote').default(
-      DEFAULT.remote,
-    ),
-  )
+  .addOption(new Option('--remote <string>', 'the name of remote').default(DEFAULT.remote))
   .action(async (options: SetupCommandOptions) => {
     await Gitarist.setup({ remote: options.remote });
   });
@@ -32,12 +25,8 @@ program
 program
   .command('start')
   .description('start gitarist suite')
-  .addOption(
-    new Option('-o,--owner <string>', 'Repository owner').env('GITARIST_OWNER'),
-  )
-  .addOption(
-    new Option('-r,--repo <string>', 'GitHub repository').env('GITARIST_REPO'),
-  )
+  .addOption(new Option('-o,--owner <string>', 'Repository owner').env('GITARIST_OWNER'))
+  .addOption(new Option('-r,--repo <string>', 'GitHub repository').env('GITARIST_REPO'))
   .addOption(
     new Option(
       '-t,--token <string>',
@@ -45,52 +34,36 @@ program
     ).env('GITARIST_TOKEN'),
   )
   .addOption(
-    new Option(
-      '--max-commits <number>',
-      'Maximum number of commits per PR',
-    ).default(DEFAULT.maxCommits),
-  )
-  .addOption(
-    new Option(
-      '--min-commits <number>',
-      'Minimum number of commits per PR',
-    ).default(DEFAULT.minCommits),
-  )
-  .addOption(
-    new Option(
-      '--max-files <number>',
-      'Maximum number of files per commit',
-    ).default(DEFAULT.maxFiles),
-  )
-  .addOption(
-    new Option(
-      '--min-files <number>',
-      'Minimum number of files per commit',
-    ).default(DEFAULT.minFiles),
-  )
-  .addOption(
-    new Option('--issues <number>', 'A number of issues to create').default(
-      DEFAULT.numberOfIssues,
+    new Option('--max-commits <number>', 'Maximum number of commits per PR').default(
+      DEFAULT.maxCommits,
     ),
   )
   .addOption(
-    new Option(
-      '--working-branch-prefix <string>',
-      'Prefix for working branches',
-    )
+    new Option('--min-commits <number>', 'Minimum number of commits per PR').default(
+      DEFAULT.minCommits,
+    ),
+  )
+  .addOption(
+    new Option('--max-files <number>', 'Maximum number of files per commit').default(
+      DEFAULT.maxFiles,
+    ),
+  )
+  .addOption(
+    new Option('--min-files <number>', 'Minimum number of files per commit').default(
+      DEFAULT.minFiles,
+    ),
+  )
+  .addOption(
+    new Option('--issues <number>', 'A number of issues to create').default(DEFAULT.numberOfIssues),
+  )
+  .addOption(
+    new Option('--working-branch-prefix <string>', 'Prefix for working branches')
       .choices(branchPrefixes)
       .default(DEFAULT.workingBranchPrefix),
   )
+  .addOption(new Option('-m,--main-branch <string>', 'Main branch').default(DEFAULT.mainBranch))
   .addOption(
-    new Option('-m,--main-branch <string>', 'Main branch').default(
-      DEFAULT.mainBranch,
-    ),
-  )
-  .addOption(
-    new Option(
-      '--stale <days>',
-      'A number of days before closing an issue',
-    ).default(DEFAULT.stale),
+    new Option('--stale <days>', 'A number of days before closing an issue').default(DEFAULT.stale),
   )
   .action(async (options: Partial<StartCommandOptions>) => {
     dotenv.config({ path: '.env' });

@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-escape */
 
 import { faker } from '@faker-js/faker';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, lstatSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { readFile, rm } from 'fs/promises';
 import _ from 'lodash';
 import { Octokit } from 'octokit';
@@ -132,15 +132,7 @@ export class Gitarist {
     TEXT: { ext: 'txt', comment: '' },
   };
 
-  constructor({
-    owner,
-    repo,
-    token,
-  }: {
-    owner: string;
-    repo: string;
-    token: string;
-  }) {
+  constructor({ owner, repo, token }: { owner: string; repo: string; token: string }) {
     this._owner = owner;
     this._repo = repo;
     this._token = token;
@@ -188,13 +180,7 @@ export class Gitarist {
     return 'https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow';
   }
 
-  static getEnvSettingPageUrl({
-    owner,
-    repo,
-  }: {
-    owner: string;
-    repo: string;
-  }) {
+  static getEnvSettingPageUrl({ owner, repo }: { owner: string; repo: string }) {
     return `https://github.com/${owner}/${repo}/settings/secrets/actions/new`;
   }
 
@@ -262,9 +248,7 @@ GITARIST_TOKEN="${token}"
   /**
    * Setup a repository for gitarist which is creating a workflow file.
    */
-  static async setup({
-    remote = DEFAULT.remote,
-  }: Partial<SetupCommandOptions>) {
+  static async setup({ remote = DEFAULT.remote }: Partial<SetupCommandOptions>) {
     const gitConfigPath = path.join(process.cwd(), '.git', 'config');
     if (!existsSync(gitConfigPath)) {
       throw new Error(
@@ -283,12 +267,7 @@ GITARIST_TOKEN="${token}"
       console.log(`\tCould not find a ${dotenvFile} file`);
     }
 
-    const ymlPath = path.join(
-      process.cwd(),
-      '.github',
-      'workflows',
-      'gitarist.yml',
-    );
+    const ymlPath = path.join(process.cwd(), '.github', 'workflows', 'gitarist.yml');
     console.log(`Searching gitarist workflow file from ${envPath} ...`);
     if (existsSync(ymlPath)) {
       console.log(`\tThere is a gitarist workflow file already at ${ymlPath}.`);
@@ -301,37 +280,25 @@ GITARIST_TOKEN="${token}"
     );
     const owner = git?.user?.name ?? DEFAULT.ownerPlaceholder;
     const repo =
-      git[`remote "${remote}"`]?.url
-        ?.split('/')
-        ?.pop()
-        ?.replace('.git', '')
-        .replace('/', '') ?? DEFAULT.repoPlaceholder;
-    const githubWorkflowDirectory = path.join(
-      process.cwd(),
-      '.github',
-      'workflows',
-    );
+      git[`remote "${remote}"`]?.url?.split('/')?.pop()?.replace('.git', '').replace('/', '') ??
+      DEFAULT.repoPlaceholder;
+    const githubWorkflowDirectory = path.join(process.cwd(), '.github', 'workflows');
     mkdirSync(githubWorkflowDirectory, { recursive: true });
     writeFileSync(
       path.join(githubWorkflowDirectory, 'gitarist.yml'),
       Gitarist.getActionTemplate({ owner, repo }),
       { encoding: 'utf8', flag: 'a+' },
     );
-    writeFileSync(
-      path.join(process.cwd(), '.env'),
-      Gitarist.getEnvTemplate({ owner, repo }),
-      { encoding: 'utf8', flag: 'a+' },
-    );
+    writeFileSync(path.join(process.cwd(), '.env'), Gitarist.getEnvTemplate({ owner, repo }), {
+      encoding: 'utf8',
+      flag: 'a+',
+    });
 
-    console.log(
-      ['Generate a secret key settings:', Gitarist.tokenIssueUrl].join('\n'),
-    );
+    console.log(['Generate a secret key settings:', Gitarist.tokenIssueUrl].join('\n'));
     const open = await import('open');
     await open.default(Gitarist.tokenIssueUrl, { wait: false });
     const envSettingPageUrl = Gitarist.getEnvSettingPageUrl({ owner, repo });
-    console.log(
-      `Register the secret key to action settings: ${envSettingPageUrl}`,
-    );
+    console.log(`Register the secret key to action settings: ${envSettingPageUrl}`);
     console.log(
       'Go to repository > settings > Secrets and variables > Actions > New repository secret',
     );
@@ -411,9 +378,7 @@ GITARIST_TOKEN="${token}"
           continue;
         }
 
-        if (
-          new Date(issue.created_at).getTime() < new Date(olderThan).getTime()
-        ) {
+        if (new Date(issue.created_at).getTime() < new Date(olderThan).getTime()) {
           const query = `
           mutation DeleteIssue($input: DeleteIssueInput!) {
             deleteIssue(input: $input) {
@@ -449,11 +414,7 @@ GITARIST_TOKEN="${token}"
       repo: this.repo,
       ref,
     });
-    console.debug(
-      `branche names starts with ${ref}: [${branches
-        .map(({ ref }) => ref)
-        .join()}]`,
-    );
+    console.debug(`branche names starts with ${ref}: [${branches.map(({ ref }) => ref).join()}]`);
     return branches;
   }
 
@@ -474,11 +435,7 @@ GITARIST_TOKEN="${token}"
       ref,
     });
 
-    console.debug(
-      `branche names starts with ${ref}: [${refs
-        .map(({ ref }) => ref)
-        .join()}]`,
-    );
+    console.debug(`branche names starts with ${ref}: [${refs.map(({ ref }) => ref).join()}]`);
 
     for (let { ref } of refs) {
       if (ref.startsWith('refs/heads/')) {
@@ -496,19 +453,35 @@ GITARIST_TOKEN="${token}"
     }
   }
 
-  async deleteFolder({ folderPaths }: { folderPaths: string[] }) {
-    throw new Error('not implemented yet');
+  async deleteFolder({
+    folderPaths,
+    relative,
+  }: {
+    folderPaths: string[];
+    /**
+     * if true, then folderPaths are relative paths from the current working directory(process.cwd())
+     */
+    relative?: boolean;
+  }) {
+    if (relative) {
+      folderPaths = folderPaths.map((folderPath) => path.join(process.cwd(), folderPath));
+    }
+
+    for (const folderPath of folderPaths) {
+      if (!existsSync(folderPath) || !lstatSync(folderPath).isDirectory()) {
+        continue;
+      }
+      console.warn(`delete folder. folderPath: ${folderPath}`);
+      rmSync(folderPath, { recursive: true, force: true });
+    }
   }
 
   async deleteCommentsAtIssueByBot() {
-    for await (const issue of await this.octokit.paginate(
-      this.octokit.rest.issues.list,
-      {
-        owner: this.owner,
-        repo: this.repo,
-        filter: 'all',
-      },
-    )) {
+    for await (const issue of await this.octokit.paginate(this.octokit.rest.issues.list, {
+      owner: this.owner,
+      repo: this.repo,
+      filter: 'all',
+    })) {
       for await (const comment of await this.octokit.paginate(
         this.octokit.rest.issues.listComments,
         {
@@ -519,9 +492,7 @@ GITARIST_TOKEN="${token}"
         },
       )) {
         if (comment.user?.login?.includes('[bot]')) {
-          console.debug(
-            `remove comment issue. issue: ${issue.number}, comment: ${comment.id}`,
-          );
+          console.debug(`remove comment issue. issue: ${issue.number}, comment: ${comment.id}`);
           await this.octokit.rest.issues.deleteComment({
             owner: this.owner,
             repo: this.repo,
@@ -559,9 +530,7 @@ GITARIST_TOKEN="${token}"
     const targetFilePaths = currentTree.tree
       .filter((file) => {
         const fullPath = path.join(process.cwd(), file.path ?? '');
-        const createdAt = new Date(
-          Number.parseInt(path.basename(fullPath)),
-        ).getTime();
+        const createdAt = new Date(Number.parseInt(path.basename(fullPath))).getTime();
         const flag =
           file.type === 'blob' &&
           file.path?.startsWith(`${DEFAULT.relativePath}/`) &&
@@ -775,9 +744,7 @@ GITARIST_TOKEN="${token}"
       // console.debug(`pull requests: [${edges.join()}]`);
 
       const unresolvedThreads = edges
-        .map((edge: any) =>
-          edge.node.reviewThreads.edges.map(({ node }: any) => node),
-        )
+        .map((edge: any) => edge.node.reviewThreads.edges.map(({ node }: any) => node))
         .flat()
         .filter((node: any) => node && !node.isResolved);
       const unresolvedThreadIds = unresolvedThreads.map((node: any) => node.id);
@@ -831,8 +798,7 @@ GITARIST_TOKEN="${token}"
         threadAfter = null;
         nextPullRequestCursor = edges[edges.length - 1]?.cursor ?? null;
       } else {
-        threadAfter =
-          unresolvedThreads[unresolvedThreads.length - 1]?.id ?? null;
+        threadAfter = unresolvedThreads[unresolvedThreads.length - 1]?.id ?? null;
       }
       if (edges.length === 0) {
         break;
@@ -860,17 +826,13 @@ GITARIST_TOKEN="${token}"
       for (const pullRequest of pullRequests) {
         const isTarget = false;
 
-        throw new Error(
-          'Write custom target condition when you are running this script!',
-        );
+        throw new Error('Write custom target condition when you are running this script!');
 
         if (!isTarget) {
           continue;
         }
         const pullRequestNumber = pullRequest.number;
-        console.debug(
-          `change pull request. pull request: #${pullRequest.number}`,
-        );
+        console.debug(`change pull request. pull request: #${pullRequest.number}`);
         await this.octokit.rest.pulls.update({
           owner: this.owner,
           repo: this.repo,
@@ -936,9 +898,7 @@ GITARIST_TOKEN="${token}"
             repo: this.repo,
             run_id: run.id,
           })
-          .then(() =>
-            console.debug(`delete workflow run logs. runId: ${run.id}`),
-          )
+          .then(() => console.debug(`delete workflow run logs. runId: ${run.id}`))
           .catch((error: any) => {
             console.error(error.message);
           });
@@ -990,14 +950,12 @@ GITARIST_TOKEN="${token}"
     });
 
     console.debug(`comment on issues #${issue.number}`);
-    const { data: issueComment } = await this.octokit.rest.issues.createComment(
-      {
-        owner: this.owner,
-        repo: this.repo,
-        body: faker.lorem.sentences(10),
-        issue_number: issue.number,
-      },
-    );
+    const { data: issueComment } = await this.octokit.rest.issues.createComment({
+      owner: this.owner,
+      repo: this.repo,
+      body: faker.lorem.sentences(10),
+      issue_number: issue.number,
+    });
 
     let createdFilePathList: string[] = [];
 
@@ -1019,9 +977,7 @@ GITARIST_TOKEN="${token}"
     });
 
     for (const commitCount of Array(numberOfCommits).keys()) {
-      console.debug(
-        `start to create a commit... (${commitCount + 1}/${numberOfCommits})`,
-      );
+      console.debug(`start to create a commit... (${commitCount + 1}/${numberOfCommits})`);
 
       console.debug(`create files. number of files: ${numberOfFiles}`);
       createdFilePathList = this.createFiles({
@@ -1071,9 +1027,7 @@ GITARIST_TOKEN="${token}"
       const { data: newCommit } = await this.octokit.rest.git.createCommit({
         owner: this.owner,
         repo: this.repo,
-        message: `${_.sample<any>(commitCategories)}: ${faker.lorem.sentences(
-          1,
-        )}`,
+        message: `${_.sample<any>(commitCategories)}: ${faker.lorem.sentences(1)}`,
         tree: newTree.sha,
         parents,
       });
@@ -1093,9 +1047,7 @@ GITARIST_TOKEN="${token}"
       baseBranch: targetBranch,
       headBranch: `refs/heads/${mainBranch}`,
       issue: issue.number,
-      commentTargetFilePath: `${relativePath}/${path.basename(
-        createdFilePathList[0],
-      )}`,
+      commentTargetFilePath: `${relativePath}/${path.basename(createdFilePathList[0])}`,
     });
 
     console.debug(`delete the source branch. heads/${mainBranch}`);
@@ -1111,13 +1063,12 @@ GITARIST_TOKEN="${token}"
       });
 
     // leave a comment after merge
-    const { data: commentAfaterMerge } =
-      await this.octokit.rest.issues.createComment({
-        owner: this.owner,
-        repo: this.repo,
-        body: faker.lorem.sentences(10),
-        issue_number: issue.number,
-      });
+    const { data: commentAfaterMerge } = await this.octokit.rest.issues.createComment({
+      owner: this.owner,
+      repo: this.repo,
+      body: faker.lorem.sentences(10),
+      issue_number: issue.number,
+    });
 
     // clean files up
     await rm(path.join(process.cwd(), relativePath), {
@@ -1133,19 +1084,13 @@ GITARIST_TOKEN="${token}"
   private validateIssueTemplate(issues: IssueItem[]) {
     issues.forEach((issue, index) => {
       if (!issue.title) {
-        throw new Error(
-          `[createIssuesFromJson][index: ${index}] Missing field: title`,
-        );
+        throw new Error(`[createIssuesFromJson][index: ${index}] Missing field: title`);
       }
       if (!issue.body) {
-        throw new Error(
-          `[createIssuesFromJson][index: ${index}] Missing field: body`,
-        );
+        throw new Error(`[createIssuesFromJson][index: ${index}] Missing field: body`);
       }
       if (issue.assignee === '') {
-        throw new Error(
-          `[createIssuesFromJson][index: ${index}] Invalid field: assignee`,
-        );
+        throw new Error(`[createIssuesFromJson][index: ${index}] Invalid field: assignee`);
       }
     });
   }
@@ -1179,20 +1124,19 @@ GITARIST_TOKEN="${token}"
       return;
     }
 
-    const { data: reviewCommented } =
-      await this.octokit.rest.pulls.createReview({
-        owner: this.owner,
-        repo: this.repo,
-        pull_number: pullRequest.number,
-        event: 'COMMENT',
-        comments: [
-          {
-            path: commentTargetFilePath,
-            body: faker.lorem.sentences(3),
-            line: 1,
-          },
-        ],
-      });
+    const { data: reviewCommented } = await this.octokit.rest.pulls.createReview({
+      owner: this.owner,
+      repo: this.repo,
+      pull_number: pullRequest.number,
+      event: 'COMMENT',
+      comments: [
+        {
+          path: commentTargetFilePath,
+          body: faker.lorem.sentences(3),
+          line: 1,
+        },
+      ],
+    });
 
     const reviewerCandidates = await this.octokit.rest.repos.listCollaborators({
       owner: this.owner,
@@ -1205,9 +1149,7 @@ GITARIST_TOKEN="${token}"
 
     console.debug(`reviewer candidates: [${reviewrs.join()}]`);
     if (reviewrs.length === 0) {
-      console.debug(
-        'Review by author is not allowed. No reviewer is assigned.',
-      );
+      console.debug('Review by author is not allowed. No reviewer is assigned.');
     } else {
       // when a number of reviewer candidates is greater than 1
       await this.octokit.rest.pulls.requestReviewers({
@@ -1217,14 +1159,13 @@ GITARIST_TOKEN="${token}"
         reviewers: [_.sample<any>(reviewrs)],
       });
 
-      const { data: reviewApproved } =
-        await this.octokit.rest.pulls.createReview({
-          owner: this.owner,
-          repo: this.repo,
-          pull_number: pullRequest.number,
-          event: 'APPROVE',
-          comments: [{ path: commentTargetFilePath, body: 'LGTM', line: 1 }],
-        });
+      const { data: reviewApproved } = await this.octokit.rest.pulls.createReview({
+        owner: this.owner,
+        repo: this.repo,
+        pull_number: pullRequest.number,
+        event: 'APPROVE',
+        comments: [{ path: commentTargetFilePath, body: 'LGTM', line: 1 }],
+      });
 
       const { data: submitData } = await this.octokit.rest.pulls.submitReview({
         owner: this.owner,
@@ -1234,14 +1175,13 @@ GITARIST_TOKEN="${token}"
         review_id: reviewCommented.id,
       });
 
-      const { data: reviewUpdated } =
-        await this.octokit.rest.pulls.updateReview({
-          owner: this.owner,
-          repo: this.repo,
-          pull_number: pullRequest.number,
-          review_id: reviewCommented.id,
-          body: 'viewed',
-        });
+      const { data: reviewUpdated } = await this.octokit.rest.pulls.updateReview({
+        owner: this.owner,
+        repo: this.repo,
+        pull_number: pullRequest.number,
+        review_id: reviewCommented.id,
+        body: 'viewed',
+      });
     }
 
     const listPullRequestsAndReviewThreadsQuery = `
@@ -1269,23 +1209,18 @@ GITARIST_TOKEN="${token}"
     `;
 
     // 이슈에서 연동된 PR이라서 검색이 안되는걸로 보임...
-    const queryResult: any = await this.octokit.graphql(
-      listPullRequestsAndReviewThreadsQuery,
-      {
-        owner: this.owner,
-        repo: this.owner,
-        pullRequestLast: 100,
-        threadLast: 100,
-      },
-    );
+    const queryResult: any = await this.octokit.graphql(listPullRequestsAndReviewThreadsQuery, {
+      owner: this.owner,
+      repo: this.owner,
+      pullRequestLast: 100,
+      threadLast: 100,
+    });
 
     const edges = queryResult.repository.pullRequests.edges;
     console.debug(`pull requests: [${edges.join()}]`);
 
     const threadIds = edges
-      .map((edge: any) =>
-        edge.node.reviewThreads.edges.map(({ node }: any) => node),
-      )
+      .map((edge: any) => edge.node.reviewThreads.edges.map(({ node }: any) => node))
       .flat()
       .filter((node: any) => node && !node.isResolved)
       .map((node: any) => node.id);
@@ -1302,14 +1237,11 @@ GITARIST_TOKEN="${token}"
       }
     `;
     for (const threadId of threadIds) {
-      const mutationResult: any = await this.octokit.graphql(
-        resolveReviewThreadMutation,
-        {
-          input: {
-            threadId,
-          },
+      const mutationResult: any = await this.octokit.graphql(resolveReviewThreadMutation, {
+        input: {
+          threadId,
         },
-      );
+      });
     }
 
     // merge pull request

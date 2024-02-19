@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
-import { Gitlaborator } from './gitlaborator';
+import { Gitlaborator } from './gitlab';
 
 jest.setTimeout(3600000);
 
@@ -28,7 +28,7 @@ describe('gitlaborator', () => {
       },
     });
 
-    await gitlaborator.createEnvByProjectVariables({
+    await gitlaborator.createDotEnvFileByProjectVariables({
       clean: true,
     });
     const expectedFilePath = path.join(process.cwd(), '.gitlaborator/.env');

@@ -10,10 +10,5 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     'object-shorthand': 'error',
   },
-  ignorePatterns: [
-    '.eslintrc*',
-    'jest.config.js',
-    'dist',
-    'commitlint.config.js',
-  ],
+  ignorePatterns: ['.eslintrc*', 'jest.config.js', 'dist', 'commitlint.config.js'],
 };

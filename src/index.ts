@@ -1,1 +1,1 @@
-export * from './gitarist';
+export * from './github';

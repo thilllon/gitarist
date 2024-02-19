@@ -25,7 +25,7 @@ dependencies:
     version: 4.3.4
   dotenv:
     specifier: ^16.4.1
-    version: 16.4.2
+    version: 16.4.4
   fast-glob:
     specifier: ^3.3.2
     version: 3.3.2
@@ -3249,8 +3249,8 @@ packages:
       is-obj: 2.0.0
     dev: true
 
-  /dotenv@16.4.2:
-    resolution: {integrity: sha512-rZSSFxke7d9nYQ5NeMIwp5PP+f8wXgKNljpOb7KtH6SKW1cEqcXAz9VSJYVLKe7Jhup/gUYOkaeSVyK8GJ+nBg==}
+  /dotenv@16.4.4:
+    resolution: {integrity: sha512-XvPXc8XAQThSjAbY6cQ/9PcBXmFoWuw1sQ3b8HqUCR6ziGXjkTi//kB9SWa2UwqlgdAIuRqAa/9hVljzPehbYg==}
     engines: {node: '>=12'}
     dev: false
 

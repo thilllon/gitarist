@@ -175,10 +175,12 @@ export class JiraClient {
     host = host ?? process.env.JIRA_HOST;
     personalAccessToken = personalAccessToken ?? process.env.JIRA_TOKEN;
     if (!host) {
-      throw new Error('Missing environment variable: "JIRA_HOST"');
+      throw new Error('Missing environment variable: "JIRA_HOST". e.g. https://jira.atlassian.com');
     }
     if (!personalAccessToken) {
-      throw new Error('Missing environment variable "JIRA_TOKEN"');
+      throw new Error(
+        'Missing environment variable "JIRA_TOKEN". Please create a personal access token (PAT) at your profile page and set it as an environment variable.',
+      );
     }
 
     this.client = new Axios({

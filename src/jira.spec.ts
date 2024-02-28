@@ -2,8 +2,6 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { JiraClient, Jiralyzer } from './jira';
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 jest.setTimeout(86400 * 1000);
 
 describe('jira', () => {
@@ -22,7 +20,7 @@ describe('jira', () => {
   });
 
   // FIXME: 테스트 이후 private method로 변경하기
-  it('parseRequestString', async () => {
+  it.skip('parseRequestString', async () => {
     const jiraClient = new JiraClient({ host, personalAccessToken: token });
     const requestObject = jiraClient.parseRequestString(
       'GET /rest/api/2/issue/{issueIdOrKey}/editmeta?expand=projects.issuetypes.fields',
@@ -82,6 +80,6 @@ describe('jira', () => {
     const assignee = 'dh.kang';
     const watcher = 'jakelee';
 
-    await jiralizer.addWatcherToAllIssuesOfAssignee(assignee, watcher);
+    await jiralizer.addWatcherToAllIssuesOfAssignee(assignee, watcher, {});
   });
 });

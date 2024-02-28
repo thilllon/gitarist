@@ -5,7 +5,7 @@
  * https://<HOST>:<PORT>/<CONTEXT>/rest/<API-NAME>/<API-VERSION>/<RESOURCE-NAME>
  */
 
-import axios, { Axios, AxiosError, AxiosResponse } from 'axios';
+import { Axios, AxiosError, AxiosResponse } from 'axios';
 
 type RequestObject = {
   method: string;
@@ -86,8 +86,11 @@ type ListWatcherBody = null;
 type ListWatcherParams = null;
 
 export class JiraClient {
-  public rest;
   private client;
+  /**
+   * namespaces e.g., rest, graphql, etc.
+   */
+  public rest;
 
   private readonly endpoints = {
     issue: {
@@ -226,7 +229,7 @@ export class JiraClient {
           });
         },
         get: async (issueIdOrKey: string, data: GetIssueBody, params: GetIssueParams) => {
-          return axios({
+          return this.client.request({
             method: this.endpoints.issue.get.method,
             url: this.endpoints.issue.get.path.replace('{issueIdOrKey}', issueIdOrKey),
             params,
@@ -234,7 +237,7 @@ export class JiraClient {
           });
         },
         delete: async (issueIdOrKey: string, data: DeleteIssueBody, params: DeleteIssueParams) => {
-          return axios({
+          return this.client.request({
             method: this.endpoints.issue.delete.method,
             url: this.endpoints.issue.delete.path.replace('{issueIdOrKey}', issueIdOrKey),
             params,
@@ -242,7 +245,7 @@ export class JiraClient {
           });
         },
         edit: async (issueIdOrKey: string, data: EditIssueBody, params: EditIssueParams) => {
-          return axios({
+          return this.client.request({
             method: this.endpoints.issue.edit.method,
             url: this.endpoints.issue.edit.path.replace('{issueIdOrKey}', issueIdOrKey),
             params,
@@ -250,7 +253,7 @@ export class JiraClient {
           });
         },
         search: async (data: SearchIssuesBody, params: SearchIssuesParams) => {
-          return axios({
+          return this.client.request({
             method: this.endpoints.issue.search.method,
             url: this.endpoints.issue.search.path,
             params,
@@ -260,7 +263,7 @@ export class JiraClient {
       },
       watcher: {
         add: async (issueIdOrKey: string, data: AddWatcherBody, params: AddWatcherParams) => {
-          return axios({
+          return this.client.request({
             method: this.endpoints.watcher.add.method,
             url: this.endpoints.watcher.add.path.replace('{issueIdOrKey}', issueIdOrKey),
             params,
@@ -272,7 +275,7 @@ export class JiraClient {
           data: RemoveWatcherBody,
           params: RemoveWatcherParams,
         ) => {
-          return axios({
+          return this.client.request({
             method: this.endpoints.watcher.remove.method,
             url: this.endpoints.watcher.remove.path.replace('{issueIdOrKey}', issueIdOrKey),
             params,
@@ -280,7 +283,7 @@ export class JiraClient {
           });
         },
         list: async (issueIdOrKey: string, data: ListWatcherBody, params: ListWatcherParams) => {
-          return axios({
+          return this.client.request({
             method: this.endpoints.watcher.list.method,
             url: this.endpoints.watcher.list.path.replace('{issueIdOrKey}', issueIdOrKey),
             params,
@@ -358,13 +361,32 @@ export class Jiralyzer {
     return this.jiraClient.rest.watcher.add(issueId, watcher, null);
   }
 
-  async addWatcherToAllIssuesOfAssignee(assignee: string, watcher: string) {
-    const fetchSize = 100;
-    const maxIteration = 999;
-    const sleepTime = 1000;
+  async addWatcherToAllIssuesOfAssignee(
+    assignee: string,
+    watcher: string,
+    options: {
+      /**
+       * sleep time between each HTTP request
+       */
+      sleepTime?: number;
+      fetchSize?: number;
+      maxIteration?: number;
+    },
+  ) {
+    const sleepTime = options?.sleepTime ?? 1000;
+    const fetchSize = options?.fetchSize ?? 100;
+    const maxIteration = options?.maxIteration ?? 999;
+
+    console.table({
+      assignee,
+      watcher,
+      sleepTime,
+      fetchSize,
+      maxIteration,
+    });
 
     const totalIssues: any[] = [];
-
+    console.log('Looking for issues for the assignee.');
     for (const iter of Array(maxIteration).keys()) {
       const response = await this.jiraClient.rest.issue.search(null, {
         jql: `assignee = ${assignee} ORDER BY created DESC`,
@@ -373,18 +395,24 @@ export class Jiralyzer {
         fields: ['id', 'key', 'created', 'summary', 'status', 'assignee'],
       });
 
-      const issues = response?.data?.issues;
+      const issues =
+        typeof response?.data === 'string'
+          ? JSON.parse(response.data).issues
+          : response?.data?.issues;
       if (!(issues?.length > 0)) {
-        console.debug(`No more issues found for assigne ${assignee}`);
+        console.log(`No more issues found.`);
         break;
+      } else {
+        console.log(`Found ${issues.length} issues.`);
       }
       totalIssues.push(...issues);
       await this.sleep(sleepTime);
     }
+    console.log(`Total issues found for the assignee: ${totalIssues.length}`);
 
     for (const issue of totalIssues) {
       const response = await this.jiraClient.rest.watcher.add(issue.key, watcher, null);
-      console.log(`[${issue.key}] status=${response.status}`);
+      console.log(`key=${issue.key} status=${response.status}`);
     }
   }
 

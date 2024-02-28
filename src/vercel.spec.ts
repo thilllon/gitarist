@@ -9,6 +9,6 @@ describe.skip('vercel', () => {
   it('deleteDeployment', async () => {
     const vercel = new VercelClient();
     const deploymentId = 'foobar';
-    await vercel.deleteDeployment({ deploymentId });
+    await vercel.deployment.delete({ deploymentId });
   });
 });

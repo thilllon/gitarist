@@ -55,7 +55,6 @@ pnpm dev
 
 # In production
 pnpm build
-pnpm start
 ```
 
 ### Testing

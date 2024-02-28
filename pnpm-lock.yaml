@@ -41,6 +41,9 @@ dependencies:
   parse-git-config:
     specifier: ^3.0.0
     version: 3.0.0
+  picocolors:
+    specifier: ^1.0.0
+    version: 1.0.0
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -6112,7 +6115,6 @@ packages:
 
   /picocolors@1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
-    dev: true
 
   /picomatch-browser@2.2.6:
     resolution: {integrity: sha512-0ypsOQt9D4e3hziV8O4elD9uN0z/jtUEfxVRtNaAAtXIyUx9m/SzlO020i8YNL2aL/E6blOvvHQcin6HZlFy/w==}

@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       # dependabot updates pnpm-lock file
-      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm install
       - run: pnpm build
       - run: pnpm prettier --check .
       - run: pnpm typecheck

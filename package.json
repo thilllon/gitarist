@@ -81,7 +81,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^18.6.0",
-    "@commitlint/config-conventional": "^18.6.0",
+    "@commitlint/config-conventional": "^19.0.3",
     "@gitbeaker/core": "^39.34.2",
     "@octokit/core": "^5.1.0",
     "@octokit/fixtures": "^22.0.7",

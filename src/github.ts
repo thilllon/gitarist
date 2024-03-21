@@ -775,12 +775,12 @@ GITARIST_TOKEN="${token}"
               threadId,
             },
           })
-          .then((response) => {
+          .then((response: any) => {
             console.debug(`resolved thread. threadId: ${threadId}`);
             resolvedThreadIds.push(threadId);
             mutationResultList.push(response);
           })
-          .catch((error) => {
+          .catch((error: any) => {
             console.error(error?.response?.data?.error);
             console.error(error.message);
             hasError = true;

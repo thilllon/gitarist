@@ -23,61 +23,67 @@ interface CustomResponse<T> {
   config: any;
 }
 
-type CreateIssueBody = any;
+/**
+ * board
+ */
+type ListBoardsBody = null;
+type ListBoardsParams = {
+  maxResults?: number;
+  startAt?: number;
+  done?: 'true' | 'false';
+};
+type ListBoardEpicsBody = null;
+type ListBoardEpicsParams = {
+  startAt?: number;
+  maxResults?: number;
+  // type?: 'kanban' | 'scrum';
+  name?: string;
+  projectKeyOrId: string;
+  accountIdLocation?: string;
+  projectLocation?: string;
+  includePrivate?: boolean;
+  negateLocationFiltering?: boolean;
+};
+
+/**
+ * issue
+ */
+type CreateIssueBody = any; // TODO: set proper types
 type CreateIssueParams = null;
 type GetIssueBody = null;
 type GetIssueParams = null;
 type DeleteIssueBody = null;
 type DeleteIssueParams = null;
-/**
- * @example
- * const sampleEditRequestBody = {
-  update: {
-    summary: [{ set: 'Bug in business logic' }],
-    components: [{ set: '' }],
-    timetracking: [{ edit: { originalEstimate: '1w 1d', remainingEstimate: '4d' } }],
-    labels: [{ add: 'triaged' }, { remove: 'blocker' }],
-  },
-  fields: {
-    summary: 'This is a shorthand for a set operation on the summary field',
-    customfield_10010: 1,
-    customfield_10000: 'This is a shorthand for a set operation on a text custom field',
-  },
-  historyMetadata: {
-    type: 'myplugin:type',
-    description: 'text description',
-    descriptionKey: 'plugin.changereason.i18.key',
-    activityDescription: 'text description',
-    activityDescriptionKey: 'plugin.activity.i18.key',
-    actor: {
-      id: 'tony',
-      displayName: 'Tony',
-      type: 'mysystem-user',
-      avatarUrl: 'http://mysystem/avatar/tony.jpg',
-      url: 'http://mysystem/users/tony',
-    },
-    generator: { id: 'mysystem-1', type: 'mysystem-application' },
-    cause: { id: 'myevent', type: 'mysystem-event' },
-    extraData: { keyvalue: 'extra data', goes: 'here' },
-  },
-  properties: [
-    { key: 'key1', value: 'properties can be set at issue create or update time' },
-    { key: 'key2', value: 'and there can be multiple properties' },
-  ],
-};
- */
-type EditIssueBody = {};
+type EditIssueBody = {}; // TODO: set proper types
 type EditIssueParams = null;
 type SearchIssuesBody = null;
 type SearchIssuesParams = {
   /**
-   * `assignee=john.doe`
+   * @example `assignee=john.doe`
    */
   jql?: string;
   maxResults?: number;
   startAt?: number;
   fields?: string[];
 };
+
+/**
+ * project
+ */
+type GetProjectBody = null;
+type GetProjectParams = null;
+
+/**
+ * sprint
+ */
+type GetSprintBody = null;
+type GetSprintParams = {
+  state?: 'active' | 'future' | 'closed';
+};
+
+/**
+ * watcher
+ */
 type AddWatcherBody = string;
 type AddWatcherParams = null;
 type RemoveWatcherBody = null;
@@ -85,14 +91,43 @@ type RemoveWatcherParams = null;
 type ListWatcherBody = null;
 type ListWatcherParams = null;
 
+type Endpoint = {
+  description: string;
+  method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH';
+  path: `/${string}`;
+  query: Record<string, any>;
+  body: Record<string, any>;
+};
+
 export class JiraClient {
   private client;
   /**
-   * namespaces e.g., rest, graphql, etc.
+   * namespaces
+   * @example rest, graphql, etc.
    */
   public rest;
 
   private readonly endpoints = {
+    board: {
+      list: {
+        description: 'GET /rest/agile/1.0/board',
+        method: 'GET',
+        path: '/dfasdf',
+        body: {},
+        query: {},
+      } as Endpoint,
+      listEpics: {
+        description: 'GET /rest/agile/1.0/board/{boardId}/epic',
+        method: 'GET',
+        path: '/rest/agile/1.0/board/{boardId}/epic',
+        body: {},
+        query: {
+          startAt: Number,
+          maxResults: Number,
+          done: String, // 'true' | 'false'
+        },
+      } as Endpoint,
+    },
     issue: {
       create: {
         description: 'POST /rest/api/2/issue',
@@ -100,28 +135,28 @@ export class JiraClient {
         path: '/rest/api/2/issue',
         query: {},
         body: {},
-      },
+      } as Endpoint,
       get: {
         description: 'GET /rest/api/2/issue/{issueIdOrKey}',
         method: 'GET',
         path: '/rest/api/2/issue/{issueIdOrKey}',
         query: {},
         body: {},
-      },
+      } as Endpoint,
       delete: {
         description: 'DELETE /rest/api/2/issue/{issueIdOrKey}',
         method: 'DELETE',
         path: '/rest/api/2/issue/{issueIdOrKey}',
         query: {},
         body: {},
-      },
+      } as Endpoint,
       edit: {
         description: 'PUT /rest/api/2/issue/{issueIdOrKey}',
         method: 'PUT',
         path: '/rest/api/2/issue/{issueIdOrKey}',
         query: {},
         body: {},
-      },
+      } as Endpoint,
       // TODO: api v3 사용 고려하기
       search: {
         description: 'GET /rest/api/2/search?jql=assignee={assignee}',
@@ -132,7 +167,27 @@ export class JiraClient {
           maxResults: Number,
         },
         body: {},
-      },
+      } as Endpoint,
+    },
+    project: {
+      get: {
+        description: 'GET /rest/api/2/project/{projectKey}',
+        method: 'GET',
+        path: '/rest/api/2/project/{projectKey}',
+        query: {},
+        body: {},
+      } as Endpoint,
+    },
+    sprint: {
+      get: {
+        description: 'GET /rest/agile/1.0/board/{boardId}/sprint',
+        method: 'GET',
+        path: '/rest/agile/1.0/board/{boardId}/sprint',
+        query: {
+          state: 'active',
+        },
+        body: {},
+      } as Endpoint,
     },
     watcher: {
       add: {
@@ -141,22 +196,30 @@ export class JiraClient {
         path: '/rest/api/2/issue/{issueIdOrKey}/watchers',
         query: {},
         body: {},
-      },
+      } as Endpoint,
       remove: {
         description: 'DELETE /rest/api/2/issue/{issueIdOrKey}/watchers',
         method: 'DELETE',
         path: '/rest/api/2/issue/{issueIdOrKey}/watchers',
         query: {},
         body: {},
-      },
+      } as Endpoint,
       list: {
-        // GET /rest/api/2/issue/{issueIdOrKey}/watchers
         description: 'GET /rest/api/2/issue/{issueIdOrKey}/watchers',
         method: 'GET',
         path: '/rest/api/2/issue/{issueIdOrKey}/watchers',
         query: {},
         body: {},
-      },
+      } as Endpoint,
+    },
+    epic: {
+      list: {
+        description: 'GET /rest/agile/1.0/epic/{epicIdOrKey}',
+        method: 'GET',
+        path: '/rest/agile/1.0/epic/{epicIdOrKey}',
+        query: {},
+        body: {},
+      } as Endpoint,
     },
   } as const;
 
@@ -206,6 +269,7 @@ export class JiraClient {
       },
       (error: AxiosError): Promise<CustomResponse<null>> => {
         // Handle errors and format them according to the custom response structure
+        console.warn(error);
         return Promise.resolve({
           ...error,
           status: error.response?.status ?? 500,
@@ -219,13 +283,35 @@ export class JiraClient {
     );
 
     this.rest = {
+      board: {
+        list: async (boardId: string, data: ListBoardsBody, params: ListBoardsParams) => {
+          return this.client.request({
+            method: this.endpoints.board.list.method,
+            url: this.endpoints.board.list.path,
+            params,
+            data,
+          });
+        },
+        listEpics: async (
+          boardId: string,
+          data: ListBoardEpicsBody,
+          params: ListBoardEpicsParams,
+        ) => {
+          return this.client.request({
+            method: this.endpoints.board.listEpics.method,
+            url: this.endpoints.board.listEpics.path.replace('{boardId}', boardId),
+            params,
+            data,
+          });
+        },
+      },
       issue: {
         create: async (data: CreateIssueBody, params: CreateIssueParams) => {
           return this.client.request({
             method: this.endpoints.issue.create.method,
             url: this.endpoints.issue.create.path,
             params,
-            data,
+            data: JSON.stringify(data),
           });
         },
         get: async (issueIdOrKey: string, data: GetIssueBody, params: GetIssueParams) => {
@@ -256,6 +342,26 @@ export class JiraClient {
           return this.client.request({
             method: this.endpoints.issue.search.method,
             url: this.endpoints.issue.search.path,
+            params,
+            data,
+          });
+        },
+      },
+      project: {
+        get: async (projectKey: string, data: GetProjectBody, params: GetProjectParams) => {
+          return this.client.request({
+            method: this.endpoints.project.get.method,
+            url: this.endpoints.project.get.path.replace('{projectKey}', projectKey),
+            params,
+            data,
+          });
+        },
+      },
+      sprint: {
+        get: async (boardId: string, data: GetSprintBody, params: GetSprintParams) => {
+          return this.client.request({
+            method: this.endpoints.sprint.get.method,
+            url: this.endpoints.sprint.get.path.replace('{boardId}', boardId),
             params,
             data,
           });
@@ -320,13 +426,36 @@ export class JiraClient {
 }
 
 /**
- * usecases of Jira
+ * use cases of Jira
  */
 export class Jiralyzer {
   private jiraClient;
 
+  get client() {
+    return this.jiraClient;
+  }
+
   constructor() {
     this.jiraClient = new JiraClient({});
+  }
+
+  async chunkAsync<T, R = any>(array: T[], chunkSize: number, callback: (value: T) => Promise<R>) {
+    const responseArray: Array<R | null> = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+      responseArray.push(
+        ...(await Promise.all(
+          array.slice(i, i + chunkSize).map((value) => {
+            try {
+              return callback(value);
+            } catch (error) {
+              console.error(error);
+              return null;
+            }
+          }),
+        )),
+      );
+    }
+    return responseArray;
   }
 
   async addLabelsToIssue(issueId: string, labels: string[]) {
@@ -339,10 +468,6 @@ export class Jiralyzer {
       },
       null,
     );
-  }
-
-  sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async removeLabelsToIssue(issueId: string, labels: string[]) {
@@ -416,32 +541,7 @@ export class Jiralyzer {
     }
   }
 
-  async createOpstoolIssueWithSummaryAndDescription({
-    summary,
-    description,
-  }: {
-    summary: string;
-    description: string;
-  }) {
-    return this.jiraClient.rest.issue.create(
-      {
-        fields: {
-          project: {
-            key: 'OPSTOOL',
-          },
-          summary,
-          description,
-          issuetype: {
-            name: 'Task',
-          },
-          labels: ['BE'],
-          // epic
-          // customfield_10006: 'TEST_1',
-          // sprint
-          // customfield_10004: [],
-        },
-      },
-      null,
-    );
+  private sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

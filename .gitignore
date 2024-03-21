@@ -6,9 +6,9 @@ coverage
 .env*
 !.env.example
 
+.github/workflows/gitarist.*
+
+# Ignore artifacts
 .gitarist
 .gitlaborator
-
 .http
-
-.github/workflows/gitarist.*

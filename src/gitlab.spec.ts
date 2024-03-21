@@ -8,6 +8,18 @@ jest.setTimeout(3600000);
 describe('gitlaborator', () => {
   dotenv.config({ path: '.env.test' });
 
+  let gitlaborator: Gitlaborator;
+
+  beforeAll(async () => {
+    gitlaborator = new Gitlaborator({
+      projectId: process.env.GITLAB_PROJECT_ID,
+      options: {
+        token: process.env.GITLAB_TOKEN,
+        host: process.env.GITLAB_HOST,
+      },
+    });
+  });
+
   it.skip('should be defined', async () => {
     expect(
       new Gitlaborator({
@@ -20,19 +32,18 @@ describe('gitlaborator', () => {
   });
 
   it.skip('createEnvByProjectVariables', async () => {
-    const gitlaborator = new Gitlaborator({
-      projectId: process.env.GITLAB_PROJECT_ID,
-      options: {
-        token: process.env.GITLAB_TOKEN,
-        host: 'https://git.baemin.in',
-      },
-    });
-
     await gitlaborator.createDotEnvFileByProjectVariables({
       clean: true,
     });
     const expectedFilePath = path.join(process.cwd(), '.gitlaborator/.env');
     expect(existsSync(expectedFilePath)).toBeTruthy();
     expect(typeof readFileSync(expectedFilePath, 'utf-8')).toBe('string');
+  });
+
+  it('findCommentsByAuthor', async () => {
+    const mergeRequestIid = 1673;
+
+    const comments = await gitlaborator.findCommentsByAuthor({ mergeRequestIid });
+    expect(comments).toBeDefined();
   });
 });

@@ -9,8 +9,8 @@ dependencies:
     specifier: ^8.4.1
     version: 8.4.1
   '@gitbeaker/requester-utils':
-    specifier: ^39.34.3
-    version: 39.34.3
+    specifier: ^40.0.1
+    version: 40.0.1
   '@gitbeaker/rest':
     specifier: ^39.34.3
     version: 39.34.3
@@ -960,6 +960,16 @@ packages:
       qs: 6.12.0
       rate-limiter-flexible: 4.0.1
       xcase: 2.0.1
+
+  /@gitbeaker/requester-utils@40.0.1:
+    resolution: {integrity: sha512-cn6fltKuQ3TbthoMTg+JsKQfozqGcRcz1jT9Nqzr4gpHWgjdQ/nr5JpjwzKABQNVL2JH3UJWr6Eji60CFZDZ6Q==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      picomatch-browser: 2.2.6
+      qs: 6.12.0
+      rate-limiter-flexible: 4.0.1
+      xcase: 2.0.1
+    dev: false
 
   /@gitbeaker/rest@39.34.3:
     resolution: {integrity: sha512-SuceThS6WhJtqNNcKmW8j0yUU7aXA4k5a29OWcd6bn7peQ3MXlIpbfvLLRnmuUaYUuxHLnUzZhAfuxaNf4DVtQ==}

@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
-    "@gitbeaker/requester-utils": "^39.34.3",
+    "@gitbeaker/requester-utils": "^40.0.1",
     "@gitbeaker/rest": "^39.34.3",
     "axios": "^1.6.8",
     "commander": "^12.0.0",

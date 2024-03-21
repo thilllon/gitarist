@@ -84,7 +84,7 @@
     "@commitlint/config-conventional": "^19.1.0",
     "@gitbeaker/core": "^39.34.3",
     "@octokit/core": "^6.0.1",
-    "@octokit/fixtures": "^22.0.7",
+    "@octokit/fixtures": "^23.0.0",
     "@octokit/plugin-rest-endpoint-methods": "^11.0.1",
     "@octokit/request-error": "^6.0.2",
     "@octokit/types": "^12.6.0",

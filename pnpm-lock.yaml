@@ -10,7 +10,7 @@ dependencies:
     version: 8.4.1
   '@gitbeaker/requester-utils':
     specifier: ^40.0.1
-    version: 40.0.1
+    version: 40.0.3
   '@gitbeaker/rest':
     specifier: ^40.0.1
     version: 40.0.1
@@ -893,13 +893,13 @@ packages:
     resolution: {integrity: sha512-Zh2eVUgy2kYVnp7Db4gWoFqFbjgsnm2FvBEERbH3UM3cOA/iMqM+tw/of+Qk4yO+gv6tGZ9f4nF7+vK0tQFmDA==}
     engines: {node: '>=18.0.0'}
     dependencies:
-      '@gitbeaker/requester-utils': 40.0.1
+      '@gitbeaker/requester-utils': 40.0.3
       qs: 6.12.0
       xcase: 2.0.1
     dev: false
 
-  /@gitbeaker/requester-utils@40.0.1:
-    resolution: {integrity: sha512-cn6fltKuQ3TbthoMTg+JsKQfozqGcRcz1jT9Nqzr4gpHWgjdQ/nr5JpjwzKABQNVL2JH3UJWr6Eji60CFZDZ6Q==}
+  /@gitbeaker/requester-utils@40.0.3:
+    resolution: {integrity: sha512-L8JpuMIsvXTHfu/2wXzkc5QyfQJSWg4XyEPStHq1ig5SAcbxxqbBoe8ed27eUXLah+PcGrPInMK4cCMxhQm41g==}
     engines: {node: '>=18.0.0'}
     dependencies:
       picomatch-browser: 2.2.6
@@ -913,7 +913,7 @@ packages:
     engines: {node: '>=18.0.0'}
     dependencies:
       '@gitbeaker/core': 40.0.1
-      '@gitbeaker/requester-utils': 40.0.1
+      '@gitbeaker/requester-utils': 40.0.3
     dev: false
 
   /@humanwhocodes/config-array@0.11.14:

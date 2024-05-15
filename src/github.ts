@@ -1047,7 +1047,7 @@ GITARIST_TOKEN="${token}"
       baseBranch: targetBranch,
       headBranch: `refs/heads/${mainBranch}`,
       issue: issue.number,
-      commentTargetFilePath: `${relativePath}/${path.basename(createdFilePathList[0])}`,
+      commentTargetFilePath: `${relativePath}/${path.basename(createdFilePathList[0])}`, // first file path is used for comment
     });
 
     console.debug(`delete the source branch. heads/${mainBranch}`);

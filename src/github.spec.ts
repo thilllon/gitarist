@@ -179,7 +179,7 @@ describe('gitarist', () => {
       const token = 'fake_token';
 
       try {
-        const stdout = execSync(
+        execSync(
           [
             `npx ts-node ./src/cli.ts start`,
             `-o ${owner}`,
@@ -197,7 +197,7 @@ describe('gitarist', () => {
 
     it.skip('start', async () => {
       try {
-        const stdout = execSync(
+        execSync(
           [
             `npx ts-node ./src/cli.ts start`,
             `-o ${owner}`,

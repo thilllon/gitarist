@@ -344,10 +344,11 @@ GITARIST_TOKEN="${token}"
     stale?: number;
     language?: Language;
   }) {
-    for (const _index of Array(numberOfIssues).keys()) {
+    for (const key of Array(numberOfIssues).keys()) {
+      console.debug(`issue: ${key + 1}/${numberOfIssues}`);
       await this.createCommitAndMakePullRequest({
-        numberOfCommits: _.sample<any>(_.range(minCommits, maxCommits + 1)),
-        numberOfFiles: _.sample<any>(_.range(minFiles, maxFiles + 1)),
+        numberOfCommits: _.sample(_.range(minCommits, maxCommits + 1)) as number,
+        numberOfFiles: _.sample(_.range(minFiles, maxFiles + 1)) as number,
         workingBranchPrefix,
         mainBranch,
         language,
@@ -950,7 +951,7 @@ GITARIST_TOKEN="${token}"
     });
 
     console.debug(`comment on issues #${issue.number}`);
-    const { data: issueComment } = await this.octokit.rest.issues.createComment({
+    await this.octokit.rest.issues.createComment({
       owner: this.owner,
       repo: this.repo,
       body: faker.lorem.sentences(10),
@@ -1034,7 +1035,7 @@ GITARIST_TOKEN="${token}"
 
       // git push (THE MOST IMPORTANT PART)
       console.debug(`push the commit. ${newCommit.sha}`);
-      const { data: pushCommit } = await this.octokit.rest.git.updateRef({
+      await this.octokit.rest.git.updateRef({
         owner: this.owner,
         repo: this.repo,
         ref: `heads/${mainBranch}`,
@@ -1063,7 +1064,7 @@ GITARIST_TOKEN="${token}"
       });
 
     // leave a comment after merge
-    const { data: commentAfaterMerge } = await this.octokit.rest.issues.createComment({
+    await this.octokit.rest.issues.createComment({
       owner: this.owner,
       repo: this.repo,
       body: faker.lorem.sentences(10),
@@ -1159,7 +1160,7 @@ GITARIST_TOKEN="${token}"
         reviewers: [_.sample<any>(reviewrs)],
       });
 
-      const { data: reviewApproved } = await this.octokit.rest.pulls.createReview({
+      await this.octokit.rest.pulls.createReview({
         owner: this.owner,
         repo: this.repo,
         pull_number: pullRequest.number,
@@ -1167,7 +1168,7 @@ GITARIST_TOKEN="${token}"
         comments: [{ path: commentTargetFilePath, body: 'LGTM', line: 1 }],
       });
 
-      const { data: submitData } = await this.octokit.rest.pulls.submitReview({
+      await this.octokit.rest.pulls.submitReview({
         owner: this.owner,
         repo: this.repo,
         pull_number: pullRequest.number,
@@ -1175,7 +1176,7 @@ GITARIST_TOKEN="${token}"
         review_id: reviewCommented.id,
       });
 
-      const { data: reviewUpdated } = await this.octokit.rest.pulls.updateReview({
+      await this.octokit.rest.pulls.updateReview({
         owner: this.owner,
         repo: this.repo,
         pull_number: pullRequest.number,
@@ -1237,11 +1238,12 @@ GITARIST_TOKEN="${token}"
       }
     `;
     for (const threadId of threadIds) {
-      const mutationResult: any = await this.octokit.graphql(resolveReviewThreadMutation, {
+      const mutationResult = await this.octokit.graphql(resolveReviewThreadMutation, {
         input: {
           threadId,
         },
       });
+      console.debug(mutationResult);
     }
 
     // merge pull request

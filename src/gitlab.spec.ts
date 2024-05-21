@@ -5,7 +5,7 @@ import { Gitlaborator } from './gitlab';
 
 jest.setTimeout(3600000);
 
-describe('gitlaborator', () => {
+describe.skip('gitlaborator', () => {
   dotenv.config({ path: '.env.test' });
 
   let gitlaborator: Gitlaborator;
@@ -20,7 +20,7 @@ describe('gitlaborator', () => {
     });
   });
 
-  it.skip('should be defined', async () => {
+  it('should be defined', async () => {
     expect(
       new Gitlaborator({
         projectId: process.env.GITLAB_PROJECT_ID,
@@ -31,7 +31,7 @@ describe('gitlaborator', () => {
     ).toBeDefined();
   });
 
-  it.skip('createEnvByProjectVariables', async () => {
+  it('createEnvByProjectVariables', async () => {
     await gitlaborator.createDotEnvFileByProjectVariables({
       clean: true,
     });

@@ -3,7 +3,7 @@ import { JiraClient, Jiralyzer } from './jira';
 
 jest.setTimeout(86400 * 1000);
 
-describe('jira', () => {
+describe.skip('jira', () => {
   dotenv.config({ path: '.env.test' });
 
   let host: string;

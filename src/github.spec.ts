@@ -15,9 +15,9 @@ describe('gitarist', () => {
   let gitarist: Gitarist;
   let octokit: Octokit;
 
-  const owner = process.env.GITARIST_OWNER;
-  const repo = process.env.GITARIST_REPO;
-  const token = process.env.GITARIST_TOKEN;
+  const owner = process.env.GITHUB_OWNER;
+  const repo = process.env.GITHUB_REPO;
+  const token = process.env.GITHUB_TOKEN;
 
   beforeAll(async () => {
     gitarist = new Gitarist({ owner, repo, token });

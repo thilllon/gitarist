@@ -138,15 +138,15 @@ export class Gitarist {
     this._token = token;
 
     if (!this._owner) {
-      throw new Error('Missing environment variable: "GITARIST_OWNER"');
+      throw new Error('Missing environment variable: "GITHUB_OWNER"');
     }
 
     if (!this._repo) {
-      throw new Error('Missing environment variable: "GITARIST_REPO"');
+      throw new Error('Missing environment variable: "GITHUB_REPO"');
     }
 
     if (!this._token) {
-      throw new Error('Missing environment variable: "GITARIST_TOKEN"');
+      throw new Error('Missing environment variable: "GITHUB_TOKEN"');
     }
 
     this._octokit = new Octokit({ auth: this._token });
@@ -177,7 +177,7 @@ export class Gitarist {
   }
 
   static get tokenIssueUrl() {
-    return 'https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow';
+    return 'https://github.com/settings/tokens/new?description=GITHUB_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow';
   }
 
   static getEnvSettingPageUrl({ owner, repo }: { owner: string; repo: string }) {
@@ -210,13 +210,13 @@ jobs:
   start:
     runs-on: ubuntu-latest
     env:
-      GITARIST_OWNER: \${{ github.repository_owner }}
-      GITARIST_REPO: \${{ github.event.repository.name }}
+      GITHUB_OWNER: \${{ github.repository_owner }}
+      GITHUB_REPO: \${{ github.event.repository.name }}
       # Create a secret key at,
       # ${this.tokenIssueUrl}
       # and register the secret key to action settings at,
       # ${Gitarist.getEnvSettingPageUrl({ owner, repo })}
-      GITARIST_TOKEN: \${{ secrets.GITARIST_TOKEN }}
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -236,10 +236,10 @@ jobs:
   static getEnvTemplate({ owner = '', repo = '', token = '' }) {
     const template = `
 # gitarist    
-GITARIST_OWNER="${owner}"
-GITARIST_REPO="${repo}"
+GITHUB_OWNER="${owner}"
+GITHUB_REPO="${repo}"
 # ${Gitarist.tokenIssueUrl}
-GITARIST_TOKEN="${token}"
+GITHUB_TOKEN="${token}"
 `;
 
     return template;

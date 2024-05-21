@@ -25,13 +25,13 @@ program
 program
   .command('start')
   .description('start gitarist suite')
-  .addOption(new Option('-o,--owner <string>', 'Repository owner').env('GITARIST_OWNER'))
-  .addOption(new Option('-r,--repo <string>', 'GitHub repository').env('GITARIST_REPO'))
+  .addOption(new Option('-o,--owner <string>', 'Repository owner').env('GITHUB_OWNER'))
+  .addOption(new Option('-r,--repo <string>', 'GitHub repository').env('GITHUB_REPO'))
   .addOption(
     new Option(
       '-t,--token <string>',
       `GitHub access token issued at ${Gitarist.tokenIssueUrl}`,
-    ).env('GITARIST_TOKEN'),
+    ).env('GITHUB_TOKEN'),
   )
   .addOption(
     new Option('--max-commits <number>', 'Maximum number of commits per PR').default(
@@ -70,9 +70,9 @@ program
 
     options = {
       ...options,
-      owner: options.owner ?? process.env.GITARIST_OWNER,
-      repo: options.repo ?? process.env.GITARIST_REPO,
-      token: options.token ?? process.env.GITARIST_TOKEN,
+      owner: options.owner ?? process.env.GITHUB_OWNER,
+      repo: options.repo ?? process.env.GITHUB_REPO,
+      token: options.token ?? process.env.GITHUB_TOKEN,
     };
 
     const validOptions = z

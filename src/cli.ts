@@ -11,12 +11,15 @@ import {
   StartCommandOptions,
   branchPrefixes,
 } from './github';
+import { CreateEnvExampleOptions, createEnvExample } from './libs';
 
 const program = new Command().name(name).description(description).version(version);
 
 program
   .command('setup')
-  .description('setup')
+  .description(
+    'It sets up gitarist suite. It will create a new GitHub workflow file and `.env` file, adds environment variables to .env file, and opens a browser to create a new GitHub token.',
+  )
   .addOption(new Option('--remote <string>', 'the name of remote').default(DEFAULT.remote))
   .action(async (options: SetupCommandOptions) => {
     await Gitarist.setup({ remote: options.remote });
@@ -24,7 +27,9 @@ program
 
 program
   .command('start')
-  .description('start gitarist suite')
+  .description(
+    'It starts gitarist suite. It simulates an active user on a GitHub repository to create issues, commits, create a pull request, and merge it.',
+  )
   .addOption(new Option('-o,--owner <string>', 'Repository owner').env('GITHUB_OWNER'))
   .addOption(new Option('-r,--repo <string>', 'GitHub repository').env('GITHUB_REPO'))
   .addOption(
@@ -66,7 +71,9 @@ program
     new Option('--stale <days>', 'A number of days before closing an issue').default(DEFAULT.stale),
   )
   .action(async (options: Partial<StartCommandOptions>) => {
-    dotenv.config({ path: '.env' });
+    ['.env'].forEach((file) => {
+      dotenv.config({ path: file });
+    });
 
     options = {
       ...options,
@@ -106,7 +113,6 @@ program
       repo: validOptions.repo,
       token: validOptions.token,
     });
-
     await gitarist.simulateActiveUser({
       mainBranch: validOptions.mainBranch,
       maxCommits: validOptions.maxCommits,
@@ -117,6 +123,33 @@ program
       workingBranchPrefix: validOptions.workingBranchPrefix,
       stale: validOptions.stale,
     });
+  });
+
+program
+  .command('env-example')
+  .description('Create an example of .env file based on the current .env file(s)')
+  .addOption(
+    new Option(
+      '-f,--filename <string>',
+      'Read given env file such as .env.local, .env.test etc.',
+    ).default('.env'),
+  )
+  .addOption(new Option('-c,--comments', 'Preserve comments').default(true))
+  .addOption(new Option('-m,--merge', 'Merge all env files into one').default(true))
+  .action(async (options: CreateEnvExampleOptions) => {
+    const validOptions = z
+      .object({
+        comments: z.boolean(),
+        filename: z
+          .string()
+          .min(1)
+          .refine((arg) => arg !== '.env.example', {
+            message: 'filename should not be .env.example',
+          }),
+        merge: z.boolean(),
+      })
+      .parse(options);
+    await createEnvExample(validOptions);
   });
 
 program.parse();

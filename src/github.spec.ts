@@ -12,17 +12,33 @@ jest.setTimeout(999999999);
 describe('gitarist', () => {
   dotenv.config({ path: '.env.test' });
 
-  let gitarist: Gitarist;
   let octokit: Octokit;
+  let mockOctokit: jest.Mocked<Octokit>;
+  let gitarist: Gitarist;
 
   const owner = process.env.GITHUB_OWNER;
   const repo = process.env.GITHUB_REPO;
   const token = process.env.GITHUB_TOKEN;
 
   beforeAll(async () => {
-    gitarist = new Gitarist({ owner, repo, token });
-    octokit = new Octokit({ auth: token });
+    // octokit = new Octokit({ auth: token });
+    // gitarist = new Gitarist({ owner, repo, token });
     jest.resetAllMocks();
+    mockOctokit = new Octokit() as jest.Mocked<Octokit>;
+    (Octokit as any as jest.Mock).mockImplementation(() => {
+      return mockOctokit;
+    });
+
+    gitarist = new Gitarist({ owner, repo, token });
+  });
+
+  afterAll(() => {
+    jest.resetAllMocks();
+  });
+
+  it('mock test', async () => {
+    // https://chatgpt.com/share/b3806e91-2edb-4137-8e90-f302e00bf7d5
+    // TODO: 올바르게 모킹되었는지 확인
   });
 
   it.skip('setup', async () => {

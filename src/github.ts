@@ -295,6 +295,7 @@ GITHUB_TOKEN="${token}"
     });
 
     console.log(['Generate a secret key settings:', Gitarist.tokenIssueUrl].join('\n'));
+    // Open the browser to create a secret key
     const open = await import('open');
     await open.default(Gitarist.tokenIssueUrl, { wait: false });
     const envSettingPageUrl = Gitarist.getEnvSettingPageUrl({ owner, repo });
@@ -360,6 +361,34 @@ GITHUB_TOKEN="${token}"
     await this.deleteOldFiles({ olderThan, mainBranch });
     await this.resolveAllReviewComments();
     await this.deleteOldIssues({ olderThan });
+    await this.deleteCommentsAtIssueByBot();
+    await this.deleteBranches({ ref: `heads/${workingBranchPrefix}` });
+    await this.closeStaleIssues({ olderThan });
+  }
+
+  async closeStaleIssues({ olderThan }: { olderThan: Date }) {
+    // close issues that are older than the specified date
+    for await (const { data: issues } of this.octokit.paginate.iterator(
+      this.octokit.rest.issues.listForRepo,
+      {
+        owner: this.owner,
+        repo: this.repo,
+        per_page: 100,
+        sort: 'created',
+        direction: 'desc',
+      },
+    )) {
+      for (const issue of issues) {
+        if (new Date(issue.created_at).getTime() < new Date(olderThan).getTime()) {
+          await this.octokit.rest.issues.update({
+            owner: this.owner,
+            repo: this.repo,
+            issue_number: issue.number,
+            state: 'closed',
+          });
+        }
+      }
+    }
   }
 
   async deleteOldIssues({ olderThan }: { olderThan: Date }) {
@@ -397,7 +426,7 @@ GITHUB_TOKEN="${token}"
             });
             console.debug(result, issue.pull_request?.url);
           } catch (error: any) {
-            // 원인: 깃헙은 이슈와 PR이 연동되어있다. 이슈에서 PR을 생성한 경우 이슈가 PR로 넘어가게되며 이슈는 더이상 삭제할 수 없게된다. 그리고 삭제 시도시 에러가 발생한다.
+            // try-catch를 써야하는 이유는 다음과 같다. 깃헙은 이슈와 PR이 연동되어있다. 이슈에서 PR을 생성한 경우 이슈가 PR로 넘어가게되며 이슈는 더이상 삭제할 수 없게된다. 그리고 삭제 시도시 에러가 발생한다.
             console.debug(error?.message, issue.pull_request?.url);
           }
         }

@@ -82,6 +82,9 @@ program
       token: options.token ?? process.env.GITHUB_TOKEN,
     };
 
+    console.log(process.env.GITHUB_OWNER);
+    console.log(process.env.GITHUB_REPO);
+
     const validOptions = z
       .object({
         owner: z.string().min(2),

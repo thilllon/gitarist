@@ -6,6 +6,7 @@
  */
 
 import { Axios, AxiosError, AxiosResponse } from 'axios';
+import { cosmiconfigSync } from 'cosmiconfig';
 
 type RequestObject = {
   method: string;
@@ -543,5 +544,36 @@ export class Jiralyzer {
 
   private sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async updateMultipleIssues() {
+    const explorer = cosmiconfigSync('gitarist');
+    const result = explorer.search();
+    console.log({ ...result });
+    console.log(`Read config from ${result?.filepath}`);
+    const config = result?.config.jira;
+    if (!config) {
+      throw new Error('No jira config found.');
+    }
+
+    for (const issue of config.issues) {
+      const append = issue.append ?? {};
+      const appendFields = Object.entries(append).reduce(
+        (acc, [key, value]) => {
+          if (Array.isArray(value)) {
+            return { ...acc, [key]: { add: value } };
+          }
+          return { ...acc, [key]: value };
+        },
+        {} as Record<string, any>,
+      );
+      await this.jiraClient.rest.issue.edit(
+        issue.key,
+        {
+          fields: appendFields,
+        },
+        null,
+      );
+    }
   }
 }

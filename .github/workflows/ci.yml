@@ -11,9 +11,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
-      GITARIST_OWNER: thilllon
-      GITARIST_REPO: turing
-      GITARIST_TOKEN: ${{ secrets.CI_GITARIST_TOKEN }}
+      GITHUB_OWNER: thilllon
+      GITHUB_REPO: turing
+      GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
     strategy:
       matrix:
@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: 'ci variables'
-        run: echo "${{ env.GITARIST_OWNER }} ${{ env.GITARIST_REPO }}"
+        run: echo "${{ env.GITHUB_OWNER }} ${{ env.GITHUB_REPO }}"
 
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -48,6 +48,9 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       # dependabot updates pnpm-lock file
-      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm install
       - run: pnpm build
+      - run: pnpm prettier --check .
+      - run: pnpm typecheck
+      - run: pnpm lint
       - run: pnpm test

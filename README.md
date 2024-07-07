@@ -27,10 +27,6 @@ npx gitarist setup
   - comment on issues
 - Run cron job using `Github Action`
 
-## Contribution
-
-[Contribution guide](./CONTRIBUTING.md)
-
 ## Contributing
 
 1. [Fork it](https://help.github.com/articles/fork-a-repo/)

@@ -2,10 +2,11 @@ declare module NodeJS {
   interface ProcessEnv {
     NODE_ENV: 'development' | 'production' | 'test';
 
-    GITARIST_OWNER: string;
-    GITARIST_REPO: string;
-    GITARIST_TOKEN: string;
+    GITHUB_OWNER: string;
+    GITHUB_REPO: string;
+    GITHUB_TOKEN: string;
 
+    GITLAB_HOST: string;
     GITLAB_PROJECT_ID: string;
     GITLAB_TOKEN: string;
 

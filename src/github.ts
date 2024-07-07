@@ -138,15 +138,15 @@ export class Gitarist {
     this._token = token;
 
     if (!this._owner) {
-      throw new Error('Missing environment variable: "GITARIST_OWNER"');
+      throw new Error('Missing environment variable: "GITHUB_OWNER"');
     }
 
     if (!this._repo) {
-      throw new Error('Missing environment variable: "GITARIST_REPO"');
+      throw new Error('Missing environment variable: "GITHUB_REPO"');
     }
 
     if (!this._token) {
-      throw new Error('Missing environment variable: "GITARIST_TOKEN"');
+      throw new Error('Missing environment variable: "GITHUB_TOKEN"');
     }
 
     this._octokit = new Octokit({ auth: this._token });
@@ -177,7 +177,7 @@ export class Gitarist {
   }
 
   static get tokenIssueUrl() {
-    return 'https://github.com/settings/tokens/new?description=GITARIST_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow';
+    return 'https://github.com/settings/tokens/new?description=GITHUB_TOKEN&scopes=repo,read:packages,read:org,delete_repo,workflow';
   }
 
   static getEnvSettingPageUrl({ owner, repo }: { owner: string; repo: string }) {
@@ -210,13 +210,13 @@ jobs:
   start:
     runs-on: ubuntu-latest
     env:
-      GITARIST_OWNER: \${{ github.repository_owner }}
-      GITARIST_REPO: \${{ github.event.repository.name }}
+      GITHUB_OWNER: \${{ github.repository_owner }}
+      GITHUB_REPO: \${{ github.event.repository.name }}
       # Create a secret key at,
       # ${this.tokenIssueUrl}
       # and register the secret key to action settings at,
       # ${Gitarist.getEnvSettingPageUrl({ owner, repo })}
-      GITARIST_TOKEN: \${{ secrets.GITARIST_TOKEN }}
+      GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -236,10 +236,10 @@ jobs:
   static getEnvTemplate({ owner = '', repo = '', token = '' }) {
     const template = `
 # gitarist    
-GITARIST_OWNER="${owner}"
-GITARIST_REPO="${repo}"
+GITHUB_OWNER="${owner}"
+GITHUB_REPO="${repo}"
 # ${Gitarist.tokenIssueUrl}
-GITARIST_TOKEN="${token}"
+GITHUB_TOKEN="${token}"
 `;
 
     return template;
@@ -295,6 +295,7 @@ GITARIST_TOKEN="${token}"
     });
 
     console.log(['Generate a secret key settings:', Gitarist.tokenIssueUrl].join('\n'));
+    // Open the browser to create a secret key
     const open = await import('open');
     await open.default(Gitarist.tokenIssueUrl, { wait: false });
     const envSettingPageUrl = Gitarist.getEnvSettingPageUrl({ owner, repo });
@@ -344,10 +345,11 @@ GITARIST_TOKEN="${token}"
     stale?: number;
     language?: Language;
   }) {
-    for (const _index of Array(numberOfIssues).keys()) {
+    for (const key of Array(numberOfIssues).keys()) {
+      console.debug(`issue: ${key + 1}/${numberOfIssues}`);
       await this.createCommitAndMakePullRequest({
-        numberOfCommits: _.sample<any>(_.range(minCommits, maxCommits + 1)),
-        numberOfFiles: _.sample<any>(_.range(minFiles, maxFiles + 1)),
+        numberOfCommits: _.sample(_.range(minCommits, maxCommits + 1)) as number,
+        numberOfFiles: _.sample(_.range(minFiles, maxFiles + 1)) as number,
         workingBranchPrefix,
         mainBranch,
         language,
@@ -359,6 +361,34 @@ GITARIST_TOKEN="${token}"
     await this.deleteOldFiles({ olderThan, mainBranch });
     await this.resolveAllReviewComments();
     await this.deleteOldIssues({ olderThan });
+    await this.deleteCommentsAtIssueByBot();
+    await this.deleteBranches({ ref: `heads/${workingBranchPrefix}` });
+    await this.closeStaleIssues({ olderThan });
+  }
+
+  async closeStaleIssues({ olderThan }: { olderThan: Date }) {
+    // close issues that are older than the specified date
+    for await (const { data: issues } of this.octokit.paginate.iterator(
+      this.octokit.rest.issues.listForRepo,
+      {
+        owner: this.owner,
+        repo: this.repo,
+        per_page: 100,
+        sort: 'created',
+        direction: 'desc',
+      },
+    )) {
+      for (const issue of issues) {
+        if (new Date(issue.created_at).getTime() < new Date(olderThan).getTime()) {
+          await this.octokit.rest.issues.update({
+            owner: this.owner,
+            repo: this.repo,
+            issue_number: issue.number,
+            state: 'closed',
+          });
+        }
+      }
+    }
   }
 
   async deleteOldIssues({ olderThan }: { olderThan: Date }) {
@@ -396,7 +426,7 @@ GITARIST_TOKEN="${token}"
             });
             console.debug(result, issue.pull_request?.url);
           } catch (error: any) {
-            // 원인: 깃헙은 이슈와 PR이 연동되어있다. 이슈에서 PR을 생성한 경우 이슈가 PR로 넘어가게되며 이슈는 더이상 삭제할 수 없게된다. 그리고 삭제 시도시 에러가 발생한다.
+            // try-catch를 써야하는 이유는 다음과 같다. 깃헙은 이슈와 PR이 연동되어있다. 이슈에서 PR을 생성한 경우 이슈가 PR로 넘어가게되며 이슈는 더이상 삭제할 수 없게된다. 그리고 삭제 시도시 에러가 발생한다.
             console.debug(error?.message, issue.pull_request?.url);
           }
         }
@@ -775,12 +805,12 @@ GITARIST_TOKEN="${token}"
               threadId,
             },
           })
-          .then((response) => {
+          .then((response: any) => {
             console.debug(`resolved thread. threadId: ${threadId}`);
             resolvedThreadIds.push(threadId);
             mutationResultList.push(response);
           })
-          .catch((error) => {
+          .catch((error: any) => {
             console.error(error?.response?.data?.error);
             console.error(error.message);
             hasError = true;
@@ -950,7 +980,7 @@ GITARIST_TOKEN="${token}"
     });
 
     console.debug(`comment on issues #${issue.number}`);
-    const { data: issueComment } = await this.octokit.rest.issues.createComment({
+    await this.octokit.rest.issues.createComment({
       owner: this.owner,
       repo: this.repo,
       body: faker.lorem.sentences(10),
@@ -1034,7 +1064,7 @@ GITARIST_TOKEN="${token}"
 
       // git push (THE MOST IMPORTANT PART)
       console.debug(`push the commit. ${newCommit.sha}`);
-      const { data: pushCommit } = await this.octokit.rest.git.updateRef({
+      await this.octokit.rest.git.updateRef({
         owner: this.owner,
         repo: this.repo,
         ref: `heads/${mainBranch}`,
@@ -1047,7 +1077,7 @@ GITARIST_TOKEN="${token}"
       baseBranch: targetBranch,
       headBranch: `refs/heads/${mainBranch}`,
       issue: issue.number,
-      commentTargetFilePath: `${relativePath}/${path.basename(createdFilePathList[0])}`,
+      commentTargetFilePath: `${relativePath}/${path.basename(createdFilePathList[0])}`, // first file path is used for comment
     });
 
     console.debug(`delete the source branch. heads/${mainBranch}`);
@@ -1063,7 +1093,7 @@ GITARIST_TOKEN="${token}"
       });
 
     // leave a comment after merge
-    const { data: commentAfaterMerge } = await this.octokit.rest.issues.createComment({
+    await this.octokit.rest.issues.createComment({
       owner: this.owner,
       repo: this.repo,
       body: faker.lorem.sentences(10),
@@ -1159,7 +1189,7 @@ GITARIST_TOKEN="${token}"
         reviewers: [_.sample<any>(reviewrs)],
       });
 
-      const { data: reviewApproved } = await this.octokit.rest.pulls.createReview({
+      await this.octokit.rest.pulls.createReview({
         owner: this.owner,
         repo: this.repo,
         pull_number: pullRequest.number,
@@ -1167,7 +1197,7 @@ GITARIST_TOKEN="${token}"
         comments: [{ path: commentTargetFilePath, body: 'LGTM', line: 1 }],
       });
 
-      const { data: submitData } = await this.octokit.rest.pulls.submitReview({
+      await this.octokit.rest.pulls.submitReview({
         owner: this.owner,
         repo: this.repo,
         pull_number: pullRequest.number,
@@ -1175,7 +1205,7 @@ GITARIST_TOKEN="${token}"
         review_id: reviewCommented.id,
       });
 
-      const { data: reviewUpdated } = await this.octokit.rest.pulls.updateReview({
+      await this.octokit.rest.pulls.updateReview({
         owner: this.owner,
         repo: this.repo,
         pull_number: pullRequest.number,
@@ -1237,11 +1267,12 @@ GITARIST_TOKEN="${token}"
       }
     `;
     for (const threadId of threadIds) {
-      const mutationResult: any = await this.octokit.graphql(resolveReviewThreadMutation, {
+      const mutationResult = await this.octokit.graphql(resolveReviewThreadMutation, {
         input: {
           threadId,
         },
       });
+      console.debug(mutationResult);
     }
 
     // merge pull request

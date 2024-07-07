@@ -117,4 +117,17 @@ export class Gitlaborator {
       console.error(error);
     }
   }
+
+  async findCommentsByAuthor({ mergeRequestIid }: { mergeRequestIid: number }) {
+    const comments = await new Gitlab({ ...this._options }).MergeRequestNotes.all(
+      this._projectId,
+      mergeRequestIid,
+      { perPage: 100 },
+    );
+    console.log(comments);
+    writeFileSync('.gitlaborator/comments.json', JSON.stringify(comments, null, 2), {
+      encoding: 'utf-8',
+    });
+    return comments;
+  }
 }

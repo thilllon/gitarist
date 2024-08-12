@@ -103,6 +103,6 @@
     "tsup": "^8.0.2",
     "tsx": "^4.10.5",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.10.0"
+    "typescript-eslint": "^8.0.1"
   }
 }

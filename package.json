@@ -86,7 +86,7 @@
     "@swc/jest": "^0.2.36",
     "@types/jest": "^29.5.12",
     "@types/lodash": "^4.17.4",
-    "@types/node": "^20.12.12",
+    "@types/node": "^22.5.0",
     "@types/parse-git-config": "^3.0.4",
     "commitizen": "^4.3.0",
     "commitlint": "^19.3.0",

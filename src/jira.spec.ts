@@ -102,4 +102,8 @@ describe.skip('jira', () => {
       await jiralizer.addWatcherToAllIssuesOfAssignee(assignee, watcher, {});
     });
   });
+
+  it('updateMultipleIssues', async () => {
+    await jiralizer.updateMultipleIssues();
+  });
 });

@@ -479,7 +479,7 @@ GITHUB_TOKEN="${token}"
     }
   }
 
-  async deleteFolder({
+  async deleteFolders({
     folderPaths,
     relative,
   }: {
@@ -571,7 +571,7 @@ GITHUB_TOKEN="${token}"
         return flag;
       })
       .map((tree) => {
-        console.debug(`will be deleted. path: ${tree.path}}`);
+        console.debug(`will be deleted. path: ${tree.path}`);
         return tree.path;
       });
 

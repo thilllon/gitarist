@@ -23,8 +23,11 @@ describe('gitarist', () => {
     octokit = new Octokit({ auth: token });
   });
 
+  /**
+   * https://github.com/vitest-dev/vitest/issues/1436
+   * chdir is not available in the vitest test environment yet
+   */
   it.skip('setup', async () => {
-    // FIXME: `open` is not working on commonjs
     const targetDir = join(process.cwd(), '.gitarist', `directory_${Date.now()}`);
     mkdirSync(targetDir, { recursive: true });
     chdir(targetDir);
@@ -35,51 +38,45 @@ describe('gitarist', () => {
     rmdirSync(targetDir);
   });
 
-  it.skip('simulate active user', { timeout: 300 * 1000 }, async () => {
+  it('simulate active user', { timeout: 300 * 1000 }, async () => {
     await gitarist.simulateActiveUser({
-      // maxCommits: 3,
-      // minCommits: 3,
-      // maxFiles: 10,
-      // minFiles: 10,
-      // mainBranch: 'main',
-      // workingBranchPrefix: 'feature',
-      // numberOfIssues: 3,
-      // stale: 7,
+      maxCommits: 1,
+      minCommits: 1,
+      maxFiles: 1,
+      minFiles: 1,
+      mainBranch: 'main',
+      workingBranchPrefix: 'feature',
+      numberOfIssues: 1,
+      stale: 7,
     });
   });
 
-  it.skip('findWastedActionsOverAllRepositories', async () => {
+  it('find wasted github actions over all repositories', async () => {
     await gitarist.findWastedActionsOverAllRepositories();
   });
 
-  it.skip('deleteFolder', async () => {
-    await gitarist.deleteFolder({ folderPaths: [] });
+  it('delete folders', async () => {
+    await gitarist.deleteFolders({ folderPaths: [] });
   });
 
-  it.skip('resolveAllReviewComments', async () => {
+  it('resolve all review comments', async () => {
     await gitarist.resolveAllReviewComments();
-
-    expect(true).toBeTruthy();
   });
 
-  it.skip('deleteOldIssues', async () => {
+  it.skip('delete old issues', async () => {
     await gitarist.deleteOldIssues({
       olderThan: new Date('2023-12-06'),
     });
-
-    expect(true).toBeTruthy();
   });
 
-  it('deleteOldFilesAndCommit', async () => {
+  it('delete old files', async () => {
     await gitarist.deleteOldFiles({
       olderThan: new Date(Date.now() - 28 * 86400 * 1000),
       mainBranch: 'main',
     });
-
-    expect(true).toBeTruthy();
   });
 
-  it('listBranches', async () => {
+  it('list branches with the following prefix', async () => {
     const branches = await gitarist.listBranches({
       ref: 'heads/ISSUE-',
     });
@@ -87,13 +84,11 @@ describe('gitarist', () => {
     expect(Array.isArray(branches)).toBeTruthy();
   });
 
-  it.skip('deleteBranches', async () => {
+  it.skip('delete branches with the following prefix ', async () => {
     await gitarist.deleteBranches({ ref: 'heads/bug-' });
-
-    expect(true).toBeTruthy();
   });
 
-  it.skip('changePullRequestData', async () => {
+  it.skip('change poull request data', async () => {
     await gitarist.changePullRequestData();
   });
 
@@ -116,7 +111,7 @@ describe('gitarist', () => {
     }
   });
 
-  it('createMultipleIssues', async () => {
+  it('create multiple issues at once', async () => {
     const issueItems: IssueItem[] = [
       {
         title: 'lorem ipsum',
@@ -128,7 +123,7 @@ describe('gitarist', () => {
     await gitarist.createMultipleIssues({ issueItems });
   });
 
-  test('createIssuesFromJson', { timeout: 60 * 1000 }, async () => {
+  test('create issue after reading json', { timeout: 60 * 1000 }, async () => {
     const issues: IssueItem[] = Array.from({ length: 4 }).map((_, index) => ({
       title: 'title ' + index,
       body: 'body ' + index,
@@ -151,11 +146,9 @@ describe('gitarist', () => {
     await gitarist.createIssuesFromJson({ relativePath: invalidFilePath });
   });
 
-  describe('cli test', () => {
+  describe('CLI test', () => {
     it('version', async () => {
-      const version = execSync('npx tsx ../src/cli.mts --version', {
-        encoding: 'utf8',
-      });
+      const version = execSync('npx tsx ../src/cli.mts --version', { encoding: 'utf8' });
       expect(typeof version === 'string').toBeTruthy();
       expect(version?.split('.')).toHaveLength(3);
     });

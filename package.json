@@ -29,39 +29,36 @@
       "url": "https://ko-fi.com/thilllon"
     }
   ],
-  "type": "commonjs",
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "require": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "default": "./dist/index.cjs"
       },
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/index.mjs"
+        "default": "./dist/index.js"
       }
     }
   },
   "bin": {
-    "gitarist": "./dist/cli.mjs"
+    "gitarist": "./dist/cli.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
+    "prepare": "husky install && chmod +x .husky/*",
     "typecheck": "tsc --noEmit",
-    "build:tsc": "tsc",
     "build": "tsup",
+    "test": "vitest",
     "format": "prettier --write --list-different .",
-    "prerelease": "pnpm format && pnpm lint && pnpm build",
-    "release": "release-it",
     "lint": "eslint --fix .",
-    "test": "jest",
-    "test:esm": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
-    "test:cov": "jest --coverage",
-    "prepare": "husky install && chmod +x .husky/*"
+    "prerelease": "pnpm format && pnpm lint && pnpm build",
+    "release": "release-it"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
@@ -83,8 +80,6 @@
     "@commitlint/config-conventional": "^19.2.2",
     "@eslint/js": "^9.3.0",
     "@swc/core": "^1.5.7",
-    "@swc/jest": "^0.2.36",
-    "@types/jest": "^29.5.12",
     "@types/lodash": "^4.17.4",
     "@types/node": "^20.12.12",
     "@types/parse-git-config": "^3.0.4",
@@ -94,15 +89,14 @@
     "eslint": "^9.3.0",
     "git-cz": "^4.9.0",
     "husky": "^9.0.11",
-    "jest": "^29.7.0",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "release-it": "^17.3.0",
-    "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "tsup": "^8.0.2",
     "tsx": "^4.10.5",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.10.0"
+    "typescript-eslint": "^7.10.0",
+    "vitest": "^1.6.0"
   }
 }

@@ -6,6 +6,7 @@
     "**/node_modules": true,
     "**/*.code-search": true
   },
+  "vitest.commandLine": "npx vitest",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"

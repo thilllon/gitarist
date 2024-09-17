@@ -11,10 +11,10 @@
     "resolveJsonModule": true,
     "removeComments": true,
     "allowJs": true,
-    "types": ["node", "jest"],
+    "types": ["node"],
     "skipLibCheck": true,
     "typeRoots": ["node_modules/@types", "src/@types"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/cli.mts"],
   "exclude": ["dist"]
 }

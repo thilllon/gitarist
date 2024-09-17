@@ -1,9 +1,8 @@
 import dotenv from 'dotenv';
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { Gitlaborator } from './gitlab';
-
-jest.setTimeout(3600000);
 
 describe.skip('gitlaborator', () => {
   dotenv.config({ path: '.env.test' });
@@ -32,15 +31,13 @@ describe.skip('gitlaborator', () => {
   });
 
   it('createEnvByProjectVariables', async () => {
-    await gitlaborator.createDotEnvFileByProjectVariables({
-      clean: true,
-    });
+    await gitlaborator.createDotEnvFileByProjectVariables({ clean: true });
     const expectedFilePath = path.join(process.cwd(), '.gitlaborator/.env');
     expect(existsSync(expectedFilePath)).toBeTruthy();
     expect(typeof readFileSync(expectedFilePath, 'utf-8')).toBe('string');
   });
 
-  it('findCommentsByAuthor', async () => {
+  it.skip('findCommentsByAuthor', async () => {
     const mergeRequestIid = 1673;
 
     const comments = await gitlaborator.findCommentsByAuthor({ mergeRequestIid });

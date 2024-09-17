@@ -1,3 +1,5 @@
+import { afterAll, describe, it } from 'vitest';
+
 describe('env-example', () => {
   it('should create an example .env file', async () => {
     //     // Arrange

@@ -218,8 +218,8 @@ jobs:
       # ${Gitarist.getEnvSettingPageUrl({ owner, repo })}
       GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
       - run: npx gitarist start
 `;
 
@@ -345,6 +345,8 @@ GITHUB_TOKEN="${token}"
     stale?: number;
     language?: Language;
   }) {
+    const olderThan = new Date(Date.now() - stale * 86400 * 1000);
+
     for (const key of Array(numberOfIssues).keys()) {
       console.debug(`issue: ${key + 1}/${numberOfIssues}`);
       await this.createCommitAndMakePullRequest({
@@ -356,12 +358,11 @@ GITHUB_TOKEN="${token}"
       });
     }
 
-    const olderThan = new Date(Date.now() - stale * 86400 * 1000);
     await this.deleteOldWorkflowLogs({ olderThan });
     await this.deleteOldFiles({ olderThan, mainBranch });
     await this.resolveAllReviewComments();
     await this.deleteOldIssues({ olderThan });
-    await this.deleteCommentsAtIssueByBot();
+    await this.deleteCommentsOnIssueCreatedByBot();
     await this.deleteBranches({ ref: `heads/${workingBranchPrefix}` });
     await this.closeStaleIssues({ olderThan });
   }
@@ -427,7 +428,7 @@ GITHUB_TOKEN="${token}"
             console.debug(result, issue.pull_request?.url);
           } catch (error: any) {
             // try-catch를 써야하는 이유는 다음과 같다. 깃헙은 이슈와 PR이 연동되어있다. 이슈에서 PR을 생성한 경우 이슈가 PR로 넘어가게되며 이슈는 더이상 삭제할 수 없게된다. 그리고 삭제 시도시 에러가 발생한다.
-            console.debug(error?.message, issue.pull_request?.url);
+            console.debug(`message: ${error?.message}, url: ${issue.pull_request?.url}`);
           }
         }
       }
@@ -449,37 +450,32 @@ GITHUB_TOKEN="${token}"
   }
 
   /**
-   * ref와 부분일치하는 브랜치
-   * @example 'heads/feat' 이걸로 시작하는 모든 브랜치 삭제
+   * ref와 부분일치하는 브랜치 삭제
+   * @example 'heads/feat' 으로 시작하는 모든 브랜치 삭제
    */
-  async deleteBranches({
-    ref,
-    mainBranch = DEFAULT.mainBranch,
-  }: {
-    ref: string;
-    mainBranch?: MainBranch;
-  }) {
+  async deleteBranches({ ref }: { ref: `heads/${string}` }) {
     const { data: refs } = await this.octokit.rest.git.listMatchingRefs({
       owner: this.owner,
       repo: this.repo,
       ref,
     });
 
-    console.debug(`branche names starts with ${ref}: [${refs.map(({ ref }) => ref).join()}]`);
+    console.debug(
+      `found branch names starting with ${ref}: [${refs.map(({ ref }) => ref).join()}]`,
+    );
 
     for (let { ref } of refs) {
       if (ref.startsWith('refs/heads/')) {
         ref = ref.replace('refs/', '');
       }
 
-      console.debug(`delete branch. ref: ${ref}`);
-
-      await this.octokit.rest.git.updateRef({
+      const { data } = await this.octokit.rest.git.deleteRef({
         owner: this.owner,
         repo: this.repo,
-        sha: '', // empty SHA denotes deletion of the branch
-        ref: `heads/${mainBranch}`,
+        ref,
       });
+      console.debug(data);
+      console.debug(`delete branch. ref: ${ref}`);
     }
   }
 
@@ -506,29 +502,36 @@ GITHUB_TOKEN="${token}"
     }
   }
 
-  async deleteCommentsAtIssueByBot() {
+  async deleteCommentsOnIssueCreatedByBot() {
     for await (const issue of await this.octokit.paginate(this.octokit.rest.issues.list, {
       owner: this.owner,
       repo: this.repo,
       filter: 'all',
     })) {
-      for await (const comment of await this.octokit.paginate(
-        this.octokit.rest.issues.listComments,
-        {
-          owner: this.owner,
-          repo: this.repo,
-          issue_number: issue.number,
-          per_page: 100,
-        },
-      )) {
-        if (comment.user?.login?.includes('[bot]')) {
-          console.debug(`remove comment issue. issue: ${issue.number}, comment: ${comment.id}`);
-          await this.octokit.rest.issues.deleteComment({
+      try {
+        for await (const comment of await this.octokit.paginate(
+          this.octokit.rest.issues.listComments,
+          {
             owner: this.owner,
             repo: this.repo,
-            comment_id: comment.id,
-          });
+            issue_number: issue.number,
+            // per_page: 100,
+          },
+        )) {
+          if (comment.user?.login?.includes('[bot]')) {
+            await this.octokit.rest.issues.deleteComment({
+              owner: this.owner,
+              repo: this.repo,
+              comment_id: comment.id,
+            });
+            console.debug(
+              `comment on issue deleted. issue: ${issue.number}, author: ${comment.user?.login}, comment: ${comment.id},`,
+            );
+          }
+          //
         }
+      } catch (error) {
+        // NOTE: this.octokit.rest.issues.listComments 에서 comments가 없는 경우 emtpry array가 아닌 404를 반환하므로 try-catch가 필요하다.
       }
     }
   }
@@ -550,7 +553,6 @@ GITHUB_TOKEN="${token}"
       ref: `heads/${mainBranch}`,
     });
     const latestCommitSha = branchRef.object.sha; // Get the latest commit SHA of the branch
-
     const { data: currentTree } = await this.octokit.rest.git.getTree({
       owner: this.owner,
       repo: this.repo,
@@ -569,7 +571,7 @@ GITHUB_TOKEN="${token}"
         return flag;
       })
       .map((tree) => {
-        console.debug(`will be deleted. ${tree.path}}`);
+        console.debug(`will be deleted. path: ${tree.path}}`);
         return tree.path;
       });
 
@@ -1080,7 +1082,7 @@ GITHUB_TOKEN="${token}"
       commentTargetFilePath: `${relativePath}/${path.basename(createdFilePathList[0])}`, // first file path is used for comment
     });
 
-    console.debug(`delete the source branch. heads/${mainBranch}`);
+    console.debug(`delete the source branch. ref: heads/${mainBranch}`);
     await this.octokit.rest.git
       .deleteRef({
         owner: this.owner,
@@ -1282,7 +1284,7 @@ GITHUB_TOKEN="${token}"
       pull_number: pullRequest.number,
       merge_method: 'squash',
     });
-    console.debug(`merged. ${mergeResult.sha} ${mergeResult.message}`);
+    console.debug(`${mergeResult.message}; sha: ${mergeResult.sha}`);
   }
 
   private createFiles({

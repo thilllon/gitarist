@@ -53,14 +53,6 @@ pnpm dev
 pnpm build
 ```
 
-### Testing
-
-We use [Jest](https://github.com/facebook/jest) to write tests. Run our test suite with this command:
-
-```sh
-pnpm test
-```
-
 ### Code Style
 
 We use [Prettier](https://prettier.io/) and tslint to maintain code style and best practices.

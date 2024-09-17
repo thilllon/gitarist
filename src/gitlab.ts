@@ -5,6 +5,24 @@ import { existsSync, writeFileSync } from 'fs';
 import { mkdir, rm } from 'fs/promises';
 import path, { join } from 'path';
 
+type CreateDotEnvFileByProjectVariablesParams = {
+  /**
+   * name of the file
+   * @default .env
+   */
+  filename?: string;
+  /**
+   * relative path to the current working directory
+   * @default ./.gitlaborator
+   */
+  directory?: string;
+  /**
+   * clean up the existing files
+   * @default false
+   */
+  clean?: boolean;
+};
+
 export class Gitlaborator {
   private readonly _token: string;
   private readonly _projectId: string;
@@ -30,30 +48,15 @@ export class Gitlaborator {
     }
   }
 
+  /**
+   * project variables를 이용하여 .env 파일을 생성합니다.
+   */
   async createDotEnvFileByProjectVariables({
     filename = '.env',
     directory = './.gitlaborator',
     clean = false,
-  }: {
-    /**
-     * name of the file
-     * @default .env
-     */
-    filename?: string;
-    /**
-     * relative path to the current working directory
-     * @default ./.gitlaborator
-     */
-    directory?: string;
-    /**
-     * clean up the existing files
-     * @default false
-     */
-    clean?: boolean;
-  }) {
-    const variables = await new Gitlab({
-      ...this._options,
-    }).ProjectVariables.all(this._projectId);
+  }: CreateDotEnvFileByProjectVariablesParams) {
+    const variables = await new Gitlab({ ...this._options }).ProjectVariables.all(this._projectId);
 
     if (!variables) {
       console.debug(`No variables found`);

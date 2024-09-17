@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { JiraClient, Jiralyzer } from './jira';
-
-jest.setTimeout(86400 * 1000);
 
 describe.skip('jira', () => {
   dotenv.config({ path: '.env.test' });

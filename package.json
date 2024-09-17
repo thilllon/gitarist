@@ -61,7 +61,7 @@
     "release": "release-it"
   },
   "dependencies": {
-    "@faker-js/faker": "^8.4.1",
+    "@faker-js/faker": "^9.0.1",
     "@gitbeaker/requester-utils": "^40.2.1",
     "@gitbeaker/rest": "^40.2.1",
     "axios": "^1.7.7",
@@ -81,7 +81,7 @@
     "@eslint/js": "^9.10.0",
     "@swc/core": "^1.7.26",
     "@types/lodash": "^4.17.7",
-    "@types/node": "^20.16.5",
+    "@types/node": "^22.5.5",
     "@types/parse-git-config": "^3.0.4",
     "commitizen": "^4.3.0",
     "commitlint": "^19.5.0",
@@ -96,7 +96,7 @@
     "tsup": "^8.3.0",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2",
-    "typescript-eslint": "^7.18.0",
-    "vitest": "^1.6.0"
+    "typescript-eslint": "^8.6.0",
+    "vitest": "^2.1.1"
   }
 }
